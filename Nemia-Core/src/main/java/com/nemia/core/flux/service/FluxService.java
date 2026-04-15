@@ -4,7 +4,7 @@ import com.nemia.core.common.exception.FluxNotFoundException;
 import com.nemia.core.flux.dto.CreateFluxRequest;
 import com.nemia.core.flux.dto.FluxResponse;
 import com.nemia.core.flux.dto.UpdateFluxRequest;
-import com.nemia.core.flux.entity.Flux;
+import com.nemia.core.flux.model.Flux;
 import com.nemia.core.flux.repository.FluxRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,21 +101,21 @@ public class FluxService {
     private void mapCreateRequestToEntity(CreateFluxRequest request, Flux flux) {
         flux.setDate(request.getDate());
         flux.setType(request.getType());
-        flux.setLibelle(request.getLibelle());
+        flux.setLibelle(normalizeRequiredText(request.getLibelle()));
         flux.setMontant(request.getMontant());
         flux.setCategorie(request.getCategorie());
         flux.setModePaiement(request.getModePaiement());
-        flux.setCommentaire(request.getCommentaire());
+        flux.setCommentaire(normalizeOptionalText(request.getCommentaire()));
     }
 
     private void mapUpdateRequestToEntity(UpdateFluxRequest request, Flux flux) {
         flux.setDate(request.getDate());
         flux.setType(request.getType());
-        flux.setLibelle(request.getLibelle());
+        flux.setLibelle(normalizeRequiredText(request.getLibelle()));
         flux.setMontant(request.getMontant());
         flux.setCategorie(request.getCategorie());
         flux.setModePaiement(request.getModePaiement());
-        flux.setCommentaire(request.getCommentaire());
+        flux.setCommentaire(normalizeOptionalText(request.getCommentaire()));
     }
 
     private FluxResponse mapToResponse(Flux flux) {
@@ -132,5 +132,19 @@ public class FluxService {
         response.setUpdatedAt(flux.getUpdatedAt());
 
         return response;
+    }
+
+    private String normalizeRequiredText(String value) {
+        return value.trim();
+    }
+
+    private String normalizeOptionalText(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String normalizedValue = value.trim();
+
+        return normalizedValue.isEmpty() ? null : normalizedValue;
     }
 }

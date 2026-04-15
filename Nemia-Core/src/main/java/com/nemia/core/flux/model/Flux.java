@@ -1,4 +1,4 @@
-package com.nemia.core.flux.entity;
+package com.nemia.core.flux.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;

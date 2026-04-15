@@ -1,6 +1,7 @@
 package com.nemia.core.common.exception;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public class ApiErrorResponse {
 
@@ -9,6 +10,7 @@ public class ApiErrorResponse {
     private String error;
     private String message;
     private String path;
+    private Map<String, String> validationErrors;
 
     public ApiErrorResponse() {
     }
@@ -59,5 +61,13 @@ public class ApiErrorResponse {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Map<String, String> getValidationErrors() {
+        return validationErrors;
+    }
+
+    public void setValidationErrors(Map<String, String> validationErrors) {
+        this.validationErrors = validationErrors;
     }
 }
