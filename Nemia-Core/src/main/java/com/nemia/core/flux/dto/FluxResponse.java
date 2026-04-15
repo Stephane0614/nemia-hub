@@ -1,12 +1,12 @@
 package com.nemia.core.flux.dto;
 
-import com.nemia.core.flux.entity.FluxCategory;
-import com.nemia.core.flux.entity.FluxType;
-import com.nemia.core.flux.entity.PaymentMode;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import com.nemia.core.flux.model.FluxCategory;
+import com.nemia.core.flux.model.FluxType;
+import com.nemia.core.flux.model.PaymentMode;
 
 public class FluxResponse {
 

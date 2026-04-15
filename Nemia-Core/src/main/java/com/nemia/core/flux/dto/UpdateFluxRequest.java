@@ -1,14 +1,16 @@
 package com.nemia.core.flux.dto;
 
-import com.nemia.core.flux.entity.FluxCategory;
-import com.nemia.core.flux.entity.FluxType;
-import com.nemia.core.flux.entity.PaymentMode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import com.nemia.core.flux.model.FluxCategory;
+import com.nemia.core.flux.model.FluxType;
+import com.nemia.core.flux.model.PaymentMode;
 
 public class UpdateFluxRequest {
 
@@ -19,6 +21,7 @@ public class UpdateFluxRequest {
     private FluxType type;
 
     @NotBlank
+    @Size(max = 120)
     private String libelle;
 
     @NotNull
@@ -31,6 +34,7 @@ public class UpdateFluxRequest {
     @NotNull
     private PaymentMode modePaiement;
 
+    @Size(max = 500)
     private String commentaire;
 
     public UpdateFluxRequest() {

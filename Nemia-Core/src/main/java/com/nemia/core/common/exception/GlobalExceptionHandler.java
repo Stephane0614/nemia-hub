@@ -8,62 +8,61 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(FluxNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleFluxNotFound(
-            FluxNotFoundException ex,
-            HttpServletRequest request
-    ) {
-        ApiErrorResponse errorResponse = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.name(),
-                ex.getMessage(),
-                request.getRequestURI()
-        );
+        @ExceptionHandler(FluxNotFoundException.class)
+        public ResponseEntity<ApiErrorResponse> handleFluxNotFound(
+                        FluxNotFoundException ex,
+                        HttpServletRequest request) {
+                ApiErrorResponse errorResponse = new ApiErrorResponse(
+                                LocalDateTime.now(),
+                                HttpStatus.NOT_FOUND.value(),
+                                HttpStatus.NOT_FOUND.name(),
+                                ex.getMessage(),
+                                request.getRequestURI());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleValidationException(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request
-    ) {
-        String message = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> error.getField() + " : " + error.getDefaultMessage())
-                .collect(Collectors.joining(", "));
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ApiErrorResponse> handleValidationException(
+                        MethodArgumentNotValidException ex,
+                        HttpServletRequest request) {
+                Map<String, String> validationErrors = ex.getBindingResult()
+                                .getFieldErrors()
+                                .stream()
+                                .collect(Collectors.toMap(
+                                                error -> error.getField(),
+                                                error -> error.getDefaultMessage(),
+                                                (existing, replacement) -> existing));
 
-        ApiErrorResponse errorResponse = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.name(),
-                message,
-                request.getRequestURI()
-        );
+                ApiErrorResponse errorResponse = new ApiErrorResponse(
+                                LocalDateTime.now(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                HttpStatus.BAD_REQUEST.name(),
+                                "Validation failed",
+                                request.getRequestURI());
+                                
+                errorResponse.setValidationErrors(validationErrors);                
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleGenericException(
-            Exception ex,
-            HttpServletRequest request
-    ) {
-        ApiErrorResponse errorResponse = new ApiErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.name(),
-                "Une erreur interne est survenue.",
-                request.getRequestURI()
-        );
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ApiErrorResponse> handleGenericException(
+                        Exception ex,
+                        HttpServletRequest request) {
+                ApiErrorResponse errorResponse = new ApiErrorResponse(
+                                LocalDateTime.now(),
+                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                HttpStatus.INTERNAL_SERVER_ERROR.name(),
+                                "Une erreur interne est survenue.",
+                                request.getRequestURI());
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
 }
