@@ -1,0 +1,49 @@
+<h1>Liste des flux</h1>
+
+
+<p>
+  <a routerLink="/flux/nouveau">Créer un flux</a>
+</p>
+
+<p>
+  <a routerLink="/">Retour à l'accueil</a>
+</p>
+
+@if (isLoading) {
+  <p>Chargement...</p>
+} @else if (loadErrorMessage) {
+  <p>{{ loadErrorMessage }}</p>
+} @else if (fluxes.length === 0) {
+  <p>Aucun flux pour le moment.</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Libellé</th>
+        <th>Montant</th>
+        <th>Catégorie</th>
+        <th>Mode de paiement</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (flux of fluxes; track flux.id) {
+        <tr>
+          <td>{{ flux.date }}</td>
+          <td>{{ flux.type }}</td>
+          <td>{{ flux.libelle }}</td>
+          <td>{{ flux.montant }}</td>
+          <td>{{ flux.categorie }}</td>
+          <td>{{ flux.modePaiement }}</td>
+          <td>
+            <a [routerLink]="['/flux', flux.id, 'modifier']">Modifier</a>
+            <button type="button" (click)="deleteFlux(flux.id)">Supprimer</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
