@@ -1,0 +1,43 @@
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 32rem;
+}
+
+form > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  padding: 0.5rem;
+}
+
+textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+small {
+  color: #b00020;
+}
+
+button {
+  width: fit-content;
+  padding: 0.5rem 0.75rem;
+}

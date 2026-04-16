@@ -1,0 +1,30 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  vertical-align: top;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+td:last-child {
+  white-space: nowrap;
+}
+
+td:last-child a,
+td:last-child button {
+  margin-right: 0.5rem;
+}
+
+button {
+  font: inherit;
+  padding: 0.35rem 0.6rem;
+}
