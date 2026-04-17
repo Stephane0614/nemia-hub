@@ -1,98 +1,95 @@
 package com.nemia.core.flux.dto;
 
+import com.nemia.core.flux.model.FluxCategory;
+import com.nemia.core.flux.model.FluxType;
+import com.nemia.core.flux.model.PaymentMode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.nemia.core.flux.model.FluxCategory;
-import com.nemia.core.flux.model.FluxType;
-import com.nemia.core.flux.model.PaymentMode;
-
 public class CreateFluxRequest {
 
-    @NotNull
-    private LocalDate date;
+  @NotNull
+  private LocalDate date;
 
-    @NotNull
-    private FluxType type;
+  @NotNull
+  private FluxType type;
 
-    @NotBlank
-    @Size(max = 120)
-    private String libelle;
+  @NotBlank
+  @Size(max = 120)
+  private String libelle;
 
-    @NotNull
-    @Positive
-    private BigDecimal montant;
+  @NotNull
+  @Positive
+  private BigDecimal montant;
 
-    @NotNull
-    private FluxCategory categorie;
+  @NotNull
+  private FluxCategory categorie;
 
-    @NotNull
-    private PaymentMode modePaiement;
-    
-    @Size(max = 500)
-    private String commentaire;
+  @NotNull
+  private PaymentMode modePaiement;
 
-    public CreateFluxRequest() {
-    }
+  @Size(max = 500)
+  private String commentaire;
 
-    public LocalDate getDate() {
-        return date;
-    }
+  public CreateFluxRequest() {}
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
+  public LocalDate getDate() {
+    return date;
+  }
 
-    public FluxType getType() {
-        return type;
-    }
+  public void setDate(LocalDate date) {
+    this.date = date;
+  }
 
-    public void setType(FluxType type) {
-        this.type = type;
-    }
+  public FluxType getType() {
+    return type;
+  }
 
-    public String getLibelle() {
-        return libelle;
-    }
+  public void setType(FluxType type) {
+    this.type = type;
+  }
 
-    public void setLibelle(String libelle) {
-        this.libelle = libelle;
-    }
+  public String getLibelle() {
+    return libelle;
+  }
 
-    public BigDecimal getMontant() {
-        return montant;
-    }
+  public void setLibelle(String libelle) {
+    this.libelle = libelle;
+  }
 
-    public void setMontant(BigDecimal montant) {
-        this.montant = montant;
-    }
+  public BigDecimal getMontant() {
+    return montant;
+  }
 
-    public FluxCategory getCategorie() {
-        return categorie;
-    }
+  public void setMontant(BigDecimal montant) {
+    this.montant = montant;
+  }
 
-    public void setCategorie(FluxCategory categorie) {
-        this.categorie = categorie;
-    }
+  public FluxCategory getCategorie() {
+    return categorie;
+  }
 
-    public PaymentMode getModePaiement() {
-        return modePaiement;
-    }
+  public void setCategorie(FluxCategory categorie) {
+    this.categorie = categorie;
+  }
 
-    public void setModePaiement(PaymentMode modePaiement) {
-        this.modePaiement = modePaiement;
-    }
+  public PaymentMode getModePaiement() {
+    return modePaiement;
+  }
 
-    public String getCommentaire() {
-        return commentaire;
-    }
+  public void setModePaiement(PaymentMode modePaiement) {
+    this.modePaiement = modePaiement;
+  }
 
-    public void setCommentaire(String commentaire) {
-        this.commentaire = commentaire;
-    }
+  public String getCommentaire() {
+    return commentaire;
+  }
+
+  public void setCommentaire(String commentaire) {
+    this.commentaire = commentaire;
+  }
 }
