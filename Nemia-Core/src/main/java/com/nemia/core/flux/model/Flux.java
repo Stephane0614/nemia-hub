@@ -1,131 +1,204 @@
 package com.nemia.core.flux.model;
 
+import com.nemia.core.flux.persistence.LocalDateStringConverter;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import com.nemia.core.flux.persistence.LocalDateStringConverter;
-
 
 @Entity
 @Table(name = "flux")
 public class Flux {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Convert(converter = LocalDateStringConverter.class)
-    @Column(nullable = false)
-    private LocalDate date;
+  @Convert(converter = LocalDateStringConverter.class)
+  @Column(nullable = false)
+  private LocalDate date;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private FluxType type;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private FluxType type;
 
-    @Column(nullable = false, length = 255)
-    private String libelle;
+  @Column(nullable = false, length = 255)
+  private String libelle;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal montant;
+  @Column(nullable = false, precision = 12, scale = 2)
+  private BigDecimal montant;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private FluxCategory categorie;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private FluxCategory categorie;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private PaymentMode modePaiement;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private PaymentMode modePaiement;
 
-    @Column(length = 1000)
-    private String commentaire;
+  @Column(length = 1000)
+  private String commentaire;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
+  @Column(nullable = false)
+  private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+  @Column(nullable = false)
+  private LocalDateTime updatedAt;
 
-    public Flux() {
-    }
+  private Long bienId;
 
-    @PrePersist
-    public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-    }
+  private Long exerciceId;
 
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+  @Convert(converter = LocalDateStringConverter.class)
+  private LocalDate dateValeur;
 
-    public Long getId() {
-        return id;
-    }
+  @Enumerated(EnumType.STRING)
+  private Occurrence occurrence;
 
-    public LocalDate getDate() {
-        return date;
-    }
+  @Enumerated(EnumType.STRING)
+  private StatutJustificatif statutJustificatif;
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
+  @Enumerated(EnumType.STRING)
+  private QualificationPressentie qualificationPressentie;
 
-    public FluxType getType() {
-        return type;
-    }
+  @Enumerated(EnumType.STRING)
+  private StatutTraitement statutTraitement;
 
-    public void setType(FluxType type) {
-        this.type = type;
-    }
+  public Flux() {}
 
-    public String getLibelle() {
-        return libelle;
-    }
+  @PrePersist
+  public void prePersist() {
+    LocalDateTime now = LocalDateTime.now();
+    this.createdAt = now;
+    this.updatedAt = now;
+  }
 
-    public void setLibelle(String libelle) {
-        this.libelle = libelle;
-    }
+  @PreUpdate
+  public void preUpdate() {
+    this.updatedAt = LocalDateTime.now();
+  }
 
-    public BigDecimal getMontant() {
-        return montant;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setMontant(BigDecimal montant) {
-        this.montant = montant;
-    }
+  public LocalDate getDate() {
+    return date;
+  }
 
-    public FluxCategory getCategorie() {
-        return categorie;
-    }
+  public void setDate(LocalDate date) {
+    this.date = date;
+  }
 
-    public void setCategorie(FluxCategory categorie) {
-        this.categorie = categorie;
-    }
+  public FluxType getType() {
+    return type;
+  }
 
-    public PaymentMode getModePaiement() {
-        return modePaiement;
-    }
+  public void setType(FluxType type) {
+    this.type = type;
+  }
 
-    public void setModePaiement(PaymentMode modePaiement) {
-        this.modePaiement = modePaiement;
-    }
+  public String getLibelle() {
+    return libelle;
+  }
 
-    public String getCommentaire() {
-        return commentaire;
-    }
+  public void setLibelle(String libelle) {
+    this.libelle = libelle;
+  }
 
-    public void setCommentaire(String commentaire) {
-        this.commentaire = commentaire;
-    }
+  public BigDecimal getMontant() {
+    return montant;
+  }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+  public void setMontant(BigDecimal montant) {
+    this.montant = montant;
+  }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+  public FluxCategory getCategorie() {
+    return categorie;
+  }
+
+  public void setCategorie(FluxCategory categorie) {
+    this.categorie = categorie;
+  }
+
+  public PaymentMode getModePaiement() {
+    return modePaiement;
+  }
+
+  public void setModePaiement(PaymentMode modePaiement) {
+    this.modePaiement = modePaiement;
+  }
+
+  public String getCommentaire() {
+    return commentaire;
+  }
+
+  public void setCommentaire(String commentaire) {
+    this.commentaire = commentaire;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public Long getBienId() {
+    return bienId;
+  }
+
+  public void setBienId(Long bienId) {
+    this.bienId = bienId;
+  }
+
+  public Long getExerciceId() {
+    return exerciceId;
+  }
+
+  public void setExerciceId(Long exerciceId) {
+    this.exerciceId = exerciceId;
+  }
+
+  public LocalDate getDateValeur() {
+    return dateValeur;
+  }
+
+  public void setDateValeur(LocalDate dateValeur) {
+    this.dateValeur = dateValeur;
+  }
+
+  public Occurrence getOccurrence() {
+    return occurrence;
+  }
+
+  public void setOccurrence(Occurrence occurrence) {
+    this.occurrence = occurrence;
+  }
+
+  public StatutJustificatif getStatutJustificatif() {
+    return statutJustificatif;
+  }
+
+  public void setStatutJustificatif(StatutJustificatif statutJustificatif) {
+    this.statutJustificatif = statutJustificatif;
+  }
+
+  public QualificationPressentie getQualificationPressentie() {
+    return qualificationPressentie;
+  }
+
+  public void setQualificationPressentie(QualificationPressentie qualificationPressentie) {
+    this.qualificationPressentie = qualificationPressentie;
+  }
+
+  public StatutTraitement getStatutTraitement() {
+    return statutTraitement;
+  }
+
+  public void setStatutTraitement(StatutTraitement statutTraitement) {
+    this.statutTraitement = statutTraitement;
+  }
 }

@@ -1,98 +1,113 @@
 package com.nemia.core.flux.dto;
 
+import com.nemia.core.flux.model.FluxCategory;
+import com.nemia.core.flux.model.FluxType;
+import com.nemia.core.flux.model.Occurrence;
+import com.nemia.core.flux.model.PaymentMode;
+import com.nemia.core.flux.model.QualificationPressentie;
+import com.nemia.core.flux.model.StatutJustificatif;
+import com.nemia.core.flux.model.StatutTraitement;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.nemia.core.flux.model.FluxCategory;
-import com.nemia.core.flux.model.FluxType;
-import com.nemia.core.flux.model.PaymentMode;
-
 public class CreateFluxRequest {
 
-    @NotNull
-    private LocalDate date;
+  @NotNull
+  private LocalDate date;
 
-    @NotNull
-    private FluxType type;
+  @NotNull
+  private FluxType type;
 
-    @NotBlank
-    @Size(max = 120)
-    private String libelle;
+  @NotBlank
+  @Size(max = 120)
+  private String libelle;
 
-    @NotNull
-    @Positive
-    private BigDecimal montant;
+  @NotNull
+  @Positive
+  private BigDecimal montant;
 
-    @NotNull
-    private FluxCategory categorie;
+  @NotNull
+  private FluxCategory categorie;
 
-    @NotNull
-    private PaymentMode modePaiement;
-    
-    @Size(max = 500)
-    private String commentaire;
+  @NotNull
+  private PaymentMode modePaiement;
 
-    public CreateFluxRequest() {
-    }
+  private Long bienId;
 
-    public LocalDate getDate() {
-        return date;
-    }
+  private Long exerciceId;
 
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
+  private LocalDate dateValeur;
 
-    public FluxType getType() {
-        return type;
-    }
+  private Occurrence occurrence;
 
-    public void setType(FluxType type) {
-        this.type = type;
-    }
+  private StatutJustificatif statutJustificatif;
 
-    public String getLibelle() {
-        return libelle;
-    }
+  private QualificationPressentie qualificationPressentie;
 
-    public void setLibelle(String libelle) {
-        this.libelle = libelle;
-    }
+  private StatutTraitement statutTraitement;
 
-    public BigDecimal getMontant() {
-        return montant;
-    }
+  @Size(max = 500)
+  private String commentaire;
 
-    public void setMontant(BigDecimal montant) {
-        this.montant = montant;
-    }
+  public CreateFluxRequest() {}
 
-    public FluxCategory getCategorie() {
-        return categorie;
-    }
+  public LocalDate getDate() {
+    return date;
+  }
 
-    public void setCategorie(FluxCategory categorie) {
-        this.categorie = categorie;
-    }
+  public void setDate(LocalDate date) {
+    this.date = date;
+  }
 
-    public PaymentMode getModePaiement() {
-        return modePaiement;
-    }
+  public FluxType getType() {
+    return type;
+  }
 
-    public void setModePaiement(PaymentMode modePaiement) {
-        this.modePaiement = modePaiement;
-    }
+  public void setType(FluxType type) {
+    this.type = type;
+  }
 
-    public String getCommentaire() {
-        return commentaire;
-    }
+  public String getLibelle() {
+    return libelle;
+  }
 
-    public void setCommentaire(String commentaire) {
-        this.commentaire = commentaire;
-    }
+  public void setLibelle(String libelle) {
+    this.libelle = libelle;
+  }
+
+  public BigDecimal getMontant() {
+    return montant;
+  }
+
+  public void setMontant(BigDecimal montant) {
+    this.montant = montant;
+  }
+
+  public FluxCategory getCategorie() {
+    return categorie;
+  }
+
+  public void setCategorie(FluxCategory categorie) {
+    this.categorie = categorie;
+  }
+
+  public PaymentMode getModePaiement() {
+    return modePaiement;
+  }
+
+  public void setModePaiement(PaymentMode modePaiement) {
+    this.modePaiement = modePaiement;
+  }
+
+  public String getCommentaire() {
+    return commentaire;
+  }
+
+  public void setCommentaire(String commentaire) {
+    this.commentaire = commentaire;
+  }
 }

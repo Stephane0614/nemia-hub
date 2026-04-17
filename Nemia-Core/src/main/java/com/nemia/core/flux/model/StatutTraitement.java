@@ -1,12 +1,13 @@
 package com.nemia.core.flux.model;
 
-public enum FluxType {
-  RECETTE("Recette"),
-  DEPENSE("Dépense");
+public enum StatutTraitement {
+  A_TRAITER("À traiter"),
+  A_REVOIR("À revoir"),
+  VALIDE("Validé");
 
   private final String label;
 
-  FluxType(String label) {
+  StatutTraitement(String label) {
     this.label = label;
   }
 
