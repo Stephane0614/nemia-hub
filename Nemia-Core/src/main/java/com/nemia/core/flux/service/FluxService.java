@@ -16,28 +16,40 @@ public class FluxService {
 
   private static final Logger logger = LoggerFactory.getLogger(FluxService.class);
 
-  private final FluxRepository fluxRepository;
+      private final FluxRepository fluxRepository;
+    private final FluxValidationService fluxValidationService;
 
-  public FluxService(FluxRepository fluxRepository) {
-    this.fluxRepository = fluxRepository;
-  }
+    public FluxService(FluxRepository fluxRepository, FluxValidationService fluxValidationService) {
+        this.fluxRepository = fluxRepository;
+        this.fluxValidationService = fluxValidationService;
+    }
 
-  public FluxResponse create(CreateFluxRequest request) {
-    logger.info(
-      "Création d'un flux : type={}, libelle={}, montant={}",
-      request.getType(),
-      request.getLibelle(),
-      request.getMontant()
-    );
+        private List<String> validateFlux(Flux flux) {
+        return fluxValidationService.validate(
+                flux.getType(),
+                flux.getCategorie(),
+                flux.getQualificationPressentie(),
+                flux.getStatutJustificatif(),
+                flux.getOccurrence(),
+                flux.getStatutTraitement()
+        );
+    }
 
-    Flux flux = new Flux();
-    mapCreateRequestToEntity(request, flux);
 
-    Flux savedFlux = fluxRepository.save(flux);
 
-    logger.info("Flux créé avec succès : id={}", savedFlux.getId());
-    return mapToResponse(savedFlux);
-  }
+      public FluxResponse create(CreateFluxRequest request) {
+        Flux flux = new Flux();
+        mapCreateRequestToEntity(request, flux);
+
+        List<String> warnings = validateFlux(flux);
+
+        Flux savedFlux = fluxRepository.save(flux);
+
+        FluxResponse response = mapToResponse(savedFlux);
+        response.setWarnings(warnings);
+        return response;
+    }
+
 
   public List<FluxResponse> findAll() {
     logger.info("Récupération de tous les flux");
@@ -66,29 +78,21 @@ public class FluxService {
     return mapToResponse(flux);
   }
 
-  public FluxResponse update(Long id, UpdateFluxRequest request) {
-    logger.info(
-      "Mise à jour du flux id={} : type={}, libelle={}, montant={}",
-      id,
-      request.getType(),
-      request.getLibelle(),
-      request.getMontant()
-    );
+      public FluxResponse update(Long id, UpdateFluxRequest request) {
+        Flux flux = fluxRepository.findById(id)
+                .orElseThrow(() -> new FluxNotFoundException(id));
 
-    Flux flux = fluxRepository
-      .findById(id)
-      .orElseThrow(() -> {
-        logger.warn("Impossible de mettre à jour : flux introuvable avec l'id={}", id);
-        return new FluxNotFoundException(id);
-      });
+        mapUpdateRequestToEntity(request, flux);
 
-    mapUpdateRequestToEntity(request, flux);
+        List<String> warnings = validateFlux(flux);
 
-    Flux updatedFlux = fluxRepository.save(flux);
+        Flux updatedFlux = fluxRepository.save(flux);
 
-    logger.info("Flux mis à jour avec succès : id={}", updatedFlux.getId());
-    return mapToResponse(updatedFlux);
-  }
+        FluxResponse response = mapToResponse(updatedFlux);
+        response.setWarnings(warnings);
+        return response;
+    }
+
 
   public void delete(Long id) {
     logger.info("Suppression du flux id={}", id);
@@ -113,6 +117,13 @@ public class FluxService {
     flux.setCategorie(request.getCategorie());
     flux.setModePaiement(request.getModePaiement());
     flux.setCommentaire(normalizeOptionalText(request.getCommentaire()));
+    flux.setBienId(request.getBienId());
+    flux.setExerciceId(request.getExerciceId());
+    flux.setDateValeur(request.getDateValeur());
+    flux.setOccurrence(request.getOccurrence());
+    flux.setStatutJustificatif(request.getStatutJustificatif());
+    flux.setQualificationPressentie(request.getQualificationPressentie());
+    flux.setStatutTraitement(request.getStatutTraitement());
   }
 
   private void mapUpdateRequestToEntity(UpdateFluxRequest request, Flux flux) {
@@ -123,6 +134,13 @@ public class FluxService {
     flux.setCategorie(request.getCategorie());
     flux.setModePaiement(request.getModePaiement());
     flux.setCommentaire(normalizeOptionalText(request.getCommentaire()));
+    flux.setBienId(request.getBienId());
+    flux.setExerciceId(request.getExerciceId());
+    flux.setDateValeur(request.getDateValeur());
+    flux.setOccurrence(request.getOccurrence());
+    flux.setStatutJustificatif(request.getStatutJustificatif());
+    flux.setQualificationPressentie(request.getQualificationPressentie());
+    flux.setStatutTraitement(request.getStatutTraitement());
   }
 
   private FluxResponse mapToResponse(Flux flux) {
@@ -137,6 +155,13 @@ public class FluxService {
     response.setCommentaire(flux.getCommentaire());
     response.setCreatedAt(flux.getCreatedAt());
     response.setUpdatedAt(flux.getUpdatedAt());
+    response.setBienId(flux.getBienId());
+    response.setExerciceId(flux.getExerciceId());
+    response.setDateValeur(flux.getDateValeur());
+    response.setOccurrence(flux.getOccurrence());
+    response.setStatutJustificatif(flux.getStatutJustificatif());
+    response.setQualificationPressentie(flux.getQualificationPressentie());
+    response.setStatutTraitement(flux.getStatutTraitement());
 
     return response;
   }

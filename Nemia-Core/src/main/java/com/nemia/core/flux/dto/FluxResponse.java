@@ -2,10 +2,16 @@ package com.nemia.core.flux.dto;
 
 import com.nemia.core.flux.model.FluxCategory;
 import com.nemia.core.flux.model.FluxType;
+import com.nemia.core.flux.model.Occurrence;
 import com.nemia.core.flux.model.PaymentMode;
+import com.nemia.core.flux.model.QualificationPressentie;
+import com.nemia.core.flux.model.StatutJustificatif;
+import com.nemia.core.flux.model.StatutTraitement;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FluxResponse {
 
@@ -16,9 +22,25 @@ public class FluxResponse {
   private BigDecimal montant;
   private FluxCategory categorie;
   private PaymentMode modePaiement;
+  private Long bienId;
+
+  private Long exerciceId;
+
+  private LocalDate dateValeur;
+
+  private Occurrence occurrence;
+
+  private StatutJustificatif statutJustificatif;
+
+  private QualificationPressentie qualificationPressentie;
+
+  private StatutTraitement statutTraitement;
+
   private String commentaire;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private List<String> warnings = new ArrayList<>();
+
 
   public FluxResponse() {}
 
@@ -101,4 +123,69 @@ public class FluxResponse {
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
   }
+
+  public Long getBienId() {
+    return bienId;
+  }
+
+  public void setBienId(Long bienId) {
+    this.bienId = bienId;
+  }
+
+  public Long getExerciceId() {
+    return exerciceId;
+  }
+
+  public void setExerciceId(Long exerciceId) {
+    this.exerciceId = exerciceId;
+  }
+
+  public LocalDate getDateValeur() {
+    return dateValeur;
+  }
+
+  public void setDateValeur(LocalDate dateValeur) {
+    this.dateValeur = dateValeur;
+  }
+
+  public Occurrence getOccurrence() {
+    return occurrence;
+  }
+
+  public void setOccurrence(Occurrence occurrence) {
+    this.occurrence = occurrence;
+  }
+
+  public StatutJustificatif getStatutJustificatif() {
+    return statutJustificatif;
+  }
+
+  public void setStatutJustificatif(StatutJustificatif statutJustificatif) {
+    this.statutJustificatif = statutJustificatif;
+  }
+
+  public QualificationPressentie getQualificationPressentie() {
+    return qualificationPressentie;
+  }
+
+  public void setQualificationPressentie(QualificationPressentie qualificationPressentie) {
+    this.qualificationPressentie = qualificationPressentie;
+  }
+
+  public StatutTraitement getStatutTraitement() {
+    return statutTraitement;
+  }
+
+  public void setStatutTraitement(StatutTraitement statutTraitement) {
+    this.statutTraitement = statutTraitement;
+  }
+
+      public List<String> getWarnings() {
+        return warnings;
+    }
+
+    public void setWarnings(List<String> warnings) {
+        this.warnings = warnings;
+    }
+
 }
