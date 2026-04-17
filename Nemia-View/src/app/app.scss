@@ -1,0 +1,58 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #334155 !important;
+  color: white !important;
+}
+
+.app-toolbar__inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.app-brand {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.2px;
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.app-nav a {
+  color: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.app-nav a.active,
+.app-nav a:hover {
+  color: white;
+}
+
+.app-shell {
+  min-height: calc(100vh - 64px);
+  padding: 24px;
+  background: #f6f7f9;
+}
+
+.app-shell__content {
+  max-width: 1200px;
+  margin: 0 auto;
+}

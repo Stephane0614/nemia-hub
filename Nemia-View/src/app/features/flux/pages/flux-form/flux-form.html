@@ -1,140 +1,150 @@
-<h1>{{ isEditMode() ? 'Modification d’un flux' : 'Création d’un flux' }}</h1>
-
-<p>debug — isLoading: {{ isLoading }} | editMode: {{ isEditMode() }}</p>
+<section class="page-header">
+  <div>
+    <h1 class="page-title">
+      {{ isEditMode() ? 'Modifier une opération' : 'Créer une opération' }}
+    </h1>
+    <p class="page-subtitle">
+      Renseigne les informations de l’opération puis enregistre.
+    </p>
+  </div>
+</section>
 
 @if (isLoading) {
-  <p>Chargement...</p>
+<mat-card class="state-card">
+  <div class="state-content">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+</mat-card>
 } @else {
-  @if (loadErrorMessage) {
-    <p>{{ loadErrorMessage }}</p>
-  }
-
+@if (loadErrorMessage) {
+<mat-card class="state-card state-card--error">
+  <p>{{ loadErrorMessage }}</p>
+  <a mat-stroked-button routerLink="/flux">Retour à la liste</a>
+</mat-card>
+} @else {
+<mat-card class="form-card">
   @if (submitErrorMessage) {
-    <p>{{ submitErrorMessage }}</p>
+  <div class="form-alert">
+    {{ submitErrorMessage }}
+  </div>
   }
 
-  <form [formGroup]="form" (ngSubmit)="save()">
-    <div>
-      <label for="date">Date</label>
-      <input id="date" type="date" formControlName="date" (input)="clearServerError('date')" />
-      @if (hasError('date', 'required')) {
-        <small>La date est obligatoire.</small>
-      }
-      @if (getServerError('date'); as error) {
-        <small>{{ error }}</small>
-      }
-    </div>
+  <form class="operation-form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" id="date" formControlName="date"
+          (dateInput)="clearServerError('date')" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
 
-    <div>
-      <label for="type">Type</label>
-      <select id="type" formControlName="type" (change)="clearServerError('type')">
-        <option value="">Sélectionner un type</option>
-        @for (type of fluxTypes; track type.code) {
-          <option [value]="type.code">{{ type.label }}</option>
+        @if (hasError('date', 'required')) {
+        <mat-error>La date est obligatoire.</mat-error>
         }
-      </select>
-      @if (hasError('type', 'required')) {
-        <small>Le type est obligatoire.</small>
-      }
-      @if (getServerError('type'); as error) {
-        <small>{{ error }}</small>
-      }
-    </div>
-
-    <div>
-      <label for="libelle">Libellé</label>
-      <input
-        id="libelle"
-        type="text"
-        formControlName="libelle"
-        (input)="clearServerError('libelle')"
-      />
-      @if (hasError('libelle', 'required')) {
-        <small>Le libellé est obligatoire.</small>
-      }
-      @if (hasError('libelle', 'maxlength')) {
-        <small>Le libellé ne doit pas dépasser 120 caractères.</small>
-      }
-      @if (getServerError('libelle'); as error) {
-        <small>{{ error }}</small>
-      }
-    </div>
-
-    <div>
-      <label for="montant">Montant</label>
-      <input
-        id="montant"
-        type="number"
-        step="0.01"
-        formControlName="montant"
-        (input)="clearServerError('montant')"
-      />
-      @if (hasError('montant', 'required')) {
-        <small>Le montant est obligatoire.</small>
-      }
-      @if (hasError('montant', 'min')) {
-        <small>Le montant doit être strictement supérieur à 0.</small>
-      }
-      @if (getServerError('montant'); as error) {
-        <small>{{ error }}</small>
-      }
-    </div>
-
-    <div>
-      <label for="categorie">Catégorie</label>
-      <select id="categorie" formControlName="categorie" (change)="clearServerError('categorie')">
-        <option value="">Sélectionner une catégorie</option>
-        @for (category of fluxCategories; track category.code) {
-          <option [value]="category.code">{{ category.label }}</option>
+        @if (getServerError('date'); as error) {
+        <mat-error>{{ error }}</mat-error>
         }
-      </select>
-      @if (hasError('categorie', 'required')) {
-        <small>La catégorie est obligatoire.</small>
-      }
-      @if (getServerError('categorie'); as error) {
-        <small>{{ error }}</small>
-      }
-    </div>
+      </mat-form-field>
 
-    <div>
-      <label for="modePaiement">Mode de paiement</label>
-      <select
-        id="modePaiement"
-        formControlName="modePaiement"
-        (change)="clearServerError('modePaiement')"
-      >
-        <option value="">Sélectionner un mode de paiement</option>
-        @for (mode of paymentModes; track mode.code) {
-          <option [value]="mode.code">{{ mode.label }}</option>
+      <mat-form-field appearance="outline">
+        <mat-label>Type</mat-label>
+        <mat-select id="type" formControlName="type" (selectionChange)="clearServerError('type')">
+          <mat-option value="">Sélectionner un type</mat-option>
+          @for (type of fluxTypes; track type.code) {
+          <mat-option [value]="type.code">{{ type.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('type', 'required')) {
+        <mat-error>Le type est obligatoire.</mat-error>
         }
-      </select>
-      @if (hasError('modePaiement', 'required')) {
-        <small>Le mode de paiement est obligatoire.</small>
-      }
-      @if (getServerError('modePaiement'); as error) {
-        <small>{{ error }}</small>
-      }
+        @if (getServerError('type'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Libellé</mat-label>
+        <input matInput id="libelle" type="text" formControlName="libelle" (input)="clearServerError('libelle')" />
+        @if (hasError('libelle', 'required')) {
+        <mat-error>Le libellé est obligatoire.</mat-error>
+        }
+        @if (hasError('libelle', 'maxlength')) {
+        <mat-error>Le libellé ne doit pas dépasser 120 caractères.</mat-error>
+        }
+        @if (getServerError('libelle'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Montant</mat-label>
+        <input matInput id="montant" type="number" step="0.01" formControlName="montant"
+          (input)="clearServerError('montant')" />
+        @if (hasError('montant', 'required')) {
+        <mat-error>Le montant est obligatoire.</mat-error>
+        }
+        @if (hasError('montant', 'min')) {
+        <mat-error>Le montant doit être strictement supérieur à 0.</mat-error>
+        }
+        @if (getServerError('montant'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Catégorie</mat-label>
+        <mat-select id="categorie" formControlName="categorie" (selectionChange)="clearServerError('categorie')">
+          <mat-option value="">Sélectionner une catégorie</mat-option>
+          @for (category of fluxCategories; track category.code) {
+          <mat-option [value]="category.code">{{ category.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('categorie', 'required')) {
+        <mat-error>La catégorie est obligatoire.</mat-error>
+        }
+        @if (getServerError('categorie'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Mode de paiement</mat-label>
+        <mat-select id="modePaiement" formControlName="modePaiement"
+          (selectionChange)="clearServerError('modePaiement')">
+          <mat-option value="">Sélectionner un mode de paiement</mat-option>
+          @for (mode of paymentModes; track mode.code) {
+          <mat-option [value]="mode.code">{{ mode.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('modePaiement', 'required')) {
+        <mat-error>Le mode de paiement est obligatoire.</mat-error>
+        }
+        @if (getServerError('modePaiement'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput id="commentaire" rows="5" formControlName="commentaire"
+          (input)="clearServerError('commentaire')"></textarea>
+        @if (hasError('commentaire', 'maxlength')) {
+        <mat-error>Le commentaire ne doit pas dépasser 500 caractères.</mat-error>
+        }
+        @if (getServerError('commentaire'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
     </div>
 
-    <div>
-      <label for="commentaire">Commentaire</label>
-      <textarea
-        id="commentaire"
-        formControlName="commentaire"
-        (input)="clearServerError('commentaire')"
-      ></textarea>
-      @if (hasError('commentaire', 'maxlength')) {
-        <small>Le commentaire ne doit pas dépasser 500 caractères.</small>
-      }
-      @if (getServerError('commentaire'); as error) {
-        <small>{{ error }}</small>
-      }
+    <div class="form-actions">
+      <a mat-stroked-button routerLink="/flux">Annuler</a>
+      <button mat-flat-button type="submit" [disabled]="isSubmitting || form.invalid">
+        {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
     </div>
-
-    <button type="submit" [disabled]="isSubmitting || form.invalid">
-      {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
-    </button>
   </form>
+</mat-card>
 }
-
-<a routerLink="/">Retour à l'accueil</a>
+}

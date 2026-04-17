@@ -1,49 +1,64 @@
-<h1>Liste des flux</h1>
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Liste des opérations</h1>
+    <p class="page-subtitle">Consulte, modifie et supprime les opérations existantes.</p>
+  </div>
 
-
-<p>
-  <a routerLink="/flux/nouveau">Créer un flux</a>
-</p>
-
-<p>
-  <a routerLink="/">Retour à l'accueil</a>
-</p>
+  <a mat-flat-button routerLink="/flux/nouveau">Créer une opération</a>
+</section>
 
 @if (isLoading) {
-  <p>Chargement...</p>
+  <mat-card class="state-card">
+    <div class="state-content">
+      <mat-spinner diameter="36"></mat-spinner>
+      <p>Chargement des opérations...</p>
+    </div>
+  </mat-card>
 } @else if (loadErrorMessage) {
-  <p>{{ loadErrorMessage }}</p>
+  <mat-card class="state-card state-card--error">
+    <p>{{ loadErrorMessage }}</p>
+    <a mat-stroked-button routerLink="/">Retour à l'accueil</a>
+  </mat-card>
 } @else if (fluxes.length === 0) {
-  <p>Aucun flux pour le moment.</p>
+  <mat-card class="state-card">
+    <p>Aucune opération pour le moment.</p>
+    <a mat-flat-button routerLink="/flux/nouveau">Créer la première opération</a>
+  </mat-card>
 } @else {
-  <table>
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Type</th>
-        <th>Libellé</th>
-        <th>Montant</th>
-        <th>Catégorie</th>
-        <th>Mode de paiement</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+  <mat-card class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Libellé</th>
+            <th>Montant</th>
+            <th>Catégorie</th>
+            <th>Mode de paiement</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-    <tbody>
-      @for (flux of fluxes; track flux.id) {
-        <tr>
-          <td>{{ flux.date }}</td>
-          <td>{{ flux.type }}</td>
-          <td>{{ flux.libelle }}</td>
-          <td>{{ flux.montant }}</td>
-          <td>{{ flux.categorie }}</td>
-          <td>{{ flux.modePaiement }}</td>
-          <td>
-            <a [routerLink]="['/flux', flux.id, 'modifier']">Modifier</a>
-            <button type="button" (click)="deleteFlux(flux.id)">Supprimer</button>
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
+        <tbody>
+          @for (flux of fluxes; track flux.id) {
+            <tr>
+              <td>{{ flux.date }}</td>
+              <td>{{ flux.type }}</td>
+              <td>{{ flux.libelle }}</td>
+              <td>{{ flux.montant }}</td>
+              <td>{{ flux.categorie }}</td>
+              <td>{{ flux.modePaiement }}</td>
+              <td class="actions-cell">
+                <a mat-button [routerLink]="['/flux', flux.id, 'modifier']">Modifier</a>
+                <button mat-stroked-button type="button" (click)="deleteFlux(flux.id)">
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
 }

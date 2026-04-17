@@ -1,6 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ReactiveFormsModule, Validators, NonNullableFormBuilder } from '@angular/forms';
+import { ChangeDetectorRef, Component, OnInit, computed, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiErrorResponse } from '../../models/api-error-response';
 import { FluxCategory } from '../../models/flux-category';
@@ -11,14 +19,25 @@ import { FluxApi } from '../../services/flux-api';
 
 @Component({
   selector: 'app-flux-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatDatepickerModule,
+  ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './flux-form.html',
   styleUrl: './flux-form.scss',
 })
 export class FluxForm implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder = inject(FormBuilder);
   private readonly fluxApi = inject(FluxApi);
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -40,10 +59,10 @@ export class FluxForm implements OnInit {
   readonly isEditMode = computed(() => this.fluxId() !== null);
 
   readonly form = this.formBuilder.group({
-    date: ['', Validators.required],
+    date: [null as Date | null, Validators.required],
     type: ['', Validators.required],
     libelle: ['', [Validators.required, Validators.maxLength(120)]],
-    montant: [0, [Validators.required, Validators.min(0.01)]],
+    montant: [null as number | null, [Validators.required, Validators.min(0.01)]],
     categorie: ['', Validators.required],
     modePaiement: ['', Validators.required],
     commentaire: ['', Validators.maxLength(500)],
@@ -163,14 +182,40 @@ export class FluxForm implements OnInit {
     const rawValue = this.form.getRawValue();
 
     return {
-      date: rawValue.date,
+      date: this.formatDateForApi(rawValue.date),
       type: rawValue.type as FluxType,
-      libelle: rawValue.libelle.trim(),
-      montant: rawValue.montant,
+      libelle: (rawValue.libelle ?? '').trim(),
+      montant: rawValue.montant ?? 0,
       categorie: rawValue.categorie as FluxCategory,
       modePaiement: rawValue.modePaiement as PaymentMode,
-      commentaire: rawValue.commentaire.trim() ? rawValue.commentaire.trim() : null,
+      commentaire: (rawValue.commentaire ?? '').trim() ? (rawValue.commentaire ?? '').trim() : null,
     };
+  }
+
+  private formatDateForApi(date: Date | null): string {
+    if (!date) {
+      return '';
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  private parseApiDate(value: string | null | undefined): Date | null {
+    if (!value) {
+      return null;
+    }
+
+    const [year, month, day] = value.split('-').map(Number);
+
+    if (!year || !month || !day) {
+      return null;
+    }
+
+    return new Date(year, month - 1, day);
   }
 
   private applyServerValidationErrors(errors: Record<string, string> | undefined): void {
@@ -197,7 +242,7 @@ export class FluxForm implements OnInit {
     this.fluxApi.getById(id).subscribe({
       next: (flux) => {
         this.form.patchValue({
-          date: flux.date,
+          date: this.parseApiDate(flux.date),
           type: flux.type,
           libelle: flux.libelle,
           montant: flux.montant,
@@ -211,7 +256,7 @@ export class FluxForm implements OnInit {
       },
       error: (error) => {
         console.error('Erreur lors du chargement du flux', error);
-        this.loadErrorMessage = 'Impossible de charger le flux à modifier.';
+        this.loadErrorMessage = 'Impossible de charger l’opération à modifier.';
         this.isLoading = false;
         this.cdr.detectChanges();
       },

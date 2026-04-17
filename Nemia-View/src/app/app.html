@@ -1,1 +1,16 @@
-<router-outlet></router-outlet>
+<mat-toolbar class="app-toolbar" color="primary">
+  <div class="app-toolbar__inner">
+    <a routerLink="/" class="app-brand">Nemia Hub</a>
+
+    <nav class="app-nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Accueil</a>
+      <a routerLink="/flux" routerLinkActive="active">Opérations</a>
+    </nav>
+  </div>
+</mat-toolbar>
+
+<main class="app-shell">
+  <div class="app-shell__content">
+    <router-outlet></router-outlet>
+  </div>
+</main>
