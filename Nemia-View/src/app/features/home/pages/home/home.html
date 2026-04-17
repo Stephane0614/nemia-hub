@@ -1,7 +1,117 @@
-<h1>Accueil</h1>
+<section class="home-header">
+  <div>
+    <p class="home-eyebrow">Pilotage patrimonial</p>
+    <h1 class="home-title">Vue d’ensemble LMNP</h1>
+    <p class="home-subtitle">
+      Cette page a vocation à regrouper les informations utiles sans devoir parcourir les autres écrans.
+    </p>
+  </div>
+</section>
 
-<p>Bienvenue dans Nemia View.</p>
+<section class="metrics-grid">
+  @for (metric of metrics; track metric.label) {
+    <mat-card
+      class="metric-card"
+      [class.metric-card--positive]="metric.label === 'Recettes du mois' || metric.label === 'Solde du mois'"
+      [class.metric-card--negative]="metric.label === 'Dépenses du mois'"
+    >
+      <p class="metric-label">{{ metric.label }}</p>
+      <p class="metric-value">{{ metric.value }}</p>
+      <p class="metric-detail">{{ metric.detail }}</p>
+    </mat-card>
+  }
+</section>
 
-<p>
-  <a routerLink="/flux">Accéder aux flux</a>
-</p>
+<section class="home-content-grid">
+  <mat-card class="panel-card panel-card--wide">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Synthèse du mois</h2>
+        <p class="panel-subtitle">{{ monthLabel }}</p>
+      </div>
+    </div>
+
+    <div class="summary-list">
+      <div class="summary-item">
+        <span class="summary-label">Recettes encaissées</span>
+        <span class="summary-value summary-value--positive">2 145 €</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="summary-item">
+        <span class="summary-label">Dépenses engagées</span>
+        <span class="summary-value summary-value--negative">684 €</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="summary-item">
+        <span class="summary-label">Solde mensuel provisoire</span>
+        <span class="summary-value summary-value--positive">1 461 €</span>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="summary-item">
+        <span class="summary-label">Nombre d’opérations</span>
+        <span class="summary-value">8</span>
+      </div>
+    </div>
+  </mat-card>
+
+  <mat-card class="panel-card">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Points d’attention</h2>
+        <p class="panel-subtitle">Signaux utiles à surveiller</p>
+      </div>
+    </div>
+
+    <ul class="attention-list">
+      @for (item of attentionPoints; track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+  </mat-card>
+
+  <mat-card class="panel-card panel-card--wide">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Dernières opérations</h2>
+        <p class="panel-subtitle">Aperçu rapide de l’activité récente</p>
+      </div>
+    </div>
+
+    <div class="operations-table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Libellé</th>
+            <th>Type</th>
+            <th>Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (operation of recentOperations; track operation.date + operation.label) {
+            <tr>
+              <td>{{ operation.date | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ operation.label }}</td>
+              <td>
+                <span
+                  class="operation-badge"
+                  [class.operation-badge--positive]="operation.type === 'RECETTE'"
+                  [class.operation-badge--negative]="operation.type === 'DEPENSE'"
+                >
+                  {{ operation.type === 'RECETTE' ? 'Recette' : 'Dépense' }}
+                </span>
+              </td>
+              <td>{{ operation.amount | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
+</section>

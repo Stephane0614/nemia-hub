@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.nemia.core.flux.persistence.LocalDateStringConverter;
+
 
 @Entity
 @Table(name = "flux")
@@ -13,6 +15,7 @@ public class Flux {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Convert(converter = LocalDateStringConverter.class)
     @Column(nullable = false)
     private LocalDate date;
 
