@@ -9,9 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   @ExceptionHandler(FluxNotFoundException.class)
   public ResponseEntity<ApiErrorResponse> handleFluxNotFound(
@@ -59,19 +63,38 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiErrorResponse> handleGenericException(
-    Exception ex,
+    @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
+    IllegalArgumentException ex,
     HttpServletRequest request
   ) {
     ApiErrorResponse errorResponse = new ApiErrorResponse(
       LocalDateTime.now(),
-      HttpStatus.INTERNAL_SERVER_ERROR.value(),
-      HttpStatus.INTERNAL_SERVER_ERROR.name(),
-      "Une erreur interne est survenue.",
+      HttpStatus.BAD_REQUEST.value(),
+      HttpStatus.BAD_REQUEST.name(),
+      ex.getMessage(),
       request.getRequestURI()
     );
 
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
+
+
+  @ExceptionHandler(Exception.class)
+public ResponseEntity<ApiErrorResponse> handleGenericException(
+  Exception ex,
+  HttpServletRequest request
+) {
+  logger.error("Erreur interne sur {} : {}", request.getRequestURI(), ex.getMessage(), ex);
+
+  ApiErrorResponse errorResponse = new ApiErrorResponse(
+    LocalDateTime.now(),
+    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+    HttpStatus.INTERNAL_SERVER_ERROR.name(),
+    "Une erreur interne est survenue.",
+    request.getRequestURI()
+  );
+
+  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+}
 }

@@ -4,10 +4,10 @@
 
 set -u
 
-PROJECT_ROOT="/c/Perso/projet_dev_perso/nemia-hub/Nemia-Core"
-SRC_DIR="$PROJECT_ROOT/src"
+PROJECT_ROOT="/c/Perso/projet_dev_perso/nemia-hub"
+SRC_DIR="$PROJECT_ROOT/Nemia-Core/src"
 CONFIG_FILE="/c/Perso/projet_dev_perso/nemia-hub/.prettierrc"
-PRETTIER_BIN="$PROJECT_ROOT/node_modules/.bin/prettier"
+PRETTIER_BIN="$PROJECT_ROOT/Nemia-View/node_modules/.bin/prettier"  
 HEARTBEAT_INTERVAL=15
 
 timestamp() {

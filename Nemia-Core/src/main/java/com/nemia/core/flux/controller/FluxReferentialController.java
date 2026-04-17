@@ -4,11 +4,17 @@ import com.nemia.core.flux.dto.referential.FluxReferentialsResponse;
 import com.nemia.core.flux.dto.referential.ReferentialItemResponse;
 import com.nemia.core.flux.model.FluxCategory;
 import com.nemia.core.flux.model.FluxType;
+import com.nemia.core.flux.model.Occurrence;
 import com.nemia.core.flux.model.PaymentMode;
+import com.nemia.core.flux.model.QualificationPressentie;
+import com.nemia.core.flux.model.StatutJustificatif;
+import com.nemia.core.flux.model.StatutTraitement;
+
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 public class FluxReferentialController {
@@ -27,6 +33,32 @@ public class FluxReferentialController {
       .map(paymentMode -> new ReferentialItemResponse(paymentMode.name(), paymentMode.getLabel()))
       .toList();
 
-    return new FluxReferentialsResponse(types, categories, paymentModes);
+             List<ReferentialItemResponse> occurrences = Arrays.stream(Occurrence.values())
+                .map(occurrence -> new ReferentialItemResponse(occurrence.name(), occurrence.getLabel()))
+                .toList();
+
+        List<ReferentialItemResponse> statutJustificatifs = Arrays.stream(StatutJustificatif.values())
+                .map(statut -> new ReferentialItemResponse(statut.name(), statut.getLabel()))
+                .toList();
+
+        List<ReferentialItemResponse> qualificationPressenties = Arrays.stream(QualificationPressentie.values())
+                .map(qualification -> new ReferentialItemResponse(qualification.name(), qualification.getLabel()))
+                .toList();
+
+        List<ReferentialItemResponse> statutTraitements = Arrays.stream(StatutTraitement.values())
+                .map(statut -> new ReferentialItemResponse(statut.name(), statut.getLabel()))
+                .toList();
+ 
+
+            return new FluxReferentialsResponse(
+                types,
+                categories,
+                paymentModes,
+                occurrences,
+                statutJustificatifs,
+                qualificationPressenties,
+                statutTraitements
+        );
+
   }
 }

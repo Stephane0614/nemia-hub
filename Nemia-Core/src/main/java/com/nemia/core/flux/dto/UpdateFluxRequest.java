@@ -2,7 +2,11 @@ package com.nemia.core.flux.dto;
 
 import com.nemia.core.flux.model.FluxCategory;
 import com.nemia.core.flux.model.FluxType;
+import com.nemia.core.flux.model.Occurrence;
 import com.nemia.core.flux.model.PaymentMode;
+import com.nemia.core.flux.model.QualificationPressentie;
+import com.nemia.core.flux.model.StatutJustificatif;
+import com.nemia.core.flux.model.StatutTraitement;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -31,6 +35,20 @@ public class UpdateFluxRequest {
 
   @NotNull
   private PaymentMode modePaiement;
+
+  private Long bienId;
+
+  private Long exerciceId;
+
+  private LocalDate dateValeur;
+
+  private Occurrence occurrence;
+
+  private StatutJustificatif statutJustificatif;
+
+  private QualificationPressentie qualificationPressentie;
+
+  private StatutTraitement statutTraitement;
 
   @Size(max = 500)
   private String commentaire;
@@ -91,5 +109,61 @@ public class UpdateFluxRequest {
 
   public void setCommentaire(String commentaire) {
     this.commentaire = commentaire;
+  }
+
+  public Long getBienId() {
+    return bienId;
+  }
+
+  public void setBienId(Long bienId) {
+    this.bienId = bienId;
+  }
+
+  public Long getExerciceId() {
+    return exerciceId;
+  }
+
+  public void setExerciceId(Long exerciceId) {
+    this.exerciceId = exerciceId;
+  }
+
+  public LocalDate getDateValeur() {
+    return dateValeur;
+  }
+
+  public void setDateValeur(LocalDate dateValeur) {
+    this.dateValeur = dateValeur;
+  }
+
+  public Occurrence getOccurrence() {
+    return occurrence;
+  }
+
+  public void setOccurrence(Occurrence occurrence) {
+    this.occurrence = occurrence;
+  }
+
+  public StatutJustificatif getStatutJustificatif() {
+    return statutJustificatif;
+  }
+
+  public void setStatutJustificatif(StatutJustificatif statutJustificatif) {
+    this.statutJustificatif = statutJustificatif;
+  }
+
+  public QualificationPressentie getQualificationPressentie() {
+    return qualificationPressentie;
+  }
+
+  public void setQualificationPressentie(QualificationPressentie qualificationPressentie) {
+    this.qualificationPressentie = qualificationPressentie;
+  }
+
+  public StatutTraitement getStatutTraitement() {
+    return statutTraitement;
+  }
+
+  public void setStatutTraitement(StatutTraitement statutTraitement) {
+    this.statutTraitement = statutTraitement;
   }
 }

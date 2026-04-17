@@ -16,7 +16,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.nemia.core.flux.dto.FluxResponse;
 import com.nemia.core.flux.model.FluxCategory;
 import com.nemia.core.flux.model.FluxType;
+import com.nemia.core.flux.model.Occurrence;
 import com.nemia.core.flux.model.PaymentMode;
+import com.nemia.core.flux.model.QualificationPressentie;
+import com.nemia.core.flux.model.StatutJustificatif;
+import com.nemia.core.flux.model.StatutTraitement;
 import com.nemia.core.flux.service.FluxService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +32,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+
 
 @WebMvcTest(FluxController.class)
 class FluxControllerTest {
@@ -233,4 +239,122 @@ class FluxControllerTest {
     response.setUpdatedAt(LocalDateTime.of(2026, 4, 15, 10, 0));
     return response;
   }
+
+    @Test
+  void shouldReturnWarningsWhenOccurrencePonctuelOnRecurrentCategory() throws Exception {
+    FluxResponse response = buildFluxResponse(
+      1L,
+      LocalDate.of(2026, 4, 15),
+      FluxType.DEPENSE,
+      "Charges copro",
+      new BigDecimal("200.00"),
+      FluxCategory.CHARGES_COPRO,
+      PaymentMode.VIREMENT,
+      null
+    );
+    response.setOccurrence(Occurrence.PONCTUEL);
+    response.setWarnings(List.of("Occurrence PONCTUEL suspecte pour une catégorie structurellement récurrente : Charges copropriété"));
+
+    when(fluxService.create(any())).thenReturn(response);
+
+    String requestBody = """
+      {
+        "date": "2026-04-15",
+        "type": "DEPENSE",
+        "libelle": "Charges copro",
+        "montant": 200.00,
+        "categorie": "CHARGES_COPRO",
+        "modePaiement": "VIREMENT",
+        "occurrence": "PONCTUEL"
+      }
+      """;
+
+    mockMvc
+      .perform(post("/api/flux").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(jsonPath("$.warnings").isArray())
+      .andExpect(jsonPath("$.warnings.length()").value(1));
+
+    verify(fluxService).create(any());
+  }
+  @Test
+  void shouldRejectRecetteWithDepenseCategory() throws Exception {
+    when(fluxService.create(any())).thenThrow(
+      new IllegalArgumentException("Incohérence bloquante : une RECETTE ne peut pas avoir la catégorie Électricité")
+    );
+
+    String requestBody = """
+      {
+        "date": "2026-04-15",
+        "type": "RECETTE",
+        "libelle": "Test invalide",
+        "montant": 200.00,
+        "categorie": "ELECTRICITE",
+        "modePaiement": "VIREMENT"
+      }
+      """;
+
+    mockMvc
+      .perform(post("/api/flux").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isBadRequest())
+      .andExpect(jsonPath("$.status").value(400))
+      .andExpect(jsonPath("$.message").value("Incohérence bloquante : une RECETTE ne peut pas avoir la catégorie Électricité"));
+
+    verify(fluxService).create(any());
+  }
+  @Test
+void shouldReturnContextualFieldsInResponse() throws Exception {
+  FluxResponse response = buildFluxResponse(
+    1L,
+    LocalDate.of(2026, 4, 15),
+    FluxType.DEPENSE,
+    "Internet avril",
+    new BigDecimal("29.99"),
+    FluxCategory.INTERNET,
+    PaymentMode.PRELEVEMENT,
+    null
+  );
+  response.setBienId(10L);
+  response.setExerciceId(2L);
+  response.setOccurrence(Occurrence.RECURRENT);
+  response.setStatutJustificatif(StatutJustificatif.FOURNI);
+  response.setQualificationPressentie(QualificationPressentie.CHARGE_COURANTE);
+  response.setStatutTraitement(StatutTraitement.A_REVOIR);
+  response.setWarnings(List.of());
+
+  when(fluxService.create(any())).thenReturn(response);
+
+  String requestBody = """
+    {
+      "date": "2026-04-15",
+      "type": "DEPENSE",
+      "libelle": "Internet avril",
+      "montant": 29.99,
+      "categorie": "INTERNET",
+      "modePaiement": "PRELEVEMENT",
+      "bienId": 10,
+      "exerciceId": 2,
+      "occurrence": "RECURRENT",
+      "statutJustificatif": "FOURNI",
+      "qualificationPressentie": "CHARGE_COURANTE",
+      "statutTraitement": "BRUT"
+    }
+    """;
+
+  mockMvc
+    .perform(post("/api/flux").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    .andDo(print())
+    .andExpect(status().isCreated())
+    .andExpect(jsonPath("$.bienId").value(10))
+    .andExpect(jsonPath("$.exerciceId").value(2))
+    .andExpect(jsonPath("$.occurrence").value("RECURRENT"))
+    .andExpect(jsonPath("$.statutJustificatif").value("FOURNI"))
+    .andExpect(jsonPath("$.qualificationPressentie").value("CHARGE_COURANTE"))
+    .andExpect(jsonPath("$.statutTraitement").value("A_REVOIR"))
+    .andExpect(jsonPath("$.warnings").isArray());
+
+  verify(fluxService).create(any());
+}
 }

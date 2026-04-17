@@ -45,6 +45,25 @@ public class Flux {
   @Column(nullable = false)
   private LocalDateTime updatedAt;
 
+  private Long bienId;
+
+  private Long exerciceId;
+
+  @Convert(converter = LocalDateStringConverter.class)
+  private LocalDate dateValeur;
+
+  @Enumerated(EnumType.STRING)
+  private Occurrence occurrence;
+
+  @Enumerated(EnumType.STRING)
+  private StatutJustificatif statutJustificatif;
+
+  @Enumerated(EnumType.STRING)
+  private QualificationPressentie qualificationPressentie;
+
+  @Enumerated(EnumType.STRING)
+  private StatutTraitement statutTraitement;
+
   public Flux() {}
 
   @PrePersist
@@ -125,5 +144,61 @@ public class Flux {
 
   public LocalDateTime getUpdatedAt() {
     return updatedAt;
+  }
+
+  public Long getBienId() {
+    return bienId;
+  }
+
+  public void setBienId(Long bienId) {
+    this.bienId = bienId;
+  }
+
+  public Long getExerciceId() {
+    return exerciceId;
+  }
+
+  public void setExerciceId(Long exerciceId) {
+    this.exerciceId = exerciceId;
+  }
+
+  public LocalDate getDateValeur() {
+    return dateValeur;
+  }
+
+  public void setDateValeur(LocalDate dateValeur) {
+    this.dateValeur = dateValeur;
+  }
+
+  public Occurrence getOccurrence() {
+    return occurrence;
+  }
+
+  public void setOccurrence(Occurrence occurrence) {
+    this.occurrence = occurrence;
+  }
+
+  public StatutJustificatif getStatutJustificatif() {
+    return statutJustificatif;
+  }
+
+  public void setStatutJustificatif(StatutJustificatif statutJustificatif) {
+    this.statutJustificatif = statutJustificatif;
+  }
+
+  public QualificationPressentie getQualificationPressentie() {
+    return qualificationPressentie;
+  }
+
+  public void setQualificationPressentie(QualificationPressentie qualificationPressentie) {
+    this.qualificationPressentie = qualificationPressentie;
+  }
+
+  public StatutTraitement getStatutTraitement() {
+    return statutTraitement;
+  }
+
+  public void setStatutTraitement(StatutTraitement statutTraitement) {
+    this.statutTraitement = statutTraitement;
   }
 }
