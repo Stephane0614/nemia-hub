@@ -1,6 +1,8 @@
+// flux-request.ts
 import { FluxCategory } from './flux-category';
-import { PaymentMode } from './payment-mode';
 import { FluxType } from './flux-type';
+import { Occurrence, QualificationPressentie, StatutJustificatif, StatutTraitement } from './flux-enums';
+import { PaymentMode } from './payment-mode';
 
 export interface FluxRequest {
   date: string;
@@ -9,5 +11,12 @@ export interface FluxRequest {
   montant: number;
   categorie: FluxCategory;
   modePaiement: PaymentMode;
+  occurrence: Occurrence;
+  statutJustificatif: StatutJustificatif;
+  qualificationPressentie: QualificationPressentie;
+  statutTraitement: StatutTraitement;
+  dateValeur?: string | null;
   commentaire?: string | null;
+  bienId?: number | null;
+  exerciceId?: number | null;
 }
