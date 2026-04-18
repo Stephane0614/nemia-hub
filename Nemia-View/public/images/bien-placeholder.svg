@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" fill="none">
+  <!-- Fond -->
+  <rect width="400" height="260" fill="#f1f5f9"/>
+
+  <!-- Ciel -->
+  <rect width="400" height="140" fill="#e2eaf4"/>
+
+  <!-- Soleil -->
+  <circle cx="340" cy="50" r="28" fill="#fbbf24" opacity="0.7"/>
+
+  <!-- Bâtiment principal -->
+  <rect x="80" y="90" width="240" height="150" rx="4" fill="#cbd5e1"/>
+
+  <!-- Toit -->
+  <polygon points="60,95 200,30 340,95" fill="#94a3b8"/>
+
+  <!-- Porte -->
+  <rect x="170" y="175" width="60" height="65" rx="3" fill="#64748b"/>
+  <circle cx="224" cy="210" r="4" fill="#94a3b8"/>
+
+  <!-- Fenêtres rangée 1 -->
+  <rect x="100" y="115" width="45" height="40" rx="3" fill="#bfdbfe"/>
+  <rect x="177" y="115" width="45" height="40" rx="3" fill="#bfdbfe"/>
+  <rect x="255" y="115" width="45" height="40" rx="3" fill="#bfdbfe"/>
+
+  <!-- Fenêtres rangée 2 -->
+  <rect x="100" y="170" width="45" height="40" rx="3" fill="#bfdbfe"/>
+  <rect x="255" y="170" width="45" height="40" rx="3" fill="#bfdbfe"/>
+
+  <!-- Sol -->
+  <rect x="0" y="238" width="400" height="22" fill="#cbd5e1"/>
+
+  <!-- Arbres -->
+  <rect x="30" y="195" width="8" height="45" fill="#94a3b8"/>
+  <ellipse cx="34" cy="185" rx="22" ry="28" fill="#86efac"/>
+
+  <rect x="358" y="195" width="8" height="45" fill="#94a3b8"/>
+  <ellipse cx="362" cy="185" rx="22" ry="28" fill="#86efac"/>
+</svg>

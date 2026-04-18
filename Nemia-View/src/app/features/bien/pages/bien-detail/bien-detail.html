@@ -1,0 +1,106 @@
+<section class="page-header">
+  <a mat-button routerLink="/biens" class="back-link">
+    &#8592; Retour aux biens
+  </a>
+</section>
+
+@if (isLoading) {
+  <div class="loading-state">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement du bien...</p>
+  </div>
+} @else if (errorMessage) {
+  <mat-card class="state-card state-card--error">
+    <p>{{ errorMessage }}</p>
+    <a mat-stroked-button routerLink="/biens">Retour aux biens</a>
+  </mat-card>
+} @else if (bien) {
+
+  <div class="detail-layout">
+
+    <!-- ── Colonne gauche : photo + actions ── -->
+    <div class="detail-left">
+      <mat-card class="photo-card">
+        <img
+          [src]="bien.photoUrl || 'images/bien-placeholder.svg'"
+          [alt]="bien.nomUsuel"
+          class="detail-photo" />
+        <div class="photo-card__statut">
+          <span class="statut-badge"
+            [class.badge--actif]="bien.statutActivite === 'ACTIF'"
+            [class.badge--preparation]="bien.statutActivite === 'EN_PREPARATION'"
+            [class.badge--suspendu]="bien.statutActivite === 'SUSPENDU'"
+            [class.badge--cloture]="bien.statutActivite === 'CLOTURE'">
+            {{ getStatutLabel(bien.statutActivite) }}
+          </span>
+        </div>
+      </mat-card>
+
+      <div class="detail-actions">
+        <button mat-flat-button (click)="allerVersModifier()">Modifier</button>
+        <button mat-stroked-button (click)="supprimerBien()">Supprimer</button>
+      </div>
+    </div>
+
+    <!-- ── Colonne droite : informations ── -->
+    <div class="detail-right">
+
+      <mat-card class="info-card">
+        <h1 class="bien-nom">{{ bien.nomUsuel }}</h1>
+        <p class="bien-adresse">{{ bien.adresseSimplifiee }}</p>
+
+        <mat-divider></mat-divider>
+
+        <div class="info-grid">
+
+          <div class="info-item">
+            <span class="info-label">Type de location</span>
+            <span class="info-value">{{ bien.typeLocation ?? '—' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Régime visé</span>
+            <span class="info-value">{{ bien.regimeVise ?? '—' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Date de mise en location</span>
+            <span class="info-value">
+              {{ bien.dateMiseEnLocation ? (bien.dateMiseEnLocation | date:'dd/MM/yyyy') : '—' }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Créé le</span>
+            <span class="info-value">{{ bien.createdAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Modifié le</span>
+            <span class="info-value">{{ bien.updatedAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+        </div>
+
+        @if (bien.commentaire) {
+          <mat-divider></mat-divider>
+          <div class="info-commentaire">
+            <span class="info-label">Commentaire</span>
+            <p class="commentaire-texte">{{ bien.commentaire }}</p>
+          </div>
+        }
+      </mat-card>
+
+      <!-- ── Zone réservée aux futures synthèses ── -->
+      <mat-card class="synthese-card">
+        <div class="synthese-placeholder">
+          <p class="synthese-placeholder__titre">Synthèse financière</p>
+          <p class="synthese-placeholder__texte">
+            Les données financières par bien seront disponibles ici prochainement.
+          </p>
+        </div>
+      </mat-card>
+
+    </div>
+  </div>
+}

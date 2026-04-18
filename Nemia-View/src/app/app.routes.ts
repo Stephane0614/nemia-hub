@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Home } from './features/home/pages/home/home';
 import { fluxRoutes } from './features/flux/flux.routes';
+import { bienRoutes } from './features/bien/bien.routes';
 
 export const routes: Routes = [
   {
@@ -10,6 +11,10 @@ export const routes: Routes = [
   {
     path: 'flux',
     children: fluxRoutes,
+  },
+  {
+    path: 'biens',
+    children: bienRoutes,
   },
   {
     path: '**',

@@ -1,0 +1,200 @@
+:host {
+  display: block;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.back-link {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+// ── États ──
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #475569;
+  padding: 24px 0;
+}
+
+.state-card {
+  padding: 24px;
+  border-radius: 14px;
+}
+
+.state-card--error {
+  border-left: 4px solid #b91c1c;
+  color: #991b1b;
+}
+
+// ── Layout ──
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+// ── Colonne gauche ──
+
+.photo-card {
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 0;
+  margin-bottom: 16px;
+}
+
+.detail-photo {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-card__statut {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.statut-badge {
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  &.badge--actif        { background: #dcfce7; color: #15803d; }
+  &.badge--preparation  { background: #fef9c3; color: #854d0e; }
+  &.badge--suspendu     { background: #f1f5f9; color: #64748b; }
+  &.badge--cloture      { background: #fee2e2; color: #b91c1c; }
+}
+
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  button {
+    width: 100%;
+  }
+}
+
+// ── Colonne droite ──
+
+.info-card {
+  padding: 28px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.bien-nom {
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.bien-adresse {
+  margin: 0 0 20px;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+mat-divider {
+  margin: 20px 0;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+.info-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.info-commentaire {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commentaire-texte {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+// ── Zone synthèse future ──
+
+.synthese-card {
+  padding: 28px;
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+  background: #f8fafc;
+}
+
+.synthese-placeholder {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.synthese-placeholder__titre {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.synthese-placeholder__texte {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+// ── Responsive ──
+
+@media (max-width: 900px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-photo {
+    height: 200px;
+  }
+
+  .detail-actions {
+    flex-direction: row;
+
+    button {
+      width: auto;
+      flex: 1;
+    }
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

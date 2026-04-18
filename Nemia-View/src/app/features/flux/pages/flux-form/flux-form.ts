@@ -15,6 +15,9 @@ import { FluxRequest } from '../../models/flux-request';
 import { FluxType } from '../../models/flux-type';
 import { PaymentMode } from '../../models/payment-mode';
 import { FluxApi } from '../../services/flux-api';
+import { BienApi } from '../.././../bien/services/bien-api';
+import { BienResponse } from '../../../bien/models/bien-response';
+
 import {
   Occurrence,
   QualificationPressentie,
@@ -44,6 +47,7 @@ export class FluxForm implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly fluxApi = inject(FluxApi);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly bienApi = inject(BienApi);
 
   serverValidationErrors: Record<string, string> = {};
   loadErrorMessage = '';
@@ -59,6 +63,8 @@ export class FluxForm implements OnInit {
   statutsJustificatif: { code: string; label: string }[] = [];
   qualificationsPressenties: { code: string; label: string }[] = [];
   statutsTraitement: { code: string; label: string }[] = [];
+  biens: BienResponse[] = [];
+  biensLoading = false;
 
   readonly fluxId = computed(() => {
     const id = this.route.snapshot.paramMap.get('id');
@@ -97,6 +103,18 @@ export class FluxForm implements OnInit {
         this.statutsJustificatif = referentials.statutJustificatifs ?? [];
         this.qualificationsPressenties = referentials.qualificationPressenties ?? [];
         this.statutsTraitement = referentials.statutTraitements ?? [];
+        this.biensLoading = true;
+        this.bienApi.getAll().subscribe({
+          next: (biens) => {
+            this.biens = biens;
+            this.biensLoading = false;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.biensLoading = false;
+            this.cdr.detectChanges();
+          },
+        });
 
         const fluxId = this.fluxId();
 
