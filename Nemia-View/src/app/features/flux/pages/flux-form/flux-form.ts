@@ -16,6 +16,12 @@ import { FluxRequest } from '../../models/flux-request';
 import { FluxType } from '../../models/flux-type';
 import { PaymentMode } from '../../models/payment-mode';
 import { FluxApi } from '../../services/flux-api';
+import {
+  Occurrence,
+  QualificationPressentie,
+  StatutJustificatif,
+  StatutTraitement,
+} from '../../models/flux-enums';
 
 @Component({
   selector: 'app-flux-form',
@@ -46,10 +52,15 @@ export class FluxForm implements OnInit {
   submitErrorMessage = '';
   isLoading = false;
   isSubmitting = false;
+  submitWarnings: string[] = [];
 
   fluxTypes: { code: string; label: string }[] = [];
   fluxCategories: { code: string; label: string }[] = [];
   paymentModes: { code: string; label: string }[] = [];
+  occurrences: { code: string; label: string }[] = [];
+  statutsJustificatif: { code: string; label: string }[] = [];
+  qualificationsPressenties: { code: string; label: string }[] = [];
+  statutsTraitement: { code: string; label: string }[] = [];
 
   readonly fluxId = computed(() => {
     const id = this.route.snapshot.paramMap.get('id');
@@ -65,6 +76,13 @@ export class FluxForm implements OnInit {
     montant: [null as number | null, [Validators.required, Validators.min(0.01)]],
     categorie: ['', Validators.required],
     modePaiement: ['', Validators.required],
+    dateValeur: [null as Date | null],
+    occurrence: ['', Validators.required],
+    statutJustificatif: ['', Validators.required],
+    qualificationPressentie: ['', Validators.required],
+    statutTraitement: ['', Validators.required],
+    bienId: [null as number | null],
+    exerciceId: [null as number | null],
     commentaire: ['', Validators.maxLength(500)],
   });
 
@@ -77,6 +95,10 @@ export class FluxForm implements OnInit {
         this.fluxTypes = referentials.types;
         this.fluxCategories = referentials.categories;
         this.paymentModes = referentials.paymentModes;
+        this.occurrences = referentials.occurrences ?? [];
+        this.statutsJustificatif = referentials.statutJustificatifs ?? [];
+        this.qualificationsPressenties = referentials.qualificationPressenties ?? [];
+        this.statutsTraitement = referentials.statutTraitements ?? [];
 
         const fluxId = this.fluxId();
 
@@ -135,9 +157,9 @@ export class FluxForm implements OnInit {
       }
 
       this.fluxApi.update(fluxId, payload).subscribe({
-        next: () => {
+        next: (fluxResponse) => {
           this.isSubmitting = false;
-          this.handleSaveSuccess();
+          this.handleSaveSuccess(fluxResponse.warnings);
           console.log('Flux mis à jour avec succès');
         },
         error: (error: HttpErrorResponse) => {
@@ -158,9 +180,9 @@ export class FluxForm implements OnInit {
     }
 
     this.fluxApi.create(payload).subscribe({
-      next: () => {
+      next: (fluxResponse) => {
         this.isSubmitting = false;
-        this.handleSaveSuccess();
+        this.handleSaveSuccess(fluxResponse.warnings);
         console.log('Flux créé avec succès');
       },
       error: (error: HttpErrorResponse) => {
@@ -188,7 +210,14 @@ export class FluxForm implements OnInit {
       montant: rawValue.montant ?? 0,
       categorie: rawValue.categorie as FluxCategory,
       modePaiement: rawValue.modePaiement as PaymentMode,
-      commentaire: (rawValue.commentaire ?? '').trim() ? (rawValue.commentaire ?? '').trim() : null,
+      occurrence: rawValue.occurrence as Occurrence,
+      statutJustificatif: rawValue.statutJustificatif as StatutJustificatif,
+      qualificationPressentie: rawValue.qualificationPressentie as QualificationPressentie,
+      statutTraitement: rawValue.statutTraitement as StatutTraitement,
+      dateValeur: this.formatDateForApi(rawValue.dateValeur) || null,
+      commentaire: (rawValue.commentaire ?? '').trim() || null,
+      bienId: rawValue.bienId ? Number(rawValue.bienId) : null,
+      exerciceId: rawValue.exerciceId ? Number(rawValue.exerciceId) : null,
     };
   }
 
@@ -222,9 +251,17 @@ export class FluxForm implements OnInit {
     this.serverValidationErrors = errors ?? {};
   }
 
-  private handleSaveSuccess(): void {
+  private handleSaveSuccess(warnings: string[]): void {
     this.serverValidationErrors = {};
     this.submitErrorMessage = '';
+    this.submitWarnings = [];
+
+    if (warnings.length > 0) {
+      this.submitWarnings = warnings;
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.form.reset();
     this.router.navigateByUrl('/flux');
   }
@@ -249,6 +286,13 @@ export class FluxForm implements OnInit {
           categorie: flux.categorie,
           modePaiement: flux.modePaiement,
           commentaire: flux.commentaire ?? '',
+          dateValeur: this.parseApiDate(flux.dateValeur),
+          occurrence: flux.occurrence,
+          statutJustificatif: flux.statutJustificatif,
+          qualificationPressentie: flux.qualificationPressentie,
+          statutTraitement: flux.statutTraitement,
+          bienId: flux.bienId,
+          exerciceId: flux.exerciceId,
         });
 
         this.isLoading = false;
@@ -261,5 +305,11 @@ export class FluxForm implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  confirmAndRedirect(): void {
+    this.submitWarnings = [];
+    this.form.reset();
+    this.router.navigateByUrl('/flux');
   }
 }

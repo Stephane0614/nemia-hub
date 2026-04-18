@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -8,12 +8,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConfirmDialog } from '../../../../shared/ui/confirm-dialog/confirm-dialog';
 import { FluxResponse } from '../../models/flux-response';
 import { FluxApi } from '../../services/flux-api';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-flux-list',
   imports: [
     RouterLink,
     MatCardModule,
+    DecimalPipe,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatDialogModule,
@@ -31,6 +33,12 @@ export class FluxList implements OnInit {
   fluxes: FluxResponse[] = [];
   isLoading = false;
   loadErrorMessage = '';
+  @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
+
+scrollTable(direction: 'left' | 'right'): void {
+  const el = this.tableWrapper.nativeElement;
+  el.scrollBy({ left: direction === 'right' ? 200 : -200, behavior: 'smooth' });
+}
 
   ngOnInit(): void {
     this.loadFluxes();

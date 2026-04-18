@@ -1,6 +1,8 @@
+// flux-response.ts
 import { FluxCategory } from './flux-category';
-import { PaymentMode } from './payment-mode';
 import { FluxType } from './flux-type';
+import { Occurrence, QualificationPressentie, StatutJustificatif, StatutTraitement } from './flux-enums';
+import { PaymentMode } from './payment-mode';
 
 export interface FluxResponse {
   id: number;
@@ -13,4 +15,12 @@ export interface FluxResponse {
   commentaire: string | null;
   createdAt: string;
   updatedAt: string;
+  dateValeur: string | null;
+  occurrence: Occurrence;
+  statutJustificatif: StatutJustificatif;
+  qualificationPressentie: QualificationPressentie;
+  statutTraitement: StatutTraitement;
+  bienId: number | null;
+  exerciceId: number | null;
+  warnings: string[];
 }
