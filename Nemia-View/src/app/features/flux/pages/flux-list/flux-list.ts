@@ -8,7 +8,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConfirmDialog } from '../../../../shared/ui/confirm-dialog/confirm-dialog';
 import { FluxResponse } from '../../models/flux-response';
 import { FluxApi } from '../../services/flux-api';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, DatePipe , registerLocaleData  } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+
 
 @Component({
   selector: 'app-flux-list',
@@ -16,6 +18,7 @@ import { DecimalPipe } from '@angular/common';
     RouterLink,
     MatCardModule,
     DecimalPipe,
+    DatePipe,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatDialogModule,
@@ -38,6 +41,10 @@ export class FluxList implements OnInit {
 scrollTable(direction: 'left' | 'right'): void {
   const el = this.tableWrapper.nativeElement;
   el.scrollBy({ left: direction === 'right' ? 200 : -200, behavior: 'smooth' });
+}
+
+constructor() {
+  registerLocaleData(localeFr);
 }
 
   ngOnInit(): void {

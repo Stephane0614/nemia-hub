@@ -3,7 +3,6 @@ import { ChangeDetectorRef, Component, OnInit, computed, inject } from '@angular
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -36,7 +35,6 @@ import {
     MatProgressSpinnerModule,
     MatDatepickerModule,
   ],
-  providers: [provideNativeDateAdapter()],
   templateUrl: './flux-form.html',
   styleUrl: './flux-form.scss',
 })
