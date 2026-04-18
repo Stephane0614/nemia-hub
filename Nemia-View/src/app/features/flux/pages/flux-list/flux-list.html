@@ -45,7 +45,7 @@
       <tbody>
         @for (flux of fluxes; track flux.id) {
         <tr [class.row--warning]="flux.warnings && flux.warnings.length > 0">
-          <td>{{ flux.date }}</td>
+          <td>{{ flux.date | date:'dd/MM/yyyy' }}</td>
 
           <td>
             <span class="badge" [class.badge--recette]="flux.type === 'RECETTE'"

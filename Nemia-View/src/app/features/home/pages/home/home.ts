@@ -1,89 +1,155 @@
-import { Component } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, CurrencyPipe, registerLocaleData, DatePipe  } from '@angular/common';
+import { Router } from '@angular/router';
+import localeFr from '@angular/common/locales/fr';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-
-type HomeMetric = {
-  label: string;
-  value: string;
-  detail: string;
-};
-
-type HomeOperation = {
-  date: string;
-  label: string;
-  type: 'RECETTE' | 'DEPENSE';
-  amount: number;
-};
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { HomeSyntheseApi } from './home-synthese-api';
+import {
+  HomeSyntheseResponse,
+  Alertes,
+  Metriques,
+  RepartitionDepense,
+  RecurrenceDepenses,
+  DerniereOperation,
+} from './models/home-synthese';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, MatCardModule, MatDividerModule, CurrencyPipe, DatePipe],
+  imports: [
+    CommonModule,
+    MatCardModule,
+    DatePipe ,
+    MatDividerModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatIconModule,
+    CurrencyPipe,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home {
-  readonly monthLabel = 'Avril 2026';
+export class Home implements OnInit {
+  private readonly homeSyntheseApi = inject(HomeSyntheseApi);
+  private readonly router = inject(Router);
 
-  readonly metrics: HomeMetric[] = [
-    {
-      label: 'Recettes du mois',
-      value: '2 145 €',
-      detail: '3 encaissements enregistrés',
-    },
-    {
-      label: 'Dépenses du mois',
-      value: '684 €',
-      detail: '5 dépenses enregistrées',
-    },
-    {
-      label: 'Solde du mois',
-      value: '1 461 €',
-      detail: 'Vision mensuelle provisoire',
-    },
-    {
-      label: 'Opérations du mois',
-      value: '8',
-      detail: 'Suivi d’activité courant',
-    },
-  ];
+  isLoading = false;
+  errorMessage = '';
+  synthese: HomeSyntheseResponse | null = null;
+  moisCourant: string = '';
+  private readonly cdr = inject(ChangeDetectorRef);
 
-  readonly recentOperations: HomeOperation[] = [
-    {
-      date: '2026-04-12',
-      label: 'Loyer appartement Bordeaux',
-      type: 'RECETTE',
-      amount: 715,
-    },
-    {
-      date: '2026-04-10',
-      label: 'Charges de copropriété',
-      type: 'DEPENSE',
-      amount: 148,
-    },
-    {
-      date: '2026-04-08',
-      label: 'Assurance PNO',
-      type: 'DEPENSE',
-      amount: 32,
-    },
-    {
-      date: '2026-04-05',
-      label: 'Loyer studio Mérignac',
-      type: 'RECETTE',
-      amount: 680,
-    },
-    {
-      date: '2026-04-03',
-      label: 'Intervention plomberie',
-      type: 'DEPENSE',
-      amount: 210,
-    },
-  ];
+  constructor() {
+  registerLocaleData(localeFr);
+}
 
-  readonly attentionPoints: string[] = [
-    'Une dépense de plomberie a été enregistrée ce mois-ci.',
-    'Le niveau de dépenses reste modéré par rapport aux recettes.',
-    'Cette page est une maquette fonctionnelle en attendant les vraies données métier.',
-  ];
+  ngOnInit(): void {
+  this.loadSynthese();
+}
+
+
+  loadSynthese(mois?: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.homeSyntheseApi.getSynthese(mois).subscribe({
+      next: (data) => {
+        this.synthese = data;
+        this.moisCourant = data.periode.mois;
+        this.isLoading = false;
+        setTimeout(() => this.cdr.detectChanges());
+      },
+      error: () => {
+        this.errorMessage = 'Impossible de charger les données.';
+        this.isLoading = false;
+        setTimeout(() => this.cdr.detectChanges());
+      },
+    });
+  }
+
+  // ── Navigation entre mois ──
+
+  get moisPrecedent(): string {
+    return this.decrementerMois(this.moisCourant);
+  }
+
+  get moisSuivant(): string {
+    return this.incrementerMois(this.moisCourant);
+  }
+
+  get isMoisCourant(): boolean {
+    const now = new Date();
+    const moisActuel = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return this.moisCourant === moisActuel;
+  }
+
+  allerMoisPrecedent(): void {
+    this.loadSynthese(this.moisPrecedent);
+  }
+
+  allerMoisSuivant(): void {
+    if (!this.isMoisCourant) {
+      this.loadSynthese(this.moisSuivant);
+    }
+  }
+
+  private decrementerMois(mois: string): string {
+    const [year, month] = mois.split('-').map(Number);
+    const date = new Date(year, month - 2);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  private incrementerMois(mois: string): string {
+    const [year, month] = mois.split('-').map(Number);
+    const date = new Date(year, month);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  // ── Navigation vers flux ──
+
+  allerVersFlux(): void {
+    this.router.navigate(['/flux']);
+  }
+
+  allerVersFluxDetail(id: number): void {
+    this.router.navigate(['/flux', id, 'modifier']);
+  }
+
+  // ── Helpers métriques ──
+
+  get metriques(): Metriques | null {
+    return this.synthese?.metriques ?? null;
+  }
+
+  get alertes(): Alertes | null {
+    return this.synthese?.alertes ?? null;
+  }
+
+  get repartitionDepenses(): RepartitionDepense[] {
+    return this.synthese?.repartitionDepenses ?? [];
+  }
+
+  get recurrenceDepenses(): RecurrenceDepenses | null {
+    return this.synthese?.recurrenceDepenses ?? null;
+  }
+
+  get dernieresOperations(): DerniereOperation[] {
+    return this.synthese?.dernieresOperations ?? [];
+  }
+
+  get aucuneAlerte(): boolean {
+    if (!this.alertes) return true;
+    return (
+      this.alertes.fluxSansJustificatif === 0 &&
+      this.alertes.fluxAArbitrer === 0 &&
+      this.alertes.fluxARevoir === 0
+    );
+  }
+
+  get soldePositif(): boolean {
+    return (this.metriques?.solde ?? 0) > 0;
+  }
 }
