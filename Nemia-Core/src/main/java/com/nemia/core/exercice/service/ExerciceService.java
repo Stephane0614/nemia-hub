@@ -27,7 +27,8 @@ public class ExerciceService {
 
     String libelle = request.getLibelleExercice().trim();
 
-    exerciceRepository.findByLibelleExercice(libelle)
+    exerciceRepository
+      .findByLibelleExercice(libelle)
       .ifPresent(existing -> {
         logger.warn("Doublon détecté à la création : {}", libelle);
         throw new ExerciceAlreadyExistsException(libelle);
@@ -44,17 +45,15 @@ public class ExerciceService {
 
   public List<ExerciceResponse> findAll() {
     logger.info("Récupération de tous les exercices");
-    List<ExerciceResponse> exercices = exerciceRepository.findAll()
-      .stream()
-      .map(this::mapToResponse)
-      .toList();
+    List<ExerciceResponse> exercices = exerciceRepository.findAll().stream().map(this::mapToResponse).toList();
     logger.info("Nombre d'exercices récupérés : {}", exercices.size());
     return exercices;
   }
 
   public ExerciceResponse findById(Long id) {
     logger.info("Recherche de l'exercice id={}", id);
-    Exercice exercice = exerciceRepository.findById(id)
+    Exercice exercice = exerciceRepository
+      .findById(id)
       .orElseThrow(() -> {
         logger.warn("Exercice introuvable id={}", id);
         return new ExerciceNotFoundException(id);
@@ -66,7 +65,8 @@ public class ExerciceService {
   public ExerciceResponse update(Long id, ExerciceRequest request) {
     logger.info("Mise à jour de l'exercice id={}", id);
 
-    Exercice exercice = exerciceRepository.findById(id)
+    Exercice exercice = exerciceRepository
+      .findById(id)
       .orElseThrow(() -> {
         logger.warn("Exercice introuvable pour mise à jour id={}", id);
         return new ExerciceNotFoundException(id);
@@ -74,7 +74,8 @@ public class ExerciceService {
 
     String libelle = request.getLibelleExercice().trim();
 
-    exerciceRepository.findByLibelleExercice(libelle)
+    exerciceRepository
+      .findByLibelleExercice(libelle)
       .ifPresent(existing -> {
         if (!existing.getId().equals(id)) {
           logger.warn("Doublon détecté à la modification : {}", libelle);
@@ -92,7 +93,8 @@ public class ExerciceService {
 
   public void delete(Long id) {
     logger.info("Suppression de l'exercice id={}", id);
-    Exercice exercice = exerciceRepository.findById(id)
+    Exercice exercice = exerciceRepository
+      .findById(id)
       .orElseThrow(() -> {
         logger.warn("Exercice introuvable pour suppression id={}", id);
         return new ExerciceNotFoundException(id);
@@ -103,9 +105,7 @@ public class ExerciceService {
 
   private void validateDates(ExerciceRequest request) {
     if (!request.getDateFin().isAfter(request.getDateDebut())) {
-      throw new IllegalArgumentException(
-        "La date de fin doit être strictement postérieure à la date de début."
-      );
+      throw new IllegalArgumentException("La date de fin doit être strictement postérieure à la date de début.");
     }
   }
 

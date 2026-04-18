@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, CurrencyPipe, registerLocaleData, DatePipe  } from '@angular/common';
+import { CommonModule, CurrencyPipe, registerLocaleData, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import localeFr from '@angular/common/locales/fr';
 import { MatCardModule } from '@angular/material/card';
@@ -22,7 +22,7 @@ import {
   imports: [
     CommonModule,
     MatCardModule,
-    DatePipe ,
+    DatePipe,
     MatDividerModule,
     MatProgressSpinnerModule,
     MatButtonModule,
@@ -43,13 +43,12 @@ export class Home implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
 
   constructor() {
-  registerLocaleData(localeFr);
-}
+    registerLocaleData(localeFr);
+  }
 
   ngOnInit(): void {
-  this.loadSynthese();
-}
-
+    this.loadSynthese();
+  }
 
   loadSynthese(mois?: string): void {
     this.isLoading = true;

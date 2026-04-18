@@ -19,30 +19,75 @@ public class ExerciceResponse {
 
   public ExerciceResponse() {}
 
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+  public Long getId() {
+    return id;
+  }
 
-  public String getLibelleExercice() { return libelleExercice; }
-  public void setLibelleExercice(String libelleExercice) { this.libelleExercice = libelleExercice; }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-  public LocalDate getDateDebut() { return dateDebut; }
-  public void setDateDebut(LocalDate dateDebut) { this.dateDebut = dateDebut; }
+  public String getLibelleExercice() {
+    return libelleExercice;
+  }
 
-  public LocalDate getDateFin() { return dateFin; }
-  public void setDateFin(LocalDate dateFin) { this.dateFin = dateFin; }
+  public void setLibelleExercice(String libelleExercice) {
+    this.libelleExercice = libelleExercice;
+  }
 
-  public StatutExercice getStatutExercice() { return statutExercice; }
-  public void setStatutExercice(StatutExercice statutExercice) { this.statutExercice = statutExercice; }
+  public LocalDate getDateDebut() {
+    return dateDebut;
+  }
 
-  public NiveauCompletude getNiveauCompletude() { return niveauCompletude; }
-  public void setNiveauCompletude(NiveauCompletude niveauCompletude) { this.niveauCompletude = niveauCompletude; }
+  public void setDateDebut(LocalDate dateDebut) {
+    this.dateDebut = dateDebut;
+  }
 
-  public String getCommentaire() { return commentaire; }
-  public void setCommentaire(String commentaire) { this.commentaire = commentaire; }
+  public LocalDate getDateFin() {
+    return dateFin;
+  }
 
-  public LocalDateTime getCreatedAt() { return createdAt; }
-  public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+  public void setDateFin(LocalDate dateFin) {
+    this.dateFin = dateFin;
+  }
 
-  public LocalDateTime getUpdatedAt() { return updatedAt; }
-  public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+  public StatutExercice getStatutExercice() {
+    return statutExercice;
+  }
+
+  public void setStatutExercice(StatutExercice statutExercice) {
+    this.statutExercice = statutExercice;
+  }
+
+  public NiveauCompletude getNiveauCompletude() {
+    return niveauCompletude;
+  }
+
+  public void setNiveauCompletude(NiveauCompletude niveauCompletude) {
+    this.niveauCompletude = niveauCompletude;
+  }
+
+  public String getCommentaire() {
+    return commentaire;
+  }
+
+  public void setCommentaire(String commentaire) {
+    this.commentaire = commentaire;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
 }

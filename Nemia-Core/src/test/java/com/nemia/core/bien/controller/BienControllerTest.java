@@ -46,16 +46,21 @@ class BienControllerTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(bienController)
+    mockMvc = MockMvcBuilders.standaloneSetup(bienController)
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }
 
   @Test
   void shouldCreateBien() throws Exception {
-    BienResponse response = buildBienResponse(1L, "Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux",
-      StatutActiviteBien.ACTIF, TypeLocation.LMNP_LONGUE_DUREE, RegimeVise.REEL);
+    BienResponse response = buildBienResponse(
+      1L,
+      "Studio Bordeaux",
+      "12 rue des Capucins, 33000 Bordeaux",
+      StatutActiviteBien.ACTIF,
+      TypeLocation.LMNP_LONGUE_DUREE,
+      RegimeVise.REEL
+    );
 
     when(bienService.create(any())).thenReturn(response);
 
@@ -71,7 +76,8 @@ class BienControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(1))
@@ -83,8 +89,14 @@ class BienControllerTest {
 
   @Test
   void shouldCreateBienWithOptionalFieldsAbsent() throws Exception {
-    BienResponse response = buildBienResponse(2L, "Studio Paris", "45 rue de la Roquette, 75011 Paris",
-      StatutActiviteBien.EN_PREPARATION, null, null);
+    BienResponse response = buildBienResponse(
+      2L,
+      "Studio Paris",
+      "45 rue de la Roquette, 75011 Paris",
+      StatutActiviteBien.EN_PREPARATION,
+      null,
+      null
+    );
 
     when(bienService.create(any())).thenReturn(response);
 
@@ -96,7 +108,8 @@ class BienControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(2))
@@ -107,14 +120,27 @@ class BienControllerTest {
 
   @Test
   void shouldReturnAllBiens() throws Exception {
-    BienResponse first = buildBienResponse(1L, "Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux",
-      StatutActiviteBien.ACTIF, TypeLocation.LMNP_LONGUE_DUREE, RegimeVise.REEL);
-    BienResponse second = buildBienResponse(2L, "T2 Lyon", "8 rue Marietton, 69009 Lyon",
-      StatutActiviteBien.ACTIF, TypeLocation.LMNP_LONGUE_DUREE, RegimeVise.REEL);
+    BienResponse first = buildBienResponse(
+      1L,
+      "Studio Bordeaux",
+      "12 rue des Capucins, 33000 Bordeaux",
+      StatutActiviteBien.ACTIF,
+      TypeLocation.LMNP_LONGUE_DUREE,
+      RegimeVise.REEL
+    );
+    BienResponse second = buildBienResponse(
+      2L,
+      "T2 Lyon",
+      "8 rue Marietton, 69009 Lyon",
+      StatutActiviteBien.ACTIF,
+      TypeLocation.LMNP_LONGUE_DUREE,
+      RegimeVise.REEL
+    );
 
     when(bienService.findAll()).thenReturn(List.of(first, second));
 
-    mockMvc.perform(get("/api/biens"))
+    mockMvc
+      .perform(get("/api/biens"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$").isArray())
@@ -128,12 +154,19 @@ class BienControllerTest {
   @Test
   void shouldReturnBienById() throws Exception {
     Long id = 1L;
-    BienResponse response = buildBienResponse(id, "Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux",
-      StatutActiviteBien.ACTIF, TypeLocation.LMNP_LONGUE_DUREE, RegimeVise.REEL);
+    BienResponse response = buildBienResponse(
+      id,
+      "Studio Bordeaux",
+      "12 rue des Capucins, 33000 Bordeaux",
+      StatutActiviteBien.ACTIF,
+      TypeLocation.LMNP_LONGUE_DUREE,
+      RegimeVise.REEL
+    );
 
     when(bienService.findById(id)).thenReturn(response);
 
-    mockMvc.perform(get("/api/biens/{id}", id))
+    mockMvc
+      .perform(get("/api/biens/{id}", id))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
@@ -147,7 +180,8 @@ class BienControllerTest {
     Long id = 99L;
     when(bienService.findById(id)).thenThrow(new BienNotFoundException(id));
 
-    mockMvc.perform(get("/api/biens/{id}", id))
+    mockMvc
+      .perform(get("/api/biens/{id}", id))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message").value("Bien introuvable : 99"));
@@ -158,8 +192,14 @@ class BienControllerTest {
   @Test
   void shouldUpdateBien() throws Exception {
     Long id = 1L;
-    BienResponse response = buildBienResponse(id, "Studio Bordeaux MAJ", "12 rue des Capucins, 33000 Bordeaux",
-      StatutActiviteBien.ACTIF, TypeLocation.LMNP_LONGUE_DUREE, RegimeVise.REEL);
+    BienResponse response = buildBienResponse(
+      id,
+      "Studio Bordeaux MAJ",
+      "12 rue des Capucins, 33000 Bordeaux",
+      StatutActiviteBien.ACTIF,
+      TypeLocation.LMNP_LONGUE_DUREE,
+      RegimeVise.REEL
+    );
 
     when(bienService.update(eq(id), any())).thenReturn(response);
 
@@ -173,7 +213,8 @@ class BienControllerTest {
       }
       """;
 
-    mockMvc.perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.nomUsuel").value("Studio Bordeaux MAJ"));
@@ -194,7 +235,8 @@ class BienControllerTest {
       }
       """;
 
-    mockMvc.perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isNotFound());
 
@@ -206,9 +248,7 @@ class BienControllerTest {
     Long id = 1L;
     doNothing().when(bienService).delete(id);
 
-    mockMvc.perform(delete("/api/biens/{id}", id))
-      .andDo(print())
-      .andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/biens/{id}", id)).andDo(print()).andExpect(status().isNoContent());
 
     verify(bienService).delete(id);
   }
@@ -218,15 +258,19 @@ class BienControllerTest {
     Long id = 99L;
     doThrow(new BienNotFoundException(id)).when(bienService).delete(id);
 
-    mockMvc.perform(delete("/api/biens/{id}", id))
-      .andDo(print())
-      .andExpect(status().isNotFound());
+    mockMvc.perform(delete("/api/biens/{id}", id)).andDo(print()).andExpect(status().isNotFound());
 
     verify(bienService).delete(id);
   }
 
-  private BienResponse buildBienResponse(Long id, String nomUsuel, String adresseSimplifiee,
-    StatutActiviteBien statutActivite, TypeLocation typeLocation, RegimeVise regimeVise) {
+  private BienResponse buildBienResponse(
+    Long id,
+    String nomUsuel,
+    String adresseSimplifiee,
+    StatutActiviteBien statutActivite,
+    TypeLocation typeLocation,
+    RegimeVise regimeVise
+  ) {
     BienResponse response = new BienResponse();
     response.setId(id);
     response.setNomUsuel(nomUsuel);
@@ -242,70 +286,81 @@ class BienControllerTest {
   }
 
   @Test
-void shouldReturn409WhenCreatingDuplicateBien() throws Exception {
-  when(bienService.create(any())).thenThrow(
-    new BienAlreadyExistsException("Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux")
-  );
+  void shouldReturn409WhenCreatingDuplicateBien() throws Exception {
+    when(bienService.create(any())).thenThrow(new BienAlreadyExistsException("Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux"));
 
-  String requestBody = """
-    {
-      "nomUsuel": "Studio Bordeaux",
-      "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
-      "statutActivite": "ACTIF"
-    }
-    """;
+    String requestBody = """
+      {
+        "nomUsuel": "Studio Bordeaux",
+        "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
+        "statutActivite": "ACTIF"
+      }
+      """;
 
-  mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
-    .andDo(print())
-    .andExpect(status().isConflict())
-    .andExpect(jsonPath("$.message").value("Un bien existe déjà avec ce nom et cette adresse : Studio Bordeaux — 12 rue des Capucins, 33000 Bordeaux"));
+    mockMvc
+      .perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isConflict())
+      .andExpect(
+        jsonPath("$.message").value(
+          "Un bien existe déjà avec ce nom et cette adresse : Studio Bordeaux — 12 rue des Capucins, 33000 Bordeaux"
+        )
+      );
 
-  verify(bienService).create(any());
-}
+    verify(bienService).create(any());
+  }
 
-@Test
-void shouldReturn409WhenUpdatingToExistingCombination() throws Exception {
-  Long id = 1L;
-  when(bienService.update(eq(id), any())).thenThrow(
-    new BienAlreadyExistsException("Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux")
-  );
+  @Test
+  void shouldReturn409WhenUpdatingToExistingCombination() throws Exception {
+    Long id = 1L;
+    when(bienService.update(eq(id), any())).thenThrow(
+      new BienAlreadyExistsException("Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux")
+    );
 
-  String requestBody = """
-    {
-      "nomUsuel": "Studio Bordeaux",
-      "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
-      "statutActivite": "ACTIF"
-    }
-    """;
+    String requestBody = """
+      {
+        "nomUsuel": "Studio Bordeaux",
+        "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
+        "statutActivite": "ACTIF"
+      }
+      """;
 
-  mockMvc.perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
-    .andDo(print())
-    .andExpect(status().isConflict());
+    mockMvc
+      .perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isConflict());
 
-  verify(bienService).update(eq(id), any());
-}
+    verify(bienService).update(eq(id), any());
+  }
 
-@Test
-void shouldReturn200WhenUpdatingBienWithSameNomAndAdresse() throws Exception {
-  Long id = 1L;
-  BienResponse response = buildBienResponse(id, "Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux",
-    StatutActiviteBien.ACTIF, TypeLocation.LMNP_LONGUE_DUREE, RegimeVise.REEL);
+  @Test
+  void shouldReturn200WhenUpdatingBienWithSameNomAndAdresse() throws Exception {
+    Long id = 1L;
+    BienResponse response = buildBienResponse(
+      id,
+      "Studio Bordeaux",
+      "12 rue des Capucins, 33000 Bordeaux",
+      StatutActiviteBien.ACTIF,
+      TypeLocation.LMNP_LONGUE_DUREE,
+      RegimeVise.REEL
+    );
 
-  when(bienService.update(eq(id), any())).thenReturn(response);
+    when(bienService.update(eq(id), any())).thenReturn(response);
 
-  String requestBody = """
-    {
-      "nomUsuel": "Studio Bordeaux",
-      "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
-      "statutActivite": "ACTIF"
-    }
-    """;
+    String requestBody = """
+      {
+        "nomUsuel": "Studio Bordeaux",
+        "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
+        "statutActivite": "ACTIF"
+      }
+      """;
 
-  mockMvc.perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
-    .andDo(print())
-    .andExpect(status().isOk())
-    .andExpect(jsonPath("$.nomUsuel").value("Studio Bordeaux"));
+    mockMvc
+      .perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.nomUsuel").value("Studio Bordeaux"));
 
-  verify(bienService).update(eq(id), any());
-}
+    verify(bienService).update(eq(id), any());
+  }
 }

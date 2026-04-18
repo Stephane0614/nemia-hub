@@ -5,19 +5,20 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
-
 html {
   height: 100%;
 
-  @include mat.theme((
-    color: (
-      theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
 }
 
 body {
@@ -28,7 +29,6 @@ body {
   color: #1f2937;
   font: var(--mat-sys-body-medium);
 }
-
 
 .app-snackbar-success {
   --mdc-snackbar-container-color: #0f766e;

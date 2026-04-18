@@ -1,7 +1,12 @@
 // flux-response.ts
 import { FluxCategory } from './flux-category';
 import { FluxType } from './flux-type';
-import { Occurrence, QualificationPressentie, StatutJustificatif, StatutTraitement } from './flux-enums';
+import {
+  Occurrence,
+  QualificationPressentie,
+  StatutJustificatif,
+  StatutTraitement,
+} from './flux-enums';
 import { PaymentMode } from './payment-mode';
 
 export interface FluxResponse {

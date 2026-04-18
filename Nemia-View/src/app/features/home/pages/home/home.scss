@@ -180,8 +180,14 @@
   font-weight: 700;
   flex-shrink: 0;
 
-  &--warn { background: #fef9c3; color: #854d0e; }
-  &--info { background: #dbeafe; color: #1d4ed8; }
+  &--warn {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+  &--info {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
 }
 
 // ── Récurrence ──
@@ -254,7 +260,8 @@ table {
   border: 1px solid #dbe3ea;
 }
 
-th, td {
+th,
+td {
   padding: 12px 14px;
   text-align: left;
   vertical-align: middle;
@@ -310,15 +317,42 @@ td {
   background: #e2e8f0;
   color: #334155;
 
-  &--recette        { background: #ccfbf1; color: #0f766e; }
-  &--depense        { background: #fee2e2; color: #b91c1c; }
-  &--mouvement      { background: #ede9fe; color: #6d28d9; }
-  &--regularisation { background: #fef9c3; color: #854d0e; }
-  &--ok      { background: #dcfce7; color: #15803d; }
-  &--warn    { background: #fef9c3; color: #854d0e; }
-  &--error   { background: #fee2e2; color: #b91c1c; }
-  &--info    { background: #dbeafe; color: #1d4ed8; }
-  &--muted   { background: #f1f5f9; color: #64748b; }
+  &--recette {
+    background: #ccfbf1;
+    color: #0f766e;
+  }
+  &--depense {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  &--mouvement {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+  &--regularisation {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+  &--ok {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  &--warn {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+  &--error {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  &--info {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  &--muted {
+    background: #f1f5f9;
+    color: #64748b;
+  }
 }
 
 // ── Responsive ──

@@ -56,7 +56,9 @@
   border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
   padding: 0;
 
   &:hover {
@@ -87,10 +89,22 @@
   font-size: 0.78rem;
   font-weight: 600;
 
-  &.badge--actif        { background: #dcfce7; color: #15803d; }
-  &.badge--preparation  { background: #fef9c3; color: #854d0e; }
-  &.badge--suspendu     { background: #f1f5f9; color: #64748b; }
-  &.badge--cloture      { background: #fee2e2; color: #b91c1c; }
+  &.badge--actif {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  &.badge--preparation {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+  &.badge--suspendu {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  &.badge--cloture {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
 }
 
 .bien-card__body {

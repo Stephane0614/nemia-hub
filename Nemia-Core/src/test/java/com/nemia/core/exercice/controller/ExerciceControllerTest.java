@@ -45,17 +45,21 @@ class ExerciceControllerTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(exerciceController)
+    mockMvc = MockMvcBuilders.standaloneSetup(exerciceController)
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }
 
   @Test
   void shouldCreateExercice() throws Exception {
-    ExerciceResponse response = buildExerciceResponse(1L, "2026",
-      LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31),
-      StatutExercice.OUVERT, NiveauCompletude.FAIBLE);
+    ExerciceResponse response = buildExerciceResponse(
+      1L,
+      "2026",
+      LocalDate.of(2026, 1, 1),
+      LocalDate.of(2026, 12, 31),
+      StatutExercice.OUVERT,
+      NiveauCompletude.FAIBLE
+    );
 
     when(exerciceService.create(any())).thenReturn(response);
 
@@ -70,7 +74,8 @@ class ExerciceControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(1))
@@ -82,9 +87,14 @@ class ExerciceControllerTest {
 
   @Test
   void shouldCreateExerciceWithOptionalFieldsAbsent() throws Exception {
-    ExerciceResponse response = buildExerciceResponse(2L, "2025",
-      LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31),
-      StatutExercice.CLOTURE, null);
+    ExerciceResponse response = buildExerciceResponse(
+      2L,
+      "2025",
+      LocalDate.of(2025, 1, 1),
+      LocalDate.of(2025, 12, 31),
+      StatutExercice.CLOTURE,
+      null
+    );
 
     when(exerciceService.create(any())).thenReturn(response);
 
@@ -97,7 +107,8 @@ class ExerciceControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.libelleExercice").value("2025"));
@@ -107,9 +118,7 @@ class ExerciceControllerTest {
 
   @Test
   void shouldReturn409WhenCreatingDuplicateExercice() throws Exception {
-    when(exerciceService.create(any())).thenThrow(
-      new ExerciceAlreadyExistsException("2026")
-    );
+    when(exerciceService.create(any())).thenThrow(new ExerciceAlreadyExistsException("2026"));
 
     String requestBody = """
       {
@@ -120,7 +129,8 @@ class ExerciceControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isConflict())
       .andExpect(jsonPath("$.message").value("Un exercice existe déjà avec ce libellé : 2026"));
@@ -143,7 +153,8 @@ class ExerciceControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.message").value("La date de fin doit être strictement postérieure à la date de début."));
@@ -153,16 +164,27 @@ class ExerciceControllerTest {
 
   @Test
   void shouldReturnAllExercices() throws Exception {
-    ExerciceResponse first = buildExerciceResponse(1L, "2026",
-      LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31),
-      StatutExercice.OUVERT, NiveauCompletude.FAIBLE);
-    ExerciceResponse second = buildExerciceResponse(2L, "2025",
-      LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31),
-      StatutExercice.CLOTURE, NiveauCompletude.COMPLET);
+    ExerciceResponse first = buildExerciceResponse(
+      1L,
+      "2026",
+      LocalDate.of(2026, 1, 1),
+      LocalDate.of(2026, 12, 31),
+      StatutExercice.OUVERT,
+      NiveauCompletude.FAIBLE
+    );
+    ExerciceResponse second = buildExerciceResponse(
+      2L,
+      "2025",
+      LocalDate.of(2025, 1, 1),
+      LocalDate.of(2025, 12, 31),
+      StatutExercice.CLOTURE,
+      NiveauCompletude.COMPLET
+    );
 
     when(exerciceService.findAll()).thenReturn(List.of(first, second));
 
-    mockMvc.perform(get("/api/exercices"))
+    mockMvc
+      .perform(get("/api/exercices"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$").isArray())
@@ -176,13 +198,19 @@ class ExerciceControllerTest {
   @Test
   void shouldReturnExerciceById() throws Exception {
     Long id = 1L;
-    ExerciceResponse response = buildExerciceResponse(id, "2026",
-      LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31),
-      StatutExercice.OUVERT, NiveauCompletude.FAIBLE);
+    ExerciceResponse response = buildExerciceResponse(
+      id,
+      "2026",
+      LocalDate.of(2026, 1, 1),
+      LocalDate.of(2026, 12, 31),
+      StatutExercice.OUVERT,
+      NiveauCompletude.FAIBLE
+    );
 
     when(exerciceService.findById(id)).thenReturn(response);
 
-    mockMvc.perform(get("/api/exercices/{id}", id))
+    mockMvc
+      .perform(get("/api/exercices/{id}", id))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
@@ -196,7 +224,8 @@ class ExerciceControllerTest {
     Long id = 99L;
     when(exerciceService.findById(id)).thenThrow(new ExerciceNotFoundException(id));
 
-    mockMvc.perform(get("/api/exercices/{id}", id))
+    mockMvc
+      .perform(get("/api/exercices/{id}", id))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message").value("Exercice introuvable : 99"));
@@ -207,9 +236,14 @@ class ExerciceControllerTest {
   @Test
   void shouldUpdateExercice() throws Exception {
     Long id = 1L;
-    ExerciceResponse response = buildExerciceResponse(id, "2026 MAJ",
-      LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31),
-      StatutExercice.EN_PREPARATION_DE_CLOTURE, NiveauCompletude.AVANCE);
+    ExerciceResponse response = buildExerciceResponse(
+      id,
+      "2026 MAJ",
+      LocalDate.of(2026, 1, 1),
+      LocalDate.of(2026, 12, 31),
+      StatutExercice.EN_PREPARATION_DE_CLOTURE,
+      NiveauCompletude.AVANCE
+    );
 
     when(exerciceService.update(eq(id), any())).thenReturn(response);
 
@@ -223,7 +257,8 @@ class ExerciceControllerTest {
       }
       """;
 
-    mockMvc.perform(put("/api/exercices/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(put("/api/exercices/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.libelleExercice").value("2026 MAJ"))
@@ -246,7 +281,8 @@ class ExerciceControllerTest {
       }
       """;
 
-    mockMvc.perform(put("/api/exercices/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(put("/api/exercices/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isNotFound());
 
@@ -258,9 +294,7 @@ class ExerciceControllerTest {
     Long id = 1L;
     doNothing().when(exerciceService).delete(id);
 
-    mockMvc.perform(delete("/api/exercices/{id}", id))
-      .andDo(print())
-      .andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/exercices/{id}", id)).andDo(print()).andExpect(status().isNoContent());
 
     verify(exerciceService).delete(id);
   }
@@ -270,16 +304,19 @@ class ExerciceControllerTest {
     Long id = 99L;
     doThrow(new ExerciceNotFoundException(id)).when(exerciceService).delete(id);
 
-    mockMvc.perform(delete("/api/exercices/{id}", id))
-      .andDo(print())
-      .andExpect(status().isNotFound());
+    mockMvc.perform(delete("/api/exercices/{id}", id)).andDo(print()).andExpect(status().isNotFound());
 
     verify(exerciceService).delete(id);
   }
 
-  private ExerciceResponse buildExerciceResponse(Long id, String libelle,
-    LocalDate dateDebut, LocalDate dateFin,
-    StatutExercice statut, NiveauCompletude niveau) {
+  private ExerciceResponse buildExerciceResponse(
+    Long id,
+    String libelle,
+    LocalDate dateDebut,
+    LocalDate dateFin,
+    StatutExercice statut,
+    NiveauCompletude niveau
+  ) {
     ExerciceResponse response = new ExerciceResponse();
     response.setId(id);
     response.setLibelleExercice(libelle);

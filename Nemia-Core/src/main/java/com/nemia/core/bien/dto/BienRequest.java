@@ -32,24 +32,59 @@ public class BienRequest {
 
   public BienRequest() {}
 
-  public String getNomUsuel() { return nomUsuel; }
-  public void setNomUsuel(String nomUsuel) { this.nomUsuel = nomUsuel; }
+  public String getNomUsuel() {
+    return nomUsuel;
+  }
 
-  public String getAdresseSimplifiee() { return adresseSimplifiee; }
-  public void setAdresseSimplifiee(String adresseSimplifiee) { this.adresseSimplifiee = adresseSimplifiee; }
+  public void setNomUsuel(String nomUsuel) {
+    this.nomUsuel = nomUsuel;
+  }
 
-  public StatutActiviteBien getStatutActivite() { return statutActivite; }
-  public void setStatutActivite(StatutActiviteBien statutActivite) { this.statutActivite = statutActivite; }
+  public String getAdresseSimplifiee() {
+    return adresseSimplifiee;
+  }
 
-  public TypeLocation getTypeLocation() { return typeLocation; }
-  public void setTypeLocation(TypeLocation typeLocation) { this.typeLocation = typeLocation; }
+  public void setAdresseSimplifiee(String adresseSimplifiee) {
+    this.adresseSimplifiee = adresseSimplifiee;
+  }
 
-  public LocalDate getDateMiseEnLocation() { return dateMiseEnLocation; }
-  public void setDateMiseEnLocation(LocalDate dateMiseEnLocation) { this.dateMiseEnLocation = dateMiseEnLocation; }
+  public StatutActiviteBien getStatutActivite() {
+    return statutActivite;
+  }
 
-  public RegimeVise getRegimeVise() { return regimeVise; }
-  public void setRegimeVise(RegimeVise regimeVise) { this.regimeVise = regimeVise; }
+  public void setStatutActivite(StatutActiviteBien statutActivite) {
+    this.statutActivite = statutActivite;
+  }
 
-  public String getCommentaire() { return commentaire; }
-  public void setCommentaire(String commentaire) { this.commentaire = commentaire; }
+  public TypeLocation getTypeLocation() {
+    return typeLocation;
+  }
+
+  public void setTypeLocation(TypeLocation typeLocation) {
+    this.typeLocation = typeLocation;
+  }
+
+  public LocalDate getDateMiseEnLocation() {
+    return dateMiseEnLocation;
+  }
+
+  public void setDateMiseEnLocation(LocalDate dateMiseEnLocation) {
+    this.dateMiseEnLocation = dateMiseEnLocation;
+  }
+
+  public RegimeVise getRegimeVise() {
+    return regimeVise;
+  }
+
+  public void setRegimeVise(RegimeVise regimeVise) {
+    this.regimeVise = regimeVise;
+  }
+
+  public String getCommentaire() {
+    return commentaire;
+  }
+
+  public void setCommentaire(String commentaire) {
+    this.commentaire = commentaire;
+  }
 }

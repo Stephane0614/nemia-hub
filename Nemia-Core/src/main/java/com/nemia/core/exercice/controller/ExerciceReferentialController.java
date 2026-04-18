@@ -14,7 +14,6 @@ public class ExerciceReferentialController {
 
   @GetMapping("/api/exercices/referentials")
   public ExerciceReferentialsResponse getExerciceReferentials() {
-
     List<ReferentialItemResponse> statutExercices = Arrays.stream(StatutExercice.values())
       .map(s -> new ReferentialItemResponse(s.name(), s.getLabel()))
       .toList();

@@ -19,8 +19,7 @@ class ExerciceReferentialControllerTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(new ExerciceReferentialController())
+    mockMvc = MockMvcBuilders.standaloneSetup(new ExerciceReferentialController())
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }

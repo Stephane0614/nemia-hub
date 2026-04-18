@@ -29,8 +29,7 @@ class ExerciceControllerValidationTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(exerciceController)
+    mockMvc = MockMvcBuilders.standaloneSetup(exerciceController)
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }
@@ -46,7 +45,8 @@ class ExerciceControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.libelleExercice").exists());
@@ -64,7 +64,8 @@ class ExerciceControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.dateDebut").exists());
@@ -82,7 +83,8 @@ class ExerciceControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.dateFin").exists());
@@ -100,7 +102,8 @@ class ExerciceControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.statutExercice").exists());
@@ -121,7 +124,8 @@ class ExerciceControllerValidationTest {
       }
       """.formatted(libelleTropLong);
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.libelleExercice").exists());
@@ -143,7 +147,8 @@ class ExerciceControllerValidationTest {
       }
       """.formatted(commentaireTropLong);
 
-    mockMvc.perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.commentaire").exists());

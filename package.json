@@ -1,0 +1,25 @@
+{
+  "devDependencies": {
+    "@prettier/plugin-xml": "^3.4.2",
+    "prettier": "^3.8.3",
+    "prettier-plugin-java": "^2.8.1"
+  },
+  "name": "nemia-hub",
+  "version": "1.0.0",
+  "description": "To make it easy for you to get started with GitLab, here's a list of recommended next steps.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stephane0614/nemia-hub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Stephane0614/nemia-hub/issues"
+  },
+  "homepage": "https://github.com/Stephane0614/nemia-hub#readme"
+}

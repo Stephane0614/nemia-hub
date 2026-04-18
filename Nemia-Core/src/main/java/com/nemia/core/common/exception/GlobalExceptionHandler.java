@@ -18,10 +18,7 @@ public class GlobalExceptionHandler {
   private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   @ExceptionHandler(FluxNotFoundException.class)
-  public ResponseEntity<ApiErrorResponse> handleFluxNotFound(
-    FluxNotFoundException ex,
-    HttpServletRequest request
-  ) {
+  public ResponseEntity<ApiErrorResponse> handleFluxNotFound(FluxNotFoundException ex, HttpServletRequest request) {
     ApiErrorResponse errorResponse = new ApiErrorResponse(
       LocalDateTime.now(),
       HttpStatus.NOT_FOUND.value(),
@@ -34,21 +31,12 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiErrorResponse> handleValidationException(
-    MethodArgumentNotValidException ex,
-    HttpServletRequest request
-  ) {
+  public ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
     Map<String, String> validationErrors = ex
       .getBindingResult()
       .getFieldErrors()
       .stream()
-      .collect(
-        Collectors.toMap(
-          error -> error.getField(),
-          error -> error.getDefaultMessage(),
-          (existing, replacement) -> existing
-        )
-      );
+      .collect(Collectors.toMap(error -> error.getField(), error -> error.getDefaultMessage(), (existing, replacement) -> existing));
 
     ApiErrorResponse errorResponse = new ApiErrorResponse(
       LocalDateTime.now(),
@@ -64,10 +52,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ApiErrorResponse> handleIllegalArgument(
-    IllegalArgumentException ex,
-    HttpServletRequest request
-  ) {
+  public ResponseEntity<ApiErrorResponse> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
     ApiErrorResponse errorResponse = new ApiErrorResponse(
       LocalDateTime.now(),
       HttpStatus.BAD_REQUEST.value(),
@@ -80,10 +65,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiErrorResponse> handleGenericException(
-    Exception ex,
-    HttpServletRequest request
-  ) {
+  public ResponseEntity<ApiErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
     logger.error("Erreur interne sur {} : {}", request.getRequestURI(), ex.getMessage(), ex);
 
     ApiErrorResponse errorResponse = new ApiErrorResponse(
@@ -98,10 +80,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(BienNotFoundException.class)
-  public ResponseEntity<ApiErrorResponse> handleBienNotFound(
-    BienNotFoundException ex,
-    HttpServletRequest request
-  ) {
+  public ResponseEntity<ApiErrorResponse> handleBienNotFound(BienNotFoundException ex, HttpServletRequest request) {
     ApiErrorResponse errorResponse = new ApiErrorResponse(
       LocalDateTime.now(),
       HttpStatus.NOT_FOUND.value(),
@@ -114,10 +93,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(BienAlreadyExistsException.class)
-  public ResponseEntity<ApiErrorResponse> handleBienAlreadyExists(
-    BienAlreadyExistsException ex,
-    HttpServletRequest request
-  ) {
+  public ResponseEntity<ApiErrorResponse> handleBienAlreadyExists(BienAlreadyExistsException ex, HttpServletRequest request) {
     ApiErrorResponse errorResponse = new ApiErrorResponse(
       LocalDateTime.now(),
       HttpStatus.CONFLICT.value(),
@@ -130,10 +106,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(ExerciceNotFoundException.class)
-  public ResponseEntity<ApiErrorResponse> handleExerciceNotFound(
-    ExerciceNotFoundException ex,
-    HttpServletRequest request
-  ) {
+  public ResponseEntity<ApiErrorResponse> handleExerciceNotFound(ExerciceNotFoundException ex, HttpServletRequest request) {
     ApiErrorResponse errorResponse = new ApiErrorResponse(
       LocalDateTime.now(),
       HttpStatus.NOT_FOUND.value(),
@@ -145,10 +118,7 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(ExerciceAlreadyExistsException.class)
-  public ResponseEntity<ApiErrorResponse> handleExerciceAlreadyExists(
-    ExerciceAlreadyExistsException ex,
-    HttpServletRequest request
-  ) {
+  public ResponseEntity<ApiErrorResponse> handleExerciceAlreadyExists(ExerciceAlreadyExistsException ex, HttpServletRequest request) {
     ApiErrorResponse errorResponse = new ApiErrorResponse(
       LocalDateTime.now(),
       HttpStatus.CONFLICT.value(),

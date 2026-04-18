@@ -12,22 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/home")
 public class HomeSyntheseController {
 
-    private final HomeSyntheseService homeSyntheseService;
+  private final HomeSyntheseService homeSyntheseService;
 
-    public HomeSyntheseController(HomeSyntheseService homeSyntheseService) {
-        this.homeSyntheseService = homeSyntheseService;
+  public HomeSyntheseController(HomeSyntheseService homeSyntheseService) {
+    this.homeSyntheseService = homeSyntheseService;
+  }
+
+  @GetMapping("/synthese")
+  public ResponseEntity<HomeSyntheseResponse> getSynthese(
+    @RequestParam(required = false) String mois,
+    @RequestParam(required = false) Long bienId
+  ) {
+    try {
+      HomeSyntheseResponse response = homeSyntheseService.getSynthese(mois, bienId);
+      return ResponseEntity.ok(response);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().build();
     }
-
-    @GetMapping("/synthese")
-    public ResponseEntity<HomeSyntheseResponse> getSynthese(
-            @RequestParam(required = false) String mois,
-            @RequestParam(required = false) Long bienId) {
-
-        try {
-            HomeSyntheseResponse response = homeSyntheseService.getSynthese(mois, bienId);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+  }
 }

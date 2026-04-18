@@ -22,38 +22,37 @@ public class BienService {
     this.bienRepository = bienRepository;
   }
 
- public BienResponse create(BienRequest request) {
-  logger.info("Création d'un bien : {}", request.getNomUsuel());
+  public BienResponse create(BienRequest request) {
+    logger.info("Création d'un bien : {}", request.getNomUsuel());
 
-  String nomUsuel = request.getNomUsuel().trim();
-  String adresse = request.getAdresseSimplifiee().trim();
+    String nomUsuel = request.getNomUsuel().trim();
+    String adresse = request.getAdresseSimplifiee().trim();
 
-  bienRepository.findByNomUsuelAndAdresseSimplifiee(nomUsuel, adresse)
-    .ifPresent(existing -> {
-      logger.warn("Doublon détecté à la création : {} — {}", nomUsuel, adresse);
-      throw new BienAlreadyExistsException(nomUsuel, adresse);
-    });
+    bienRepository
+      .findByNomUsuelAndAdresseSimplifiee(nomUsuel, adresse)
+      .ifPresent(existing -> {
+        logger.warn("Doublon détecté à la création : {} — {}", nomUsuel, adresse);
+        throw new BienAlreadyExistsException(nomUsuel, adresse);
+      });
 
-  Bien bien = new Bien();
-  mapRequestToEntity(request, bien);
-  Bien saved = bienRepository.save(bien);
-  logger.info("Bien créé avec succès : id={}", saved.getId());
-  return mapToResponse(saved);
-}
+    Bien bien = new Bien();
+    mapRequestToEntity(request, bien);
+    Bien saved = bienRepository.save(bien);
+    logger.info("Bien créé avec succès : id={}", saved.getId());
+    return mapToResponse(saved);
+  }
 
   public List<BienResponse> findAll() {
     logger.info("Récupération de tous les biens");
-    List<BienResponse> biens = bienRepository.findAll()
-      .stream()
-      .map(this::mapToResponse)
-      .toList();
+    List<BienResponse> biens = bienRepository.findAll().stream().map(this::mapToResponse).toList();
     logger.info("Nombre de biens récupérés : {}", biens.size());
     return biens;
   }
 
   public BienResponse findById(Long id) {
     logger.info("Recherche du bien id={}", id);
-    Bien bien = bienRepository.findById(id)
+    Bien bien = bienRepository
+      .findById(id)
       .orElseThrow(() -> {
         logger.warn("Bien introuvable id={}", id);
         return new BienNotFoundException(id);
@@ -62,35 +61,38 @@ public class BienService {
     return mapToResponse(bien);
   }
 
- public BienResponse update(Long id, BienRequest request) {
-  logger.info("Mise à jour du bien id={}", id);
+  public BienResponse update(Long id, BienRequest request) {
+    logger.info("Mise à jour du bien id={}", id);
 
-  Bien bien = bienRepository.findById(id)
-    .orElseThrow(() -> {
-      logger.warn("Bien introuvable pour mise à jour id={}", id);
-      return new BienNotFoundException(id);
-    });
+    Bien bien = bienRepository
+      .findById(id)
+      .orElseThrow(() -> {
+        logger.warn("Bien introuvable pour mise à jour id={}", id);
+        return new BienNotFoundException(id);
+      });
 
-  String nomUsuel = request.getNomUsuel().trim();
-  String adresse = request.getAdresseSimplifiee().trim();
+    String nomUsuel = request.getNomUsuel().trim();
+    String adresse = request.getAdresseSimplifiee().trim();
 
-  bienRepository.findByNomUsuelAndAdresseSimplifiee(nomUsuel, adresse)
-    .ifPresent(existing -> {
-      if (!existing.getId().equals(id)) {
-        logger.warn("Doublon détecté à la modification : {} — {}", nomUsuel, adresse);
-        throw new BienAlreadyExistsException(nomUsuel, adresse);
-      }
-    });
+    bienRepository
+      .findByNomUsuelAndAdresseSimplifiee(nomUsuel, adresse)
+      .ifPresent(existing -> {
+        if (!existing.getId().equals(id)) {
+          logger.warn("Doublon détecté à la modification : {} — {}", nomUsuel, adresse);
+          throw new BienAlreadyExistsException(nomUsuel, adresse);
+        }
+      });
 
-  mapRequestToEntity(request, bien);
-  Bien updated = bienRepository.save(bien);
-  logger.info("Bien mis à jour : id={}", id);
-  return mapToResponse(updated);
-}
+    mapRequestToEntity(request, bien);
+    Bien updated = bienRepository.save(bien);
+    logger.info("Bien mis à jour : id={}", id);
+    return mapToResponse(updated);
+  }
 
   public void delete(Long id) {
     logger.info("Suppression du bien id={}", id);
-    Bien bien = bienRepository.findById(id)
+    Bien bien = bienRepository
+      .findById(id)
       .orElseThrow(() -> {
         logger.warn("Bien introuvable pour suppression id={}", id);
         return new BienNotFoundException(id);

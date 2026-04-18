@@ -1,4 +1,1 @@
-export type RegimeVise =
-  | 'MICRO_BIC'
-  | 'REEL'
-  | 'A_DEFINIR';
+export type RegimeVise = 'MICRO_BIC' | 'REEL' | 'A_DEFINIR';

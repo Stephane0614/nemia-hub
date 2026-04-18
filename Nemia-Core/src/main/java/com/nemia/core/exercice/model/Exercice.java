@@ -6,12 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-  name = "exercice",
-  uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"libelle_exercice"})
-  }
-)
+@Table(name = "exercice", uniqueConstraints = { @UniqueConstraint(columnNames = { "libelle_exercice" }) })
 public class Exercice {
 
   @Id
@@ -59,26 +54,63 @@ public class Exercice {
     this.updatedAt = LocalDateTime.now();
   }
 
-  public Long getId() { return id; }
+  public Long getId() {
+    return id;
+  }
 
-  public String getLibelleExercice() { return libelleExercice; }
-  public void setLibelleExercice(String libelleExercice) { this.libelleExercice = libelleExercice; }
+  public String getLibelleExercice() {
+    return libelleExercice;
+  }
 
-  public LocalDate getDateDebut() { return dateDebut; }
-  public void setDateDebut(LocalDate dateDebut) { this.dateDebut = dateDebut; }
+  public void setLibelleExercice(String libelleExercice) {
+    this.libelleExercice = libelleExercice;
+  }
 
-  public LocalDate getDateFin() { return dateFin; }
-  public void setDateFin(LocalDate dateFin) { this.dateFin = dateFin; }
+  public LocalDate getDateDebut() {
+    return dateDebut;
+  }
 
-  public StatutExercice getStatutExercice() { return statutExercice; }
-  public void setStatutExercice(StatutExercice statutExercice) { this.statutExercice = statutExercice; }
+  public void setDateDebut(LocalDate dateDebut) {
+    this.dateDebut = dateDebut;
+  }
 
-  public NiveauCompletude getNiveauCompletude() { return niveauCompletude; }
-  public void setNiveauCompletude(NiveauCompletude niveauCompletude) { this.niveauCompletude = niveauCompletude; }
+  public LocalDate getDateFin() {
+    return dateFin;
+  }
 
-  public String getCommentaire() { return commentaire; }
-  public void setCommentaire(String commentaire) { this.commentaire = commentaire; }
+  public void setDateFin(LocalDate dateFin) {
+    this.dateFin = dateFin;
+  }
 
-  public LocalDateTime getCreatedAt() { return createdAt; }
-  public LocalDateTime getUpdatedAt() { return updatedAt; }
+  public StatutExercice getStatutExercice() {
+    return statutExercice;
+  }
+
+  public void setStatutExercice(StatutExercice statutExercice) {
+    this.statutExercice = statutExercice;
+  }
+
+  public NiveauCompletude getNiveauCompletude() {
+    return niveauCompletude;
+  }
+
+  public void setNiveauCompletude(NiveauCompletude niveauCompletude) {
+    this.niveauCompletude = niveauCompletude;
+  }
+
+  public String getCommentaire() {
+    return commentaire;
+  }
+
+  public void setCommentaire(String commentaire) {
+    this.commentaire = commentaire;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
 }

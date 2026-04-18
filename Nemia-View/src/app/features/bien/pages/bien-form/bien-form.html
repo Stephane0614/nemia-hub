@@ -1,136 +1,113 @@
 <section class="page-header">
   <div>
-    <h1 class="page-title">
-      {{ isEditMode() ? 'Modifier un bien' : 'Ajouter un bien' }}
-    </h1>
-    <p class="page-subtitle">
-      Renseigne les informations du bien puis enregistre.
-    </p>
+    <h1 class="page-title">{{ isEditMode() ? 'Modifier un bien' : 'Ajouter un bien' }}</h1>
+    <p class="page-subtitle">Renseigne les informations du bien puis enregistre.</p>
   </div>
 </section>
 
 @if (isLoading) {
-  <mat-card class="state-card">
-    <div class="state-content">
-      <mat-spinner diameter="36"></mat-spinner>
-      <p>Chargement des données...</p>
-    </div>
-  </mat-card>
+<mat-card class="state-card">
+  <div class="state-content">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+</mat-card>
+} @else { @if (loadErrorMessage) {
+<mat-card class="state-card state-card--error">
+  <p>{{ loadErrorMessage }}</p>
+  <a mat-stroked-button routerLink="/biens">Retour aux biens</a>
+</mat-card>
 } @else {
 
-  @if (loadErrorMessage) {
-    <mat-card class="state-card state-card--error">
-      <p>{{ loadErrorMessage }}</p>
-      <a mat-stroked-button routerLink="/biens">Retour aux biens</a>
-    </mat-card>
-  } @else {
-
-    <mat-card class="form-card">
-
-      @if (submitErrorMessage) {
-        <div class="form-alert">{{ submitErrorMessage }}</div>
-      }
-
-      <form class="bien-form" [formGroup]="form" (ngSubmit)="save()">
-
-        <!-- ── Section principale ── -->
-        <div class="form-grid">
-
-          <mat-form-field appearance="outline" class="field-span-2">
-            <mat-label>Nom du bien</mat-label>
-            <input matInput formControlName="nomUsuel"
-              (input)="clearServerError('nomUsuel')" />
-            @if (hasError('nomUsuel', 'required')) {
-              <mat-error>Le nom est obligatoire.</mat-error>
-            }
-            @if (hasError('nomUsuel', 'maxlength')) {
-              <mat-error>Le nom ne doit pas dépasser 120 caractères.</mat-error>
-            }
-            @if (getServerError('nomUsuel'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field-span-2">
-            <mat-label>Adresse simplifiée</mat-label>
-            <input matInput formControlName="adresseSimplifiee"
-              (input)="clearServerError('adresseSimplifiee')" />
-            @if (hasError('adresseSimplifiee', 'required')) {
-              <mat-error>L'adresse est obligatoire.</mat-error>
-            }
-            @if (getServerError('adresseSimplifiee'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Statut d'activité</mat-label>
-            <mat-select formControlName="statutActivite"
-              (selectionChange)="clearServerError('statutActivite')">
-              <mat-option value="">Sélectionner</mat-option>
-              @for (item of statutActivites; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (hasError('statutActivite', 'required')) {
-              <mat-error>Le statut est obligatoire.</mat-error>
-            }
-            @if (getServerError('statutActivite'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Type de location</mat-label>
-            <mat-select formControlName="typeLocation">
-              <mat-option value="">—</mat-option>
-              @for (item of typeLocations; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Date de mise en location</mat-label>
-            <input matInput [matDatepicker]="picker"
-              formControlName="dateMiseEnLocation" />
-            <mat-datepicker-toggle matIconSuffix [for]="picker">
-            </mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-            <mat-hint>dd/mm/yyyy</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Régime visé</mat-label>
-            <mat-select formControlName="regimeVise">
-              <mat-option value="">—</mat-option>
-              @for (item of regimeVises; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field-span-2">
-            <mat-label>Commentaire</mat-label>
-            <textarea matInput rows="3" formControlName="commentaire"
-              (input)="clearServerError('commentaire')"></textarea>
-            @if (hasError('commentaire', 'maxlength')) {
-              <mat-error>Le commentaire ne doit pas dépasser 500 caractères.</mat-error>
-            }
-          </mat-form-field>
-
-        </div>
-
-        <!-- ── Actions ── -->
-        <div class="form-actions">
-          <a mat-stroked-button routerLink="/biens">Annuler</a>
-          <button mat-flat-button type="submit"
-            [disabled]="isSubmitting || form.invalid">
-            {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
-          </button>
-        </div>
-
-      </form>
-    </mat-card>
+<mat-card class="form-card">
+  @if (submitErrorMessage) {
+  <div class="form-alert">{{ submitErrorMessage }}</div>
   }
-}
+
+  <form class="bien-form" [formGroup]="form" (ngSubmit)="save()">
+    <!-- ── Section principale ── -->
+    <div class="form-grid">
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Nom du bien</mat-label>
+        <input matInput formControlName="nomUsuel" (input)="clearServerError('nomUsuel')" />
+        @if (hasError('nomUsuel', 'required')) {
+        <mat-error>Le nom est obligatoire.</mat-error>
+        } @if (hasError('nomUsuel', 'maxlength')) {
+        <mat-error>Le nom ne doit pas dépasser 120 caractères.</mat-error>
+        } @if (getServerError('nomUsuel'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Adresse simplifiée</mat-label>
+        <input matInput formControlName="adresseSimplifiee" (input)="clearServerError('adresseSimplifiee')" />
+        @if (hasError('adresseSimplifiee', 'required')) {
+        <mat-error>L'adresse est obligatoire.</mat-error>
+        } @if (getServerError('adresseSimplifiee'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut d'activité</mat-label>
+        <mat-select formControlName="statutActivite" (selectionChange)="clearServerError('statutActivite')">
+          <mat-option value="">Sélectionner</mat-option>
+          @for (item of statutActivites; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('statutActivite', 'required')) {
+        <mat-error>Le statut est obligatoire.</mat-error>
+        } @if (getServerError('statutActivite'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Type de location</mat-label>
+        <mat-select formControlName="typeLocation">
+          <mat-option value="">—</mat-option>
+          @for (item of typeLocations; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de mise en location</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dateMiseEnLocation" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker"> </mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-hint>dd/mm/yyyy</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Régime visé</mat-label>
+        <mat-select formControlName="regimeVise">
+          <mat-option value="">—</mat-option>
+          @for (item of regimeVises; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput rows="3" formControlName="commentaire" (input)="clearServerError('commentaire')"></textarea>
+        @if (hasError('commentaire', 'maxlength')) {
+        <mat-error>Le commentaire ne doit pas dépasser 500 caractères.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- ── Actions ── -->
+    <div class="form-actions">
+      <a mat-stroked-button routerLink="/biens">Annuler</a>
+      <button mat-flat-button type="submit" [disabled]="isSubmitting || form.invalid">
+        {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </div>
+  </form>
+</mat-card>
+} }

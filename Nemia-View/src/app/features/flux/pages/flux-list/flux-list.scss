@@ -127,17 +127,47 @@ tbody tr:hover td {
   background: #e2e8f0;
   color: #334155;
 
-  &--recette        { background: #ccfbf1; color: #0f766e; }
-  &--depense        { background: #fee2e2; color: #b91c1c; }
-  &--mouvement      { background: #ede9fe; color: #6d28d9; }
-  &--regularisation { background: #fef9c3; color: #854d0e; }
+  &--recette {
+    background: #ccfbf1;
+    color: #0f766e;
+  }
+  &--depense {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  &--mouvement {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+  &--regularisation {
+    background: #fef9c3;
+    color: #854d0e;
+  }
 
-  &--ok      { background: #dcfce7; color: #15803d; }
-  &--warn    { background: #fef9c3; color: #854d0e; }
-  &--error   { background: #fee2e2; color: #b91c1c; }
-  &--info    { background: #dbeafe; color: #1d4ed8; }
-  &--muted   { background: #f1f5f9; color: #64748b; }
-  &--neutral { background: #e2e8f0; color: #334155; }
+  &--ok {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  &--warn {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+  &--error {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  &--info {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  &--muted {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  &--neutral {
+    background: #e2e8f0;
+    color: #334155;
+  }
 }
 
 // ── Boutons scroll flottants ──
@@ -167,8 +197,12 @@ tbody tr:hover td {
   }
 }
 
-.scroll-btn-left  { left: 50px; }
-.scroll-btn-right { right: 50px; }
+.scroll-btn-left {
+  left: 50px;
+}
+.scroll-btn-right {
+  right: 50px;
+}
 
 // ── Responsive ──
 
