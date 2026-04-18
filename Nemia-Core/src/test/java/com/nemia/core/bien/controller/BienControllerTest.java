@@ -18,6 +18,7 @@ import com.nemia.core.bien.dto.BienResponse;
 import com.nemia.core.bien.model.RegimeVise;
 import com.nemia.core.bien.model.StatutActiviteBien;
 import com.nemia.core.bien.model.TypeLocation;
+import com.nemia.core.common.exception.BienAlreadyExistsException;
 import com.nemia.core.common.exception.BienNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -239,4 +240,72 @@ class BienControllerTest {
     response.setUpdatedAt(LocalDateTime.of(2026, 4, 18, 10, 0));
     return response;
   }
+
+  @Test
+void shouldReturn409WhenCreatingDuplicateBien() throws Exception {
+  when(bienService.create(any())).thenThrow(
+    new BienAlreadyExistsException("Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux")
+  );
+
+  String requestBody = """
+    {
+      "nomUsuel": "Studio Bordeaux",
+      "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
+      "statutActivite": "ACTIF"
+    }
+    """;
+
+  mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    .andDo(print())
+    .andExpect(status().isConflict())
+    .andExpect(jsonPath("$.message").value("Un bien existe déjà avec ce nom et cette adresse : Studio Bordeaux — 12 rue des Capucins, 33000 Bordeaux"));
+
+  verify(bienService).create(any());
+}
+
+@Test
+void shouldReturn409WhenUpdatingToExistingCombination() throws Exception {
+  Long id = 1L;
+  when(bienService.update(eq(id), any())).thenThrow(
+    new BienAlreadyExistsException("Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux")
+  );
+
+  String requestBody = """
+    {
+      "nomUsuel": "Studio Bordeaux",
+      "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
+      "statutActivite": "ACTIF"
+    }
+    """;
+
+  mockMvc.perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    .andDo(print())
+    .andExpect(status().isConflict());
+
+  verify(bienService).update(eq(id), any());
+}
+
+@Test
+void shouldReturn200WhenUpdatingBienWithSameNomAndAdresse() throws Exception {
+  Long id = 1L;
+  BienResponse response = buildBienResponse(id, "Studio Bordeaux", "12 rue des Capucins, 33000 Bordeaux",
+    StatutActiviteBien.ACTIF, TypeLocation.LMNP_LONGUE_DUREE, RegimeVise.REEL);
+
+  when(bienService.update(eq(id), any())).thenReturn(response);
+
+  String requestBody = """
+    {
+      "nomUsuel": "Studio Bordeaux",
+      "adresseSimplifiee": "12 rue des Capucins, 33000 Bordeaux",
+      "statutActivite": "ACTIF"
+    }
+    """;
+
+  mockMvc.perform(put("/api/biens/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    .andDo(print())
+    .andExpect(status().isOk())
+    .andExpect(jsonPath("$.nomUsuel").value("Studio Bordeaux"));
+
+  verify(bienService).update(eq(id), any());
+}
 }
