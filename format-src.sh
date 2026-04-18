@@ -101,6 +101,7 @@ check_files() {
       "$PRETTIER_BIN" "$file" \
         --config "$CONFIG_FILE" \
         --plugin prettier-plugin-java \
+        --plugin @prettier/plugin-xml \
         --check 2>&1 >/dev/null \
     )
     check_exit=$?
@@ -140,6 +141,7 @@ format_files() {
       "$PRETTIER_BIN" "$file" \
         --config "$CONFIG_FILE" \
         --plugin prettier-plugin-java \
+        --plugin @prettier/plugin-xml \
         --write 2>&1 >/dev/null \
     )
     write_exit=$?
@@ -211,6 +213,20 @@ if [ $plugin_check_exit -ne 0 ]; then
   exit 1
 fi
 log_ok "prettier-plugin-java OK"
+
+
+# ── Vérification plugin XML ────────────────────────────────────────────────────
+log_info "Vérification @prettier/plugin-xml..."
+plugin_xml_check_err=$(
+  "$PRETTIER_BIN" --plugin @prettier/plugin-xml --version 2>&1 >/dev/null
+)
+plugin_xml_check_exit=$?
+if [ $plugin_xml_check_exit -ne 0 ]; then
+  log_err "@prettier/plugin-xml inaccessible."
+  log_err "Fix : cd $PROJECT_ROOT && npm install --save-dev @prettier/plugin-xml"
+  exit 1
+fi
+log_ok "@prettier/plugin-xml OK"
 
 # ── Check ──────────────────────────────────────────────────────────────────────
 
