@@ -1,5 +1,1 @@
-export type StatutActiviteBien =
-  | 'EN_PREPARATION'
-  | 'ACTIF'
-  | 'SUSPENDU'
-  | 'CLOTURE';
+export type StatutActiviteBien = 'EN_PREPARATION' | 'ACTIF' | 'SUSPENDU' | 'CLOTURE';

@@ -18,37 +18,38 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @ExtendWith(MockitoExtension.class)
 class FluxControllerValidationTest {
 
-    @Mock
-    private FluxService fluxService;
+  @Mock
+  private FluxService fluxService;
 
-    @InjectMocks
-    private FluxController fluxController;
+  @InjectMocks
+  private FluxController fluxController;
 
-    private MockMvc mockMvc;
+  private MockMvc mockMvc;
 
-    @BeforeEach
-void setup() {
-    mockMvc = MockMvcBuilders
-            .standaloneSetup(fluxController)
-            .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
-            .build();
-}
-    @Test
-    void shouldReturnBadRequestWhenCreateRequestIsInvalid() throws Exception {
-        String invalidRequestBody = """
-                {
-                  "date": "2026-04-15",
-                  "type": "DEPENSE",
-                  "libelle": "Abonnement internet résidence meublée avec un libellé volontairement beaucoup trop long pour dépasser clairement la limite maximale attendue",
-                  "montant": -29.99,
-                  "categorie": "INTERNET",
-                  "modePaiement": "PRELEVEMENT",
-                  "commentaire": "test validation"
-                }
-                """;
+  @BeforeEach
+  void setup() {
+    mockMvc = MockMvcBuilders.standaloneSetup(fluxController)
+      .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
+      .build();
+  }
 
-        mockMvc.perform(post("/api/flux").contentType(MediaType.APPLICATION_JSON).content(invalidRequestBody))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
+  @Test
+  void shouldReturnBadRequestWhenCreateRequestIsInvalid() throws Exception {
+    String invalidRequestBody = """
+      {
+        "date": "2026-04-15",
+        "type": "DEPENSE",
+        "libelle": "Abonnement internet résidence meublée avec un libellé volontairement beaucoup trop long pour dépasser clairement la limite maximale attendue",
+        "montant": -29.99,
+        "categorie": "INTERNET",
+        "modePaiement": "PRELEVEMENT",
+        "commentaire": "test validation"
+      }
+      """;
+
+    mockMvc
+      .perform(post("/api/flux").contentType(MediaType.APPLICATION_JSON).content(invalidRequestBody))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
 }

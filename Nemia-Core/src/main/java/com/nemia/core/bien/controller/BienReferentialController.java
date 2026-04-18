@@ -15,7 +15,6 @@ public class BienReferentialController {
 
   @GetMapping("/api/biens/referentials")
   public BienReferentialsResponse getBienReferentials() {
-
     List<ReferentialItemResponse> statutActivites = Arrays.stream(StatutActiviteBien.values())
       .map(s -> new ReferentialItemResponse(s.name(), s.getLabel()))
       .toList();

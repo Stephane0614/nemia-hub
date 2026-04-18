@@ -1,5 +1,1 @@
-export type FluxType =
-  | 'RECETTE'
-  | 'DEPENSE'
-  | 'MOUVEMENT_FINANCIER'
-  | 'REGULARISATION';
+export type FluxType = 'RECETTE' | 'DEPENSE' | 'MOUVEMENT_FINANCIER' | 'REGULARISATION';

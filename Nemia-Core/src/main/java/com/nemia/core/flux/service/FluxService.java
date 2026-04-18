@@ -16,49 +16,42 @@ public class FluxService {
 
   private static final Logger logger = LoggerFactory.getLogger(FluxService.class);
 
-      private final FluxRepository fluxRepository;
-    private final FluxValidationService fluxValidationService;
+  private final FluxRepository fluxRepository;
+  private final FluxValidationService fluxValidationService;
 
-    public FluxService(FluxRepository fluxRepository, FluxValidationService fluxValidationService) {
-        this.fluxRepository = fluxRepository;
-        this.fluxValidationService = fluxValidationService;
-    }
+  public FluxService(FluxRepository fluxRepository, FluxValidationService fluxValidationService) {
+    this.fluxRepository = fluxRepository;
+    this.fluxValidationService = fluxValidationService;
+  }
 
-        private List<String> validateFlux(Flux flux) {
-        return fluxValidationService.validate(
-                flux.getType(),
-                flux.getCategorie(),
-                flux.getQualificationPressentie(),
-                flux.getStatutJustificatif(),
-                flux.getOccurrence(),
-                flux.getStatutTraitement()
-        );
-    }
+  private List<String> validateFlux(Flux flux) {
+    return fluxValidationService.validate(
+      flux.getType(),
+      flux.getCategorie(),
+      flux.getQualificationPressentie(),
+      flux.getStatutJustificatif(),
+      flux.getOccurrence(),
+      flux.getStatutTraitement()
+    );
+  }
 
+  public FluxResponse create(CreateFluxRequest request) {
+    Flux flux = new Flux();
+    mapCreateRequestToEntity(request, flux);
 
+    List<String> warnings = validateFlux(flux);
 
-      public FluxResponse create(CreateFluxRequest request) {
-        Flux flux = new Flux();
-        mapCreateRequestToEntity(request, flux);
+    Flux savedFlux = fluxRepository.save(flux);
 
-        List<String> warnings = validateFlux(flux);
-
-        Flux savedFlux = fluxRepository.save(flux);
-
-        FluxResponse response = mapToResponse(savedFlux);
-        response.setWarnings(warnings);
-        return response;
-    }
-
+    FluxResponse response = mapToResponse(savedFlux);
+    response.setWarnings(warnings);
+    return response;
+  }
 
   public List<FluxResponse> findAll() {
     logger.info("Récupération de tous les flux");
 
-    List<FluxResponse> fluxList = fluxRepository
-      .findAll()
-      .stream()
-      .map(this::mapToResponse)
-      .toList();
+    List<FluxResponse> fluxList = fluxRepository.findAll().stream().map(this::mapToResponse).toList();
 
     logger.info("Nombre de flux récupérés : {}", fluxList.size());
     return fluxList;
@@ -78,21 +71,19 @@ public class FluxService {
     return mapToResponse(flux);
   }
 
-      public FluxResponse update(Long id, UpdateFluxRequest request) {
-        Flux flux = fluxRepository.findById(id)
-                .orElseThrow(() -> new FluxNotFoundException(id));
+  public FluxResponse update(Long id, UpdateFluxRequest request) {
+    Flux flux = fluxRepository.findById(id).orElseThrow(() -> new FluxNotFoundException(id));
 
-        mapUpdateRequestToEntity(request, flux);
+    mapUpdateRequestToEntity(request, flux);
 
-        List<String> warnings = validateFlux(flux);
+    List<String> warnings = validateFlux(flux);
 
-        Flux updatedFlux = fluxRepository.save(flux);
+    Flux updatedFlux = fluxRepository.save(flux);
 
-        FluxResponse response = mapToResponse(updatedFlux);
-        response.setWarnings(warnings);
-        return response;
-    }
-
+    FluxResponse response = mapToResponse(updatedFlux);
+    response.setWarnings(warnings);
+    return response;
+  }
 
   public void delete(Long id) {
     logger.info("Suppression du flux id={}", id);

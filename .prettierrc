@@ -4,5 +4,19 @@
   "tabWidth": 2,
   "printWidth": 100,
   "trailingComma": "all",
-  "plugins": ["prettier-plugin-java"]
+  "plugins": ["prettier-plugin-java", "@prettier/plugin-xml"],
+  "overrides": [
+    {
+      "files": "*.java",
+      "options": {
+        "printWidth": 140
+      }
+    },
+    {
+      "files": ["*.html", "*.scss"],
+      "options": {
+        "printWidth": 120
+      }
+    }
+  ]
 }

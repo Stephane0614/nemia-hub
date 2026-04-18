@@ -1,7 +1,4 @@
-export type Occurrence =
-  | 'RECURRENT'
-  | 'PONCTUEL'
-  | 'INDETERMINE';
+export type Occurrence = 'RECURRENT' | 'PONCTUEL' | 'INDETERMINE';
 
 export type StatutJustificatif =
   | 'NON_REQUIS'
@@ -19,8 +16,4 @@ export type QualificationPressentie =
   | 'A_ARBITRER'
   | 'NON_APPLICABLE';
 
-export type StatutTraitement =
-  | 'BRUT'
-  | 'QUALIFIE'
-  | 'A_REVOIR'
-  | 'VALIDE';
+export type StatutTraitement = 'BRUT' | 'QUALIFIE' | 'A_REVOIR' | 'VALIDE';

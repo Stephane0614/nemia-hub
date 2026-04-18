@@ -161,11 +161,11 @@ export class BienForm implements OnInit {
       nomUsuel: (raw.nomUsuel ?? '').trim(),
       adresseSimplifiee: (raw.adresseSimplifiee ?? '').trim(),
       statutActivite: raw.statutActivite as StatutActiviteBien,
-      typeLocation: raw.typeLocation ? raw.typeLocation as TypeLocation : null,
+      typeLocation: raw.typeLocation ? (raw.typeLocation as TypeLocation) : null,
       dateMiseEnLocation: raw.dateMiseEnLocation
         ? this.formatDateForApi(raw.dateMiseEnLocation)
         : null,
-      regimeVise: raw.regimeVise ? raw.regimeVise as RegimeVise : null,
+      regimeVise: raw.regimeVise ? (raw.regimeVise as RegimeVise) : null,
       commentaire: (raw.commentaire ?? '').trim() || null,
     };
   }
@@ -190,7 +190,7 @@ export class BienForm implements OnInit {
       this.serverValidationErrors = apiError.validationErrors;
       return;
     }
-    this.submitErrorMessage = 'Une erreur est survenue lors de l\'enregistrement.';
+    this.submitErrorMessage = "Une erreur est survenue lors de l'enregistrement.";
   }
 
   private loadBien(id: number): void {

@@ -29,8 +29,7 @@ class BienControllerValidationTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(bienController)
+    mockMvc = MockMvcBuilders.standaloneSetup(bienController)
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }
@@ -45,7 +44,8 @@ class BienControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.nomUsuel").exists());
@@ -63,7 +63,8 @@ class BienControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.adresseSimplifiee").exists());
@@ -80,7 +81,8 @@ class BienControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.statutActivite").exists());
@@ -100,7 +102,8 @@ class BienControllerValidationTest {
       }
       """.formatted(nomTropLong);
 
-    mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.nomUsuel").exists());
@@ -121,7 +124,8 @@ class BienControllerValidationTest {
       }
       """.formatted(commentaireTropLong);
 
-    mockMvc.perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/biens").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.commentaire").exists());

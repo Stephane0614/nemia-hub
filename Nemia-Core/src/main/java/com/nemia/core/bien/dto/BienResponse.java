@@ -21,33 +21,83 @@ public class BienResponse {
 
   public BienResponse() {}
 
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+  public Long getId() {
+    return id;
+  }
 
-  public String getNomUsuel() { return nomUsuel; }
-  public void setNomUsuel(String nomUsuel) { this.nomUsuel = nomUsuel; }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-  public String getAdresseSimplifiee() { return adresseSimplifiee; }
-  public void setAdresseSimplifiee(String adresseSimplifiee) { this.adresseSimplifiee = adresseSimplifiee; }
+  public String getNomUsuel() {
+    return nomUsuel;
+  }
 
-  public StatutActiviteBien getStatutActivite() { return statutActivite; }
-  public void setStatutActivite(StatutActiviteBien statutActivite) { this.statutActivite = statutActivite; }
+  public void setNomUsuel(String nomUsuel) {
+    this.nomUsuel = nomUsuel;
+  }
 
-  public TypeLocation getTypeLocation() { return typeLocation; }
-  public void setTypeLocation(TypeLocation typeLocation) { this.typeLocation = typeLocation; }
+  public String getAdresseSimplifiee() {
+    return adresseSimplifiee;
+  }
 
-  public LocalDate getDateMiseEnLocation() { return dateMiseEnLocation; }
-  public void setDateMiseEnLocation(LocalDate dateMiseEnLocation) { this.dateMiseEnLocation = dateMiseEnLocation; }
+  public void setAdresseSimplifiee(String adresseSimplifiee) {
+    this.adresseSimplifiee = adresseSimplifiee;
+  }
 
-  public RegimeVise getRegimeVise() { return regimeVise; }
-  public void setRegimeVise(RegimeVise regimeVise) { this.regimeVise = regimeVise; }
+  public StatutActiviteBien getStatutActivite() {
+    return statutActivite;
+  }
 
-  public String getCommentaire() { return commentaire; }
-  public void setCommentaire(String commentaire) { this.commentaire = commentaire; }
+  public void setStatutActivite(StatutActiviteBien statutActivite) {
+    this.statutActivite = statutActivite;
+  }
 
-  public LocalDateTime getCreatedAt() { return createdAt; }
-  public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+  public TypeLocation getTypeLocation() {
+    return typeLocation;
+  }
 
-  public LocalDateTime getUpdatedAt() { return updatedAt; }
-  public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+  public void setTypeLocation(TypeLocation typeLocation) {
+    this.typeLocation = typeLocation;
+  }
+
+  public LocalDate getDateMiseEnLocation() {
+    return dateMiseEnLocation;
+  }
+
+  public void setDateMiseEnLocation(LocalDate dateMiseEnLocation) {
+    this.dateMiseEnLocation = dateMiseEnLocation;
+  }
+
+  public RegimeVise getRegimeVise() {
+    return regimeVise;
+  }
+
+  public void setRegimeVise(RegimeVise regimeVise) {
+    this.regimeVise = regimeVise;
+  }
+
+  public String getCommentaire() {
+    return commentaire;
+  }
+
+  public void setCommentaire(String commentaire) {
+    this.commentaire = commentaire;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
 }

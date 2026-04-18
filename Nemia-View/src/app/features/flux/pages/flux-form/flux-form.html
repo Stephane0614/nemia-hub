@@ -1,302 +1,254 @@
 <section class="page-header">
   <div>
-    <h1 class="page-title">
-      {{ isEditMode() ? 'Modifier une opération' : 'Créer une opération' }}
-    </h1>
-    <p class="page-subtitle">
-      Renseigne les informations de l'opération puis enregistre.
-    </p>
+    <h1 class="page-title">{{ isEditMode() ? 'Modifier une opération' : 'Créer une opération' }}</h1>
+    <p class="page-subtitle">Renseigne les informations de l'opération puis enregistre.</p>
   </div>
 </section>
 
 @if (isLoading) {
-  <mat-card class="state-card">
-    <div class="state-content">
-      <mat-spinner diameter="36"></mat-spinner>
-      <p>Chargement des données...</p>
-    </div>
-  </mat-card>
+<mat-card class="state-card">
+  <div class="state-content">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+</mat-card>
+} @else { @if (loadErrorMessage) {
+<mat-card class="state-card state-card--error">
+  <p>{{ loadErrorMessage }}</p>
+  <a mat-stroked-button routerLink="/flux">Retour à la liste</a>
+</mat-card>
 } @else {
 
-  @if (loadErrorMessage) {
-    <mat-card class="state-card state-card--error">
-      <p>{{ loadErrorMessage }}</p>
-      <a mat-stroked-button routerLink="/flux">Retour à la liste</a>
-    </mat-card>
-  } @else {
-
-    <mat-card class="form-card">
-
-      @if (submitErrorMessage) {
-        <div class="form-alert">
-          {{ submitErrorMessage }}
-        </div>
+<mat-card class="form-card">
+  @if (submitErrorMessage) {
+  <div class="form-alert">{{ submitErrorMessage }}</div>
+  } @if (submitWarnings.length > 0) {
+  <div class="form-warnings">
+    <p class="form-warnings__title">⚠ Points d'attention détectés</p>
+    <ul class="form-warnings__list">
+      @for (warning of submitWarnings; track warning) {
+      <li>{{ warning }}</li>
       }
-
-      @if (submitWarnings.length > 0) {
-        <div class="form-warnings">
-          <p class="form-warnings__title">⚠ Points d'attention détectés</p>
-          <ul class="form-warnings__list">
-            @for (warning of submitWarnings; track warning) {
-              <li>{{ warning }}</li>
-            }
-          </ul>
-          <div class="form-warnings__actions">
-            <button mat-stroked-button type="button" (click)="confirmAndRedirect()">
-              Continuer quand même
-            </button>
-          </div>
-        </div>
-      }
-
-      <form class="operation-form" [formGroup]="form" (ngSubmit)="save()">
-
-        <!-- ── Section principale ── -->
-        <div class="form-grid">
-
-          <mat-form-field appearance="outline">
-            <mat-label>Date</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="date"
-              (dateInput)="clearServerError('date')" />
-            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-            @if (hasError('date', 'required')) {
-              <mat-error>La date est obligatoire.</mat-error>
-            }
-            @if (getServerError('date'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Type</mat-label>
-            <mat-select formControlName="type" (selectionChange)="clearServerError('type')">
-              <mat-option value="">Sélectionner un type</mat-option>
-              @for (item of fluxTypes; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (hasError('type', 'required')) {
-              <mat-error>Le type est obligatoire.</mat-error>
-            }
-            @if (getServerError('type'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field-span-2">
-            <mat-label>Libellé</mat-label>
-            <input matInput type="text" formControlName="libelle"
-              (input)="clearServerError('libelle')" />
-            @if (hasError('libelle', 'required')) {
-              <mat-error>Le libellé est obligatoire.</mat-error>
-            }
-            @if (hasError('libelle', 'maxlength')) {
-              <mat-error>Le libellé ne doit pas dépasser 120 caractères.</mat-error>
-            }
-            @if (getServerError('libelle'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Montant</mat-label>
-            <input matInput type="number" step="0.01" formControlName="montant"
-              (input)="clearServerError('montant')" />
-            @if (hasError('montant', 'required')) {
-              <mat-error>Le montant est obligatoire.</mat-error>
-            }
-            @if (hasError('montant', 'min')) {
-              <mat-error>Le montant doit être strictement supérieur à 0.</mat-error>
-            }
-            @if (getServerError('montant'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Catégorie</mat-label>
-            <mat-select formControlName="categorie" (selectionChange)="clearServerError('categorie')">
-              <mat-option value="">Sélectionner une catégorie</mat-option>
-              @for (item of fluxCategories; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (hasError('categorie', 'required')) {
-              <mat-error>La catégorie est obligatoire.</mat-error>
-            }
-            @if (getServerError('categorie'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Mode de paiement</mat-label>
-            <mat-select formControlName="modePaiement"
-              (selectionChange)="clearServerError('modePaiement')">
-              <mat-option value="">Sélectionner un mode de paiement</mat-option>
-              @for (item of paymentModes; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (hasError('modePaiement', 'required')) {
-              <mat-error>Le mode de paiement est obligatoire.</mat-error>
-            }
-            @if (getServerError('modePaiement'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="field-span-2">
-            <mat-label>Commentaire</mat-label>
-            <textarea matInput rows="3" formControlName="commentaire"
-              (input)="clearServerError('commentaire')"></textarea>
-            @if (hasError('commentaire', 'maxlength')) {
-              <mat-error>Le commentaire ne doit pas dépasser 500 caractères.</mat-error>
-            }
-            @if (getServerError('commentaire'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-        </div>
-
-        <!-- ── Section qualification & statuts ── -->
-        <div class="section-divider">
-          <span class="section-divider__label">Qualification & statuts</span>
-        </div>
-
-        <div class="form-grid">
-
-          <mat-form-field appearance="outline">
-            <mat-label>Date de valeur</mat-label>
-            <input matInput [matDatepicker]="pickerValeur" formControlName="dateValeur" />
-            <mat-datepicker-toggle matIconSuffix [for]="pickerValeur"></mat-datepicker-toggle>
-            <mat-datepicker #pickerValeur></mat-datepicker>
-            <mat-hint>Date réelle d'encaissement / décaissement</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Occurrence</mat-label>
-            <mat-select formControlName="occurrence"
-              (selectionChange)="clearServerError('occurrence')">
-              <mat-option value="">Sélectionner</mat-option>
-              @for (item of occurrences; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (hasError('occurrence', 'required')) {
-              <mat-error>L'occurrence est obligatoire.</mat-error>
-            }
-            @if (getServerError('occurrence'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Statut justificatif</mat-label>
-            <mat-select formControlName="statutJustificatif"
-              (selectionChange)="clearServerError('statutJustificatif')">
-              <mat-option value="">Sélectionner</mat-option>
-              @for (item of statutsJustificatif; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (hasError('statutJustificatif', 'required')) {
-              <mat-error>Le statut justificatif est obligatoire.</mat-error>
-            }
-            @if (getServerError('statutJustificatif'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Qualification pressentie</mat-label>
-            <mat-select formControlName="qualificationPressentie"
-              (selectionChange)="clearServerError('qualificationPressentie')">
-              <mat-option value="">Sélectionner</mat-option>
-              @for (item of qualificationsPressenties; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (hasError('qualificationPressentie', 'required')) {
-              <mat-error>La qualification est obligatoire.</mat-error>
-            }
-            @if (getServerError('qualificationPressentie'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Statut de traitement</mat-label>
-            <mat-select formControlName="statutTraitement"
-              (selectionChange)="clearServerError('statutTraitement')">
-              <mat-option value="">Sélectionner</mat-option>
-              @for (item of statutsTraitement; track item.code) {
-                <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (hasError('statutTraitement', 'required')) {
-              <mat-error>Le statut de traitement est obligatoire.</mat-error>
-            }
-            @if (getServerError('statutTraitement'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-        </div>
-
-        <!-- ── Section rattachements ── -->
-        <div class="section-divider">
-          <span class="section-divider__label">Rattachements</span>
-        </div>
-
-        <div class="form-grid">
-
-          <mat-form-field appearance="outline">
-            <mat-label>Bien rattaché</mat-label>
-            <mat-select formControlName="bienId"
-              (selectionChange)="clearServerError('bienId')">
-              @if (biensLoading) {
-                <mat-option disabled>Chargement...</mat-option>
-              } @else if (biens.length === 0) {
-                <mat-option disabled>
-                  Aucun bien — créer un bien d'abord
-                </mat-option>
-              } @else {
-                <mat-option [value]="null">— Aucun bien sélectionné</mat-option>
-                @for (bien of biens; track bien.id) {
-                  <mat-option [value]="bien.id">
-                    {{ bien.nomUsuel }} — {{ bien.adresseSimplifiee }}
-                  </mat-option>
-                }
-              }
-            </mat-select>
-            <mat-hint>Optionnel — rattacher ce flux à un bien</mat-hint>
-            @if (getServerError('bienId'); as error) {
-              <mat-error>{{ error }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>ID Exercice</mat-label>
-            <input matInput type="number" formControlName="exerciceId" />
-            <mat-hint>Optionnel — identifiant de l'exercice rattaché</mat-hint>
-          </mat-form-field>
-
-        </div>
-
-        <!-- ── Actions ── -->
-        <div class="form-actions">
-          <a mat-stroked-button routerLink="/flux">Annuler</a>
-          <button mat-flat-button type="submit"
-            [disabled]="isSubmitting || form.invalid">
-            {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
-          </button>
-        </div>
-
-      </form>
-    </mat-card>
-
+    </ul>
+    <div class="form-warnings__actions">
+      <button mat-stroked-button type="button" (click)="confirmAndRedirect()">Continuer quand même</button>
+    </div>
+  </div>
   }
-}
+
+  <form class="operation-form" [formGroup]="form" (ngSubmit)="save()">
+    <!-- ── Section principale ── -->
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="date" (dateInput)="clearServerError('date')" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        @if (hasError('date', 'required')) {
+        <mat-error>La date est obligatoire.</mat-error>
+        } @if (getServerError('date'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type" (selectionChange)="clearServerError('type')">
+          <mat-option value="">Sélectionner un type</mat-option>
+          @for (item of fluxTypes; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('type', 'required')) {
+        <mat-error>Le type est obligatoire.</mat-error>
+        } @if (getServerError('type'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Libellé</mat-label>
+        <input matInput type="text" formControlName="libelle" (input)="clearServerError('libelle')" />
+        @if (hasError('libelle', 'required')) {
+        <mat-error>Le libellé est obligatoire.</mat-error>
+        } @if (hasError('libelle', 'maxlength')) {
+        <mat-error>Le libellé ne doit pas dépasser 120 caractères.</mat-error>
+        } @if (getServerError('libelle'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Montant</mat-label>
+        <input matInput type="number" step="0.01" formControlName="montant" (input)="clearServerError('montant')" />
+        @if (hasError('montant', 'required')) {
+        <mat-error>Le montant est obligatoire.</mat-error>
+        } @if (hasError('montant', 'min')) {
+        <mat-error>Le montant doit être strictement supérieur à 0.</mat-error>
+        } @if (getServerError('montant'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Catégorie</mat-label>
+        <mat-select formControlName="categorie" (selectionChange)="clearServerError('categorie')">
+          <mat-option value="">Sélectionner une catégorie</mat-option>
+          @for (item of fluxCategories; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('categorie', 'required')) {
+        <mat-error>La catégorie est obligatoire.</mat-error>
+        } @if (getServerError('categorie'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Mode de paiement</mat-label>
+        <mat-select formControlName="modePaiement" (selectionChange)="clearServerError('modePaiement')">
+          <mat-option value="">Sélectionner un mode de paiement</mat-option>
+          @for (item of paymentModes; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('modePaiement', 'required')) {
+        <mat-error>Le mode de paiement est obligatoire.</mat-error>
+        } @if (getServerError('modePaiement'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput rows="3" formControlName="commentaire" (input)="clearServerError('commentaire')"></textarea>
+        @if (hasError('commentaire', 'maxlength')) {
+        <mat-error>Le commentaire ne doit pas dépasser 500 caractères.</mat-error>
+        } @if (getServerError('commentaire'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- ── Section qualification & statuts ── -->
+    <div class="section-divider">
+      <span class="section-divider__label">Qualification & statuts</span>
+    </div>
+
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Date de valeur</mat-label>
+        <input matInput [matDatepicker]="pickerValeur" formControlName="dateValeur" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerValeur"></mat-datepicker-toggle>
+        <mat-datepicker #pickerValeur></mat-datepicker>
+        <mat-hint>Date réelle d'encaissement / décaissement</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Occurrence</mat-label>
+        <mat-select formControlName="occurrence" (selectionChange)="clearServerError('occurrence')">
+          <mat-option value="">Sélectionner</mat-option>
+          @for (item of occurrences; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('occurrence', 'required')) {
+        <mat-error>L'occurrence est obligatoire.</mat-error>
+        } @if (getServerError('occurrence'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut justificatif</mat-label>
+        <mat-select formControlName="statutJustificatif" (selectionChange)="clearServerError('statutJustificatif')">
+          <mat-option value="">Sélectionner</mat-option>
+          @for (item of statutsJustificatif; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('statutJustificatif', 'required')) {
+        <mat-error>Le statut justificatif est obligatoire.</mat-error>
+        } @if (getServerError('statutJustificatif'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Qualification pressentie</mat-label>
+        <mat-select
+          formControlName="qualificationPressentie"
+          (selectionChange)="clearServerError('qualificationPressentie')"
+        >
+          <mat-option value="">Sélectionner</mat-option>
+          @for (item of qualificationsPressenties; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('qualificationPressentie', 'required')) {
+        <mat-error>La qualification est obligatoire.</mat-error>
+        } @if (getServerError('qualificationPressentie'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut de traitement</mat-label>
+        <mat-select formControlName="statutTraitement" (selectionChange)="clearServerError('statutTraitement')">
+          <mat-option value="">Sélectionner</mat-option>
+          @for (item of statutsTraitement; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('statutTraitement', 'required')) {
+        <mat-error>Le statut de traitement est obligatoire.</mat-error>
+        } @if (getServerError('statutTraitement'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- ── Section rattachements ── -->
+    <div class="section-divider">
+      <span class="section-divider__label">Rattachements</span>
+    </div>
+
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Bien rattaché</mat-label>
+        <mat-select formControlName="bienId" (selectionChange)="clearServerError('bienId')">
+          @if (biensLoading) {
+          <mat-option disabled>Chargement...</mat-option>
+          } @else if (biens.length === 0) {
+          <mat-option disabled> Aucun bien — créer un bien d'abord </mat-option>
+          } @else {
+          <mat-option [value]="null">— Aucun bien sélectionné</mat-option>
+          @for (bien of biens; track bien.id) {
+          <mat-option [value]="bien.id"> {{ bien.nomUsuel }} — {{ bien.adresseSimplifiee }} </mat-option>
+          } }
+        </mat-select>
+        <mat-hint>Optionnel — rattacher ce flux à un bien</mat-hint>
+        @if (getServerError('bienId'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>ID Exercice</mat-label>
+        <input matInput type="number" formControlName="exerciceId" />
+        <mat-hint>Optionnel — identifiant de l'exercice rattaché</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <!-- ── Actions ── -->
+    <div class="form-actions">
+      <a mat-stroked-button routerLink="/flux">Annuler</a>
+      <button mat-flat-button type="submit" [disabled]="isSubmitting || form.invalid">
+        {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </div>
+  </form>
+</mat-card>
+
+} }

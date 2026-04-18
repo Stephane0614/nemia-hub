@@ -41,7 +41,6 @@ public class FluxResponse {
   private LocalDateTime updatedAt;
   private List<String> warnings = new ArrayList<>();
 
-
   public FluxResponse() {}
 
   public Long getId() {
@@ -180,12 +179,11 @@ public class FluxResponse {
     this.statutTraitement = statutTraitement;
   }
 
-      public List<String> getWarnings() {
-        return warnings;
-    }
+  public List<String> getWarnings() {
+    return warnings;
+  }
 
-    public void setWarnings(List<String> warnings) {
-        this.warnings = warnings;
-    }
-
+  public void setWarnings(List<String> warnings) {
+    this.warnings = warnings;
+  }
 }

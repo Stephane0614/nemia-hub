@@ -9,200 +9,208 @@
 </section>
 
 @if (isLoading) {
-  <div class="loading-state">
-    <mat-spinner diameter="36"></mat-spinner>
-    <p>Chargement des données...</p>
-  </div>
+<div class="loading-state">
+  <mat-spinner diameter="36"></mat-spinner>
+  <p>Chargement des données...</p>
+</div>
 } @else if (errorMessage) {
-  <mat-card class="error-card">
-    <p>{{ errorMessage }}</p>
-  </mat-card>
+<mat-card class="error-card">
+  <p>{{ errorMessage }}</p>
+</mat-card>
 } @else if (synthese) {
 
-  <!-- ── Navigation entre mois ── -->
-  <div class="mois-nav">
-    <button mat-icon-button (click)="allerMoisPrecedent()" title="Mois précédent">
-      &#8249;
-    </button>
-    <span class="mois-label">{{ synthese.periode.label }}</span>
-    <button mat-icon-button (click)="allerMoisSuivant()" [disabled]="isMoisCourant" title="Mois suivant">
-      &#8250;
-    </button>
-  </div>
+<!-- ── Navigation entre mois ── -->
+<div class="mois-nav">
+  <button mat-icon-button (click)="allerMoisPrecedent()" title="Mois précédent">&#8249;</button>
+  <span class="mois-label">{{ synthese.periode.label }}</span>
+  <button mat-icon-button (click)="allerMoisSuivant()" [disabled]="isMoisCourant" title="Mois suivant">&#8250;</button>
+</div>
 
-  <!-- ── Cartes métriques ── -->
-  <section class="metrics-grid">
-    <mat-card class="metric-card metric-card--positive">
-      <p class="metric-label">Recettes encaissées</p>
-      <p class="metric-value">{{ metriques?.totalRecettes | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
-      <p class="metric-detail">Sur {{ synthese.periode.label }}</p>
-    </mat-card>
+<!-- ── Cartes métriques ── -->
+<section class="metrics-grid">
+  <mat-card class="metric-card metric-card--positive">
+    <p class="metric-label">Recettes encaissées</p>
+    <p class="metric-value">{{ metriques?.totalRecettes | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
+    <p class="metric-detail">Sur {{ synthese.periode.label }}</p>
+  </mat-card>
 
-    <mat-card class="metric-card metric-card--negative">
-      <p class="metric-label">Dépenses décaissées</p>
-      <p class="metric-value">{{ metriques?.totalDepenses | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
-      <p class="metric-detail">Sur {{ synthese.periode.label }}</p>
-    </mat-card>
+  <mat-card class="metric-card metric-card--negative">
+    <p class="metric-label">Dépenses décaissées</p>
+    <p class="metric-value">{{ metriques?.totalDepenses | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
+    <p class="metric-detail">Sur {{ synthese.periode.label }}</p>
+  </mat-card>
 
-    <mat-card class="metric-card" [class.metric-card--positive]="soldePositif" [class.metric-card--negative]="!soldePositif">
-      <p class="metric-label">Solde</p>
-      <p class="metric-value">{{ metriques?.solde | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
-      <p class="metric-detail">Vision mensuelle provisoire</p>
-    </mat-card>
+  <mat-card
+    class="metric-card"
+    [class.metric-card--positive]="soldePositif"
+    [class.metric-card--negative]="!soldePositif"
+  >
+    <p class="metric-label">Solde</p>
+    <p class="metric-value">{{ metriques?.solde | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
+    <p class="metric-detail">Vision mensuelle provisoire</p>
+  </mat-card>
 
-    <mat-card class="metric-card">
-      <p class="metric-label">Opérations</p>
-      <p class="metric-value">{{ metriques?.nombreOperations }}</p>
-      <p class="metric-detail">Flux enregistrés</p>
-    </mat-card>
-  </section>
+  <mat-card class="metric-card">
+    <p class="metric-label">Opérations</p>
+    <p class="metric-value">{{ metriques?.nombreOperations }}</p>
+    <p class="metric-detail">Flux enregistrés</p>
+  </mat-card>
+</section>
 
-  <section class="home-content-grid">
+<section class="home-content-grid">
+  <!-- ── Points d'attention ── -->
+  <mat-card class="panel-card">
+    <div class="panel-header">
+      <h2 class="panel-title">Points d'attention</h2>
+      <p class="panel-subtitle">Signaux utiles à surveiller</p>
+    </div>
 
-    <!-- ── Points d'attention ── -->
-    <mat-card class="panel-card">
-      <div class="panel-header">
-        <h2 class="panel-title">Points d'attention</h2>
-        <p class="panel-subtitle">Signaux utiles à surveiller</p>
-      </div>
-
-      @if (aucuneAlerte) {
-        <p class="alerte-ok">Aucun point d'attention sur cette période.</p>
-      } @else {
-        <ul class="attention-list">
-          @if (alertes && alertes.fluxSansJustificatif > 0) {
-            <li class="attention-item" (click)="allerVersFlux()">
-              <span class="attention-icon attention-icon--warn">!</span>
-              {{ alertes.fluxSansJustificatif }} flux sans justificatif
-              — {{ alertes.montantSansJustificatif | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}
-            </li>
-          }
-          @if (alertes && alertes.fluxAArbitrer > 0) {
-            <li class="attention-item" (click)="allerVersFlux()">
-              <span class="attention-icon attention-icon--warn">?</span>
-              {{ alertes.fluxAArbitrer }} flux à arbitrer
-              — {{ alertes.montantAArbitrer | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}
-            </li>
-          }
-          @if (alertes && alertes.fluxARevoir > 0) {
-            <li class="attention-item" (click)="allerVersFlux()">
-              <span class="attention-icon attention-icon--info">~</span>
-              {{ alertes.fluxARevoir }} flux à revoir
-            </li>
-          }
-        </ul>
+    @if (aucuneAlerte) {
+    <p class="alerte-ok">Aucun point d'attention sur cette période.</p>
+    } @else {
+    <ul class="attention-list">
+      @if (alertes && alertes.fluxSansJustificatif > 0) {
+      <li class="attention-item" (click)="allerVersFlux()">
+        <span class="attention-icon attention-icon--warn">!</span>
+        {{ alertes.fluxSansJustificatif }} flux sans justificatif — {{ alertes.montantSansJustificatif | currency: 'EUR'
+        : 'symbol' : '1.2-2' : 'fr' }}
+      </li>
+      } @if (alertes && alertes.fluxAArbitrer > 0) {
+      <li class="attention-item" (click)="allerVersFlux()">
+        <span class="attention-icon attention-icon--warn">?</span>
+        {{ alertes.fluxAArbitrer }} flux à arbitrer — {{ alertes.montantAArbitrer | currency: 'EUR' : 'symbol' : '1.2-2'
+        : 'fr' }}
+      </li>
+      } @if (alertes && alertes.fluxARevoir > 0) {
+      <li class="attention-item" (click)="allerVersFlux()">
+        <span class="attention-icon attention-icon--info">~</span>
+        {{ alertes.fluxARevoir }} flux à revoir
+      </li>
       }
-    </mat-card>
-
-    <!-- ── Récurrence des dépenses ── -->
-    @if (recurrenceDepenses && (recurrenceDepenses.montantRecurrent > 0 || recurrenceDepenses.montantPonctuel > 0)) {
-      <mat-card class="panel-card">
-        <div class="panel-header">
-          <h2 class="panel-title">Récurrence des dépenses</h2>
-          <p class="panel-subtitle">Structurel vs ponctuel</p>
-        </div>
-        <div class="recurrence-grid">
-          <div class="recurrence-item">
-            <p class="recurrence-label">Charges récurrentes</p>
-            <p class="recurrence-value">{{ recurrenceDepenses.montantRecurrent | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
-          </div>
-          <div class="recurrence-item">
-            <p class="recurrence-label">Dépenses ponctuelles</p>
-            <p class="recurrence-value">{{ recurrenceDepenses.montantPonctuel | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
-          </div>
-        </div>
-      </mat-card>
+    </ul>
     }
+  </mat-card>
 
-    <!-- ── Répartition des dépenses ── -->
-    @if (repartitionDepenses.length > 0) {
-      <mat-card class="panel-card panel-card--wide">
-        <div class="panel-header">
-          <h2 class="panel-title">Répartition des dépenses</h2>
-          <p class="panel-subtitle">Par catégorie, ordre décroissant</p>
-        </div>
-        <div class="repartition-list">
-          @for (item of repartitionDepenses; track item.categorie) {
-            <div class="repartition-item">
-              <span class="repartition-label">{{ item.label }}</span>
-              <span class="repartition-montant">{{ item.montant | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</span>
-            </div>
-            <mat-divider></mat-divider>
-          }
-        </div>
-      </mat-card>
-    }
-
-    <!-- ── Dernières opérations ── -->
-    <mat-card class="panel-card panel-card--wide">
-      <div class="panel-header">
-        <h2 class="panel-title">Dernières opérations</h2>
-        <p class="panel-subtitle">Les 5 plus récentes du mois</p>
+  <!-- ── Récurrence des dépenses ── -->
+  @if (recurrenceDepenses && (recurrenceDepenses.montantRecurrent > 0 || recurrenceDepenses.montantPonctuel > 0)) {
+  <mat-card class="panel-card">
+    <div class="panel-header">
+      <h2 class="panel-title">Récurrence des dépenses</h2>
+      <p class="panel-subtitle">Structurel vs ponctuel</p>
+    </div>
+    <div class="recurrence-grid">
+      <div class="recurrence-item">
+        <p class="recurrence-label">Charges récurrentes</p>
+        <p class="recurrence-value">
+          {{ recurrenceDepenses.montantRecurrent | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}
+        </p>
       </div>
+      <div class="recurrence-item">
+        <p class="recurrence-label">Dépenses ponctuelles</p>
+        <p class="recurrence-value">
+          {{ recurrenceDepenses.montantPonctuel | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}
+        </p>
+      </div>
+    </div>
+  </mat-card>
+  }
 
-      @if (dernieresOperations.length === 0) {
-        <p class="empty-state">Aucune opération sur cette période.</p>
-      } @else {
-        <div class="operations-table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Libellé</th>
-                <th>Type</th>
-                <th>Montant</th>
-                <th>Catégorie</th>
-                <th>Justificatif</th>
-                <th>Qualification</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (op of dernieresOperations; track op.id) {
-                <tr class="operation-row" (click)="allerVersFluxDetail(op.id)"
-                    [class.operation-row--warning]="op.warnings && op.warnings.length > 0">
-                  <td>{{ op.date | date:'dd/MM/yyyy' }}</td>
-                  <td class="cell-libelle">
-                    {{ op.libelle }}
-                    @if (op.warnings && op.warnings.length > 0) {
-                      <span class="warning-icon" [title]="op.warnings.join(' | ')">⚠</span>
-                    }
-                  </td>
-                  <td>
-                    <span class="badge"
-                      [class.badge--recette]="op.type === 'RECETTE'"
-                      [class.badge--depense]="op.type === 'DEPENSE'"
-                      [class.badge--mouvement]="op.type === 'MOUVEMENT_FINANCIER'"
-                      [class.badge--regularisation]="op.type === 'REGULARISATION'">
-                      {{ op.type }}
-                    </span>
-                  </td>
-                  <td>{{ op.montant | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</td>
-                  <td>{{ op.categorie }}</td>
-                  <td>
-                    <span class="badge"
-                      [class.badge--ok]="op.statutJustificatif === 'FOURNI'"
-                      [class.badge--warn]="op.statutJustificatif === 'A_FOURNIR' || op.statutJustificatif === 'INCOMPLET' || op.statutJustificatif === 'A_VERIFIER'"
-                      [class.badge--muted]="op.statutJustificatif === 'NON_REQUIS'"
-                      [class.badge--error]="op.statutJustificatif === 'REJETE'">
-                      {{ op.statutJustificatif }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge"
-                      [class.badge--ok]="op.qualificationPressentie === 'CHARGE_COURANTE'"
-                      [class.badge--info]="op.qualificationPressentie === 'IMMOBILISATION'"
-                      [class.badge--warn]="op.qualificationPressentie === 'A_ARBITRER' || op.qualificationPressentie === 'MIXTE_OU_A_VENTILER'"
-                      [class.badge--muted]="op.qualificationPressentie === 'HORS_RESULTAT' || op.qualificationPressentie === 'NON_APPLICABLE'">
-                      {{ op.qualificationPressentie }}
-                    </span>
-                  </td>
-                </tr>
+  <!-- ── Répartition des dépenses ── -->
+  @if (repartitionDepenses.length > 0) {
+  <mat-card class="panel-card panel-card--wide">
+    <div class="panel-header">
+      <h2 class="panel-title">Répartition des dépenses</h2>
+      <p class="panel-subtitle">Par catégorie, ordre décroissant</p>
+    </div>
+    <div class="repartition-list">
+      @for (item of repartitionDepenses; track item.categorie) {
+      <div class="repartition-item">
+        <span class="repartition-label">{{ item.label }}</span>
+        <span class="repartition-montant">{{ item.montant | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</span>
+      </div>
+      <mat-divider></mat-divider>
+      }
+    </div>
+  </mat-card>
+  }
+
+  <!-- ── Dernières opérations ── -->
+  <mat-card class="panel-card panel-card--wide">
+    <div class="panel-header">
+      <h2 class="panel-title">Dernières opérations</h2>
+      <p class="panel-subtitle">Les 5 plus récentes du mois</p>
+    </div>
+
+    @if (dernieresOperations.length === 0) {
+    <p class="empty-state">Aucune opération sur cette période.</p>
+    } @else {
+    <div class="operations-table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Libellé</th>
+            <th>Type</th>
+            <th>Montant</th>
+            <th>Catégorie</th>
+            <th>Justificatif</th>
+            <th>Qualification</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (op of dernieresOperations; track op.id) {
+          <tr
+            class="operation-row"
+            (click)="allerVersFluxDetail(op.id)"
+            [class.operation-row--warning]="op.warnings && op.warnings.length > 0"
+          >
+            <td>{{ op.date | date:'dd/MM/yyyy' }}</td>
+            <td class="cell-libelle">
+              {{ op.libelle }} @if (op.warnings && op.warnings.length > 0) {
+              <span class="warning-icon" [title]="op.warnings.join(' | ')">⚠</span>
               }
-            </tbody>
-          </table>
-        </div>
-      }
-    </mat-card>
-
-  </section>
+            </td>
+            <td>
+              <span
+                class="badge"
+                [class.badge--recette]="op.type === 'RECETTE'"
+                [class.badge--depense]="op.type === 'DEPENSE'"
+                [class.badge--mouvement]="op.type === 'MOUVEMENT_FINANCIER'"
+                [class.badge--regularisation]="op.type === 'REGULARISATION'"
+              >
+                {{ op.type }}
+              </span>
+            </td>
+            <td>{{ op.montant | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</td>
+            <td>{{ op.categorie }}</td>
+            <td>
+              <span
+                class="badge"
+                [class.badge--ok]="op.statutJustificatif === 'FOURNI'"
+                [class.badge--warn]="op.statutJustificatif === 'A_FOURNIR' || op.statutJustificatif === 'INCOMPLET' || op.statutJustificatif === 'A_VERIFIER'"
+                [class.badge--muted]="op.statutJustificatif === 'NON_REQUIS'"
+                [class.badge--error]="op.statutJustificatif === 'REJETE'"
+              >
+                {{ op.statutJustificatif }}
+              </span>
+            </td>
+            <td>
+              <span
+                class="badge"
+                [class.badge--ok]="op.qualificationPressentie === 'CHARGE_COURANTE'"
+                [class.badge--info]="op.qualificationPressentie === 'IMMOBILISATION'"
+                [class.badge--warn]="op.qualificationPressentie === 'A_ARBITRER' || op.qualificationPressentie === 'MIXTE_OU_A_VENTILER'"
+                [class.badge--muted]="op.qualificationPressentie === 'HORS_RESULTAT' || op.qualificationPressentie === 'NON_APPLICABLE'"
+              >
+                {{ op.qualificationPressentie }}
+              </span>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </mat-card>
+</section>
 }

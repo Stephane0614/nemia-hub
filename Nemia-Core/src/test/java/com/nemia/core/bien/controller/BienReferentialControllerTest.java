@@ -19,8 +19,7 @@ class BienReferentialControllerTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(new BienReferentialController())
+    mockMvc = MockMvcBuilders.standaloneSetup(new BienReferentialController())
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }
