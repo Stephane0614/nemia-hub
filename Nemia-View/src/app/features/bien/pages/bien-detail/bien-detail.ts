@@ -117,36 +117,36 @@ export class BienDetail implements OnInit {
   }
 
   allerVersFlux(): void {
-  if (this.bien) {
-    this.router.navigate(['/flux'], {
-      queryParams: { bienId: this.bien.id }
-    });
+    if (this.bien) {
+      this.router.navigate(['/flux'], {
+        queryParams: { bienId: this.bien.id },
+      });
+    }
   }
-}
 
-allerVersSansJustificatif(): void {
-  if (this.bien) {
-    this.router.navigate(['/flux'], {
-      queryParams: { bienId: this.bien.id, statutJustificatif: 'A_FOURNIR,INCOMPLET' }
-    });
+  allerVersSansJustificatif(): void {
+    if (this.bien) {
+      this.router.navigate(['/flux'], {
+        queryParams: { bienId: this.bien.id, statutJustificatif: 'A_FOURNIR,INCOMPLET' },
+      });
+    }
   }
-}
 
-allerVersAArbitrer(): void {
-  if (this.bien) {
-    this.router.navigate(['/flux'], {
-      queryParams: { bienId: this.bien.id, qualificationPressentie: 'A_ARBITRER' }
-    });
+  allerVersAArbitrer(): void {
+    if (this.bien) {
+      this.router.navigate(['/flux'], {
+        queryParams: { bienId: this.bien.id, qualificationPressentie: 'A_ARBITRER' },
+      });
+    }
   }
-}
 
-allerVersARevoir(): void {
-  if (this.bien) {
-    this.router.navigate(['/flux'], {
-      queryParams: { bienId: this.bien.id, statutTraitement: 'A_REVOIR' }
-    });
+  allerVersARevoir(): void {
+    if (this.bien) {
+      this.router.navigate(['/flux'], {
+        queryParams: { bienId: this.bien.id, statutTraitement: 'A_REVOIR' },
+      });
+    }
   }
-}
 
   allerVersModifier(): void {
     if (this.bien) {

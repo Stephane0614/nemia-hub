@@ -36,11 +36,9 @@
       <mat-option disabled>Chargement...</mat-option>
       } @else if (biens.length === 0) {
       <mat-option disabled>Aucun bien enregistré</mat-option>
-      } @else {
-      @for (bien of biens; track bien.id) {
+      } @else { @for (bien of biens; track bien.id) {
       <mat-option [value]="bien.id">{{ bien.nomUsuel }}</mat-option>
-      }
-      }
+      } }
     </mat-select>
   </mat-form-field>
 </div>
@@ -59,8 +57,11 @@
     <p class="metric-detail">Sur {{ synthese.periode.label }}</p>
   </mat-card>
 
-  <mat-card class="metric-card" [class.metric-card--positive]="soldePositif"
-    [class.metric-card--negative]="!soldePositif">
+  <mat-card
+    class="metric-card"
+    [class.metric-card--positive]="soldePositif"
+    [class.metric-card--negative]="!soldePositif"
+  >
     <p class="metric-label">Solde</p>
     <p class="metric-value">{{ metriques?.solde | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
     <p class="metric-detail">Vision mensuelle provisoire</p>
@@ -175,8 +176,11 @@
         </thead>
         <tbody>
           @for (op of dernieresOperations; track op.id) {
-          <tr class="operation-row" (click)="allerVersFluxDetail(op.id)"
-            [class.operation-row--warning]="op.warnings && op.warnings.length > 0">
+          <tr
+            class="operation-row"
+            (click)="allerVersFluxDetail(op.id)"
+            [class.operation-row--warning]="op.warnings && op.warnings.length > 0"
+          >
             <td>{{ op.date | date:'dd/MM/yyyy' }}</td>
             <td class="cell-libelle">
               {{ op.libelle }} @if (op.warnings && op.warnings.length > 0) {
@@ -184,28 +188,37 @@
               }
             </td>
             <td>
-              <span class="badge" [class.badge--recette]="op.type === 'RECETTE'"
+              <span
+                class="badge"
+                [class.badge--recette]="op.type === 'RECETTE'"
                 [class.badge--depense]="op.type === 'DEPENSE'"
                 [class.badge--mouvement]="op.type === 'MOUVEMENT_FINANCIER'"
-                [class.badge--regularisation]="op.type === 'REGULARISATION'">
+                [class.badge--regularisation]="op.type === 'REGULARISATION'"
+              >
                 {{ op.type }}
               </span>
             </td>
             <td>{{ op.montant | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</td>
             <td>{{ op.categorie }}</td>
             <td>
-              <span class="badge" [class.badge--ok]="op.statutJustificatif === 'FOURNI'"
+              <span
+                class="badge"
+                [class.badge--ok]="op.statutJustificatif === 'FOURNI'"
                 [class.badge--warn]="op.statutJustificatif === 'A_FOURNIR' || op.statutJustificatif === 'INCOMPLET' || op.statutJustificatif === 'A_VERIFIER'"
                 [class.badge--muted]="op.statutJustificatif === 'NON_REQUIS'"
-                [class.badge--error]="op.statutJustificatif === 'REJETE'">
+                [class.badge--error]="op.statutJustificatif === 'REJETE'"
+              >
                 {{ op.statutJustificatif }}
               </span>
             </td>
             <td>
-              <span class="badge" [class.badge--ok]="op.qualificationPressentie === 'CHARGE_COURANTE'"
+              <span
+                class="badge"
+                [class.badge--ok]="op.qualificationPressentie === 'CHARGE_COURANTE'"
                 [class.badge--info]="op.qualificationPressentie === 'IMMOBILISATION'"
                 [class.badge--warn]="op.qualificationPressentie === 'A_ARBITRER' || op.qualificationPressentie === 'MIXTE_OU_A_VENTILER'"
-                [class.badge--muted]="op.qualificationPressentie === 'HORS_RESULTAT' || op.qualificationPressentie === 'NON_APPLICABLE'">
+                [class.badge--muted]="op.qualificationPressentie === 'HORS_RESULTAT' || op.qualificationPressentie === 'NON_APPLICABLE'"
+              >
                 {{ op.qualificationPressentie }}
               </span>
             </td>
