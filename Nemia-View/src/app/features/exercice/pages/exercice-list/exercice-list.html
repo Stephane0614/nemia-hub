@@ -1,0 +1,82 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Exercices</h1>
+    <p class="page-subtitle">Gère les périodes comptables de ton activité LMNP.</p>
+  </div>
+  <a mat-flat-button routerLink="/exercices/nouveau">Créer un exercice</a>
+</section>
+
+@if (isLoading) {
+<div class="loading-state">
+  <mat-spinner diameter="36"></mat-spinner>
+  <p>Chargement des exercices...</p>
+</div>
+} @else if (errorMessage) {
+<mat-card class="state-card state-card--error">
+  <p>{{ errorMessage }}</p>
+</mat-card>
+} @else if (exercices.length === 0) {
+<mat-card class="state-card">
+  <p>Aucun exercice enregistré pour le moment.</p>
+  <a mat-flat-button routerLink="/exercices/nouveau">Créer le premier exercice</a>
+</mat-card>
+} @else {
+<mat-card class="table-card">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Libellé</th>
+          <th>Période</th>
+          <th>Statut</th>
+          <th>Complétude</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (exercice of exercices; track exercice.id) {
+        <tr>
+          <td class="cell-libelle">{{ exercice.libelleExercice }}</td>
+
+          <td class="cell-periode">
+            {{ exercice.dateDebut | date:'dd/MM/yyyy' }} → {{ exercice.dateFin | date:'dd/MM/yyyy' }}
+          </td>
+
+          <td>
+            <span
+              class="badge"
+              [class.badge--ouvert]="exercice.statutExercice === 'OUVERT'"
+              [class.badge--preparation]="exercice.statutExercice === 'EN_PREPARATION_DE_CLOTURE'"
+              [class.badge--cloture]="exercice.statutExercice === 'CLOTURE'"
+            >
+              {{ getStatutLabel(exercice.statutExercice) }}
+            </span>
+          </td>
+
+          <td>
+            @if (exercice.niveauCompletude) {
+            <span
+              class="badge"
+              [class.badge--faible]="exercice.niveauCompletude === 'FAIBLE'"
+              [class.badge--moyen]="exercice.niveauCompletude === 'MOYEN'"
+              [class.badge--avance]="exercice.niveauCompletude === 'AVANCE'"
+              [class.badge--complet]="exercice.niveauCompletude === 'COMPLET'"
+            >
+              {{ getCompletudLabel(exercice.niveauCompletude) }}
+            </span>
+            } @else {
+            <span class="cell-empty">—</span>
+            }
+          </td>
+
+          <td class="actions-cell">
+            <button mat-button (click)="allerVersModifier(exercice.id)">Modifier</button>
+            <button mat-stroked-button (click)="supprimerExercice(exercice.id)">Supprimer</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</mat-card>
+}

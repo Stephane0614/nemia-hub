@@ -5,5 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BienRepository extends JpaRepository<Bien, Long> {
-  Optional<Bien> findByNomUsuelAndAdresseSimplifiee(String nomUsuel, String adresseSimplifiee);
+  boolean existsByNomUsuelAndAdresseSimplifiee(String nomUsuel, String adresseSimplifiee);
+
+  boolean existsByNomUsuelAndAdresseSimplifieeAndIdNot(String nomUsuel, String adresseSimplifiee, Long id);
 }

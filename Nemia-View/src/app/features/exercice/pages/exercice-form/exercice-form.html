@@ -1,0 +1,124 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">{{ isEditMode() ? 'Modifier un exercice' : 'Créer un exercice' }}</h1>
+    <p class="page-subtitle">Renseigne les informations de l'exercice puis enregistre.</p>
+  </div>
+</section>
+
+@if (isLoading) {
+<mat-card class="state-card">
+  <div class="state-content">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement des données...</p>
+  </div>
+</mat-card>
+} @else { @if (loadErrorMessage) {
+<mat-card class="state-card state-card--error">
+  <p>{{ loadErrorMessage }}</p>
+  <a mat-stroked-button routerLink="/exercices">Retour aux exercices</a>
+</mat-card>
+} @else {
+
+<mat-card class="form-card">
+  @if (submitErrorMessage) {
+  <div class="form-alert">{{ submitErrorMessage }}</div>
+  }
+
+  <form class="exercice-form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Libellé de l'exercice</mat-label>
+        <input
+          matInput
+          formControlName="libelleExercice"
+          placeholder="Ex. 2026"
+          (input)="clearServerError('libelleExercice')"
+        />
+        @if (hasError('libelleExercice', 'required')) {
+        <mat-error>Le libellé est obligatoire.</mat-error>
+        } @if (hasError('libelleExercice', 'maxlength')) {
+        <mat-error>Le libellé ne doit pas dépasser 50 caractères.</mat-error>
+        } @if (getServerError('libelleExercice'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de début</mat-label>
+        <input
+          matInput
+          [matDatepicker]="pickerDebut"
+          formControlName="dateDebut"
+          (dateInput)="clearServerError('dateDebut')"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerDebut"> </mat-datepicker-toggle>
+        <mat-datepicker #pickerDebut></mat-datepicker>
+        @if (hasError('dateDebut', 'required')) {
+        <mat-error>La date de début est obligatoire.</mat-error>
+        } @if (getServerError('dateDebut'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de fin</mat-label>
+        <input
+          matInput
+          [matDatepicker]="pickerFin"
+          formControlName="dateFin"
+          (dateInput)="clearServerError('dateFin')"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerFin"> </mat-datepicker-toggle>
+        <mat-datepicker #pickerFin></mat-datepicker>
+        @if (hasError('dateFin', 'required')) {
+        <mat-error>La date de fin est obligatoire.</mat-error>
+        } @if (hasError('dateFin', 'dateFinInvalide')) {
+        <mat-error>La date de fin doit être postérieure à la date de début.</mat-error>
+        } @if (getServerError('dateFin'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut</mat-label>
+        <mat-select formControlName="statutExercice" (selectionChange)="clearServerError('statutExercice')">
+          <mat-option value="">Sélectionner</mat-option>
+          @for (item of statutExercices; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (hasError('statutExercice', 'required')) {
+        <mat-error>Le statut est obligatoire.</mat-error>
+        } @if (getServerError('statutExercice'); as error) {
+        <mat-error>{{ error }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Niveau de complétude</mat-label>
+        <mat-select formControlName="niveauCompletude">
+          <mat-option value="">—</mat-option>
+          @for (item of niveauxCompletude; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-span-2">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput rows="3" formControlName="commentaire" (input)="clearServerError('commentaire')"></textarea>
+        @if (hasError('commentaire', 'maxlength')) {
+        <mat-error>Le commentaire ne doit pas dépasser 500 caractères.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="form-actions">
+      <a mat-stroked-button routerLink="/exercices">Annuler</a>
+      <button mat-flat-button type="submit" [disabled]="isSubmitting || form.invalid">
+        {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </div>
+  </form>
+</mat-card>
+} }

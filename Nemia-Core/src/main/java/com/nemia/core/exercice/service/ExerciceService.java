@@ -5,7 +5,10 @@ import com.nemia.core.common.exception.ExerciceNotFoundException;
 import com.nemia.core.exercice.dto.ExerciceRequest;
 import com.nemia.core.exercice.dto.ExerciceResponse;
 import com.nemia.core.exercice.model.Exercice;
+import com.nemia.core.exercice.model.NiveauCompletude;
+import com.nemia.core.exercice.model.StatutExercice;
 import com.nemia.core.exercice.repository.ExerciceRepository;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +30,10 @@ public class ExerciceService {
 
     String libelle = request.getLibelleExercice().trim();
 
-    exerciceRepository
-      .findByLibelleExercice(libelle)
-      .ifPresent(existing -> {
-        logger.warn("Doublon détecté à la création : {}", libelle);
-        throw new ExerciceAlreadyExistsException(libelle);
-      });
+    if (exerciceRepository.existsByLibelleExercice(libelle)) {
+      logger.warn("Doublon détecté à la création : {}", libelle);
+      throw new ExerciceAlreadyExistsException(libelle);
+    }
 
     validateDates(request);
 
@@ -40,7 +41,10 @@ public class ExerciceService {
     mapRequestToEntity(request, exercice);
     Exercice saved = exerciceRepository.save(exercice);
     logger.info("Exercice créé avec succès : id={}", saved.getId());
-    return mapToResponse(saved);
+
+    ExerciceResponse response = mapToResponse(saved);
+    response.setWarnings(collectWarnings(request.getStatutExercice(), request.getNiveauCompletude()));
+    return response;
   }
 
   public List<ExerciceResponse> findAll() {
@@ -74,21 +78,20 @@ public class ExerciceService {
 
     String libelle = request.getLibelleExercice().trim();
 
-    exerciceRepository
-      .findByLibelleExercice(libelle)
-      .ifPresent(existing -> {
-        if (!existing.getId().equals(id)) {
-          logger.warn("Doublon détecté à la modification : {}", libelle);
-          throw new ExerciceAlreadyExistsException(libelle);
-        }
-      });
+    if (exerciceRepository.existsByLibelleExerciceAndIdNot(libelle, id)) {
+      logger.warn("Doublon détecté à la modification : {}", libelle);
+      throw new ExerciceAlreadyExistsException(libelle);
+    }
 
     validateDates(request);
 
     mapRequestToEntity(request, exercice);
     Exercice updated = exerciceRepository.save(exercice);
     logger.info("Exercice mis à jour : id={}", id);
-    return mapToResponse(updated);
+
+    ExerciceResponse response = mapToResponse(updated);
+    response.setWarnings(collectWarnings(request.getStatutExercice(), request.getNiveauCompletude()));
+    return response;
   }
 
   public void delete(Long id) {
@@ -107,6 +110,22 @@ public class ExerciceService {
     if (!request.getDateFin().isAfter(request.getDateDebut())) {
       throw new IllegalArgumentException("La date de fin doit être strictement postérieure à la date de début.");
     }
+  }
+
+  private List<String> collectWarnings(StatutExercice statut, NiveauCompletude niveau) {
+    List<String> warnings = new ArrayList<>();
+
+    if (statut == null || niveau == null) return warnings;
+
+    if (statut == StatutExercice.CLOTURE && niveau != NiveauCompletude.COMPLET) {
+      warnings.add("Un exercice clôturé devrait avoir un niveau de complétude Complet.");
+    }
+
+    if (statut == StatutExercice.EN_PREPARATION_DE_CLOTURE && niveau == NiveauCompletude.FAIBLE) {
+      warnings.add("Un exercice en préparation de clôture devrait avoir un niveau de complétude au moins Moyen.");
+    }
+
+    return warnings;
   }
 
   private void mapRequestToEntity(ExerciceRequest request, Exercice exercice) {

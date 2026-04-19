@@ -17,6 +17,9 @@ import { PaymentMode } from '../../models/payment-mode';
 import { FluxApi } from '../../services/flux-api';
 import { BienApi } from '../.././../bien/services/bien-api';
 import { BienResponse } from '../../../bien/models/bien-response';
+import { ExerciceApi } from '../../../exercice/services/exercice-api';
+import { ExerciceResponse } from '../../../exercice/models/exercice-response';
+import { CommonModule, DatePipe } from '@angular/common';
 
 import {
   Occurrence,
@@ -28,6 +31,7 @@ import {
 @Component({
   selector: 'app-flux-form',
   imports: [
+    DatePipe,
     ReactiveFormsModule,
     RouterLink,
     MatCardModule,
@@ -64,6 +68,8 @@ export class FluxForm implements OnInit {
   qualificationsPressenties: { code: string; label: string }[] = [];
   statutsTraitement: { code: string; label: string }[] = [];
   biens: BienResponse[] = [];
+  exercices: ExerciceResponse[] = [];
+  exercicesLoading = false;
   biensLoading = false;
 
   readonly fluxId = computed(() => {
@@ -72,6 +78,7 @@ export class FluxForm implements OnInit {
   });
 
   readonly isEditMode = computed(() => this.fluxId() !== null);
+  private readonly exerciceApi = inject(ExerciceApi);
 
   readonly form = this.formBuilder.group({
     date: [null as Date | null, Validators.required],
@@ -104,6 +111,18 @@ export class FluxForm implements OnInit {
         this.qualificationsPressenties = referentials.qualificationPressenties ?? [];
         this.statutsTraitement = referentials.statutTraitements ?? [];
         this.biensLoading = true;
+        this.exercicesLoading = true;
+        this.exerciceApi.getAll().subscribe({
+          next: (exercices) => {
+            this.exercices = exercices.sort((a, b) => b.dateDebut.localeCompare(a.dateDebut));
+            this.exercicesLoading = false;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.exercicesLoading = false;
+            this.cdr.detectChanges();
+          },
+        });
         this.bienApi.getAll().subscribe({
           next: (biens) => {
             this.biens = biens;
@@ -327,5 +346,13 @@ export class FluxForm implements OnInit {
     this.submitWarnings = [];
     this.form.reset();
     this.router.navigateByUrl('/flux');
+  }
+
+  formatExerciceLabel(exercice: ExerciceResponse): string {
+    const formatDate = (dateStr: string): string => {
+      const [year, month, day] = dateStr.split('-');
+      return `${day}/${month}/${year}`;
+    };
+    return `${exercice.libelleExercice} (${formatDate(exercice.dateDebut)} → ${formatDate(exercice.dateFin)})`;
   }
 }

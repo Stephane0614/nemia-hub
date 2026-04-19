@@ -2,7 +2,13 @@ import { ChangeDetectorRef, Component, OnInit, computed, inject } from '@angular
 import { CommonModule, registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,16 +17,24 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { BienApi } from '../../services/bien-api';
-import { BienRequest } from '../../models/bien-request';
-import { StatutActiviteBien } from '../../models/statut-activite-bien';
-import { TypeLocation } from '../../models/type-location';
-import { RegimeVise } from '../../models/regime-vise';
+import { ExerciceApi } from '../../services/exercice-api';
+import { ExerciceRequest } from '../../models/exercice-request';
+import { StatutExercice } from '../../models/statut-exercice';
+import { NiveauCompletude } from '../../models/niveau-completude';
 import { ReferentialItem } from '../../../flux/models/referential-item';
 import { ApiErrorResponse } from '../../../flux/models/api-error-response';
 
+function dateFinValidator(control: AbstractControl): ValidationErrors | null {
+  const parent = control.parent;
+  if (!parent) return null;
+  const dateDebut = parent.get('dateDebut')?.value;
+  const dateFin = control.value;
+  if (!dateDebut || !dateFin) return null;
+  return dateFin > dateDebut ? null : { dateFinInvalide: true };
+}
+
 @Component({
-  selector: 'app-bien-form',
+  selector: 'app-exercice-form',
   standalone: true,
   imports: [
     CommonModule,
@@ -34,14 +48,14 @@ import { ApiErrorResponse } from '../../../flux/models/api-error-response';
     MatProgressSpinnerModule,
     MatDatepickerModule,
   ],
-  templateUrl: './bien-form.html',
-  styleUrl: './bien-form.scss',
+  templateUrl: './exercice-form.html',
+  styleUrl: './exercice-form.scss',
 })
-export class BienForm implements OnInit {
+export class ExerciceForm implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly bienApi = inject(BienApi);
+  private readonly exerciceApi = inject(ExerciceApi);
   private readonly cdr = inject(ChangeDetectorRef);
 
   serverValidationErrors: Record<string, string> = {};
@@ -50,43 +64,44 @@ export class BienForm implements OnInit {
   isLoading = false;
   isSubmitting = false;
 
-  statutActivites: ReferentialItem[] = [];
-  typeLocations: ReferentialItem[] = [];
-  regimeVises: ReferentialItem[] = [];
+  statutExercices: ReferentialItem[] = [];
+  niveauxCompletude: ReferentialItem[] = [];
 
   constructor() {
     registerLocaleData(localeFr);
   }
 
-  readonly bienId = computed(() => {
+  readonly exerciceId = computed(() => {
     const id = this.route.snapshot.paramMap.get('id');
     return id ? Number(id) : null;
   });
 
-  readonly isEditMode = computed(() => this.bienId() !== null);
+  readonly isEditMode = computed(() => this.exerciceId() !== null);
 
   readonly form = this.formBuilder.group({
-    nomUsuel: ['', [Validators.required, Validators.maxLength(120)]],
-    adresseSimplifiee: ['', [Validators.required, Validators.maxLength(255)]],
-    statutActivite: ['', Validators.required],
-    typeLocation: [''],
-    dateMiseEnLocation: [null as Date | null],
-    regimeVise: [''],
+    libelleExercice: ['', [Validators.required, Validators.maxLength(50)]],
+    dateDebut: [null as Date | null, Validators.required],
+    dateFin: [null as Date | null, [Validators.required, dateFinValidator]],
+    statutExercice: ['', Validators.required],
+    niveauCompletude: [''],
     commentaire: ['', Validators.maxLength(500)],
   });
 
   ngOnInit(): void {
     this.isLoading = true;
 
-    this.bienApi.getReferentials().subscribe({
-      next: (referentials) => {
-        this.statutActivites = referentials.statutActivites;
-        this.typeLocations = referentials.typeLocations;
-        this.regimeVises = referentials.regimeVises;
+    this.form.get('dateDebut')?.valueChanges.subscribe(() => {
+      this.form.get('dateFin')?.updateValueAndValidity();
+    });
 
-        const id = this.bienId();
+    this.exerciceApi.getReferentials().subscribe({
+      next: (referentials) => {
+        this.statutExercices = referentials.statutExercices;
+        this.niveauxCompletude = referentials.niveauxCompletude;
+
+        const id = this.exerciceId();
         if (id !== null) {
-          this.loadBien(id);
+          this.loadExercice(id);
           return;
         }
 
@@ -127,13 +142,13 @@ export class BienForm implements OnInit {
     this.isSubmitting = true;
 
     const payload = this.buildPayload();
-    const id = this.bienId();
+    const id = this.exerciceId();
 
     if (this.isEditMode() && id !== null) {
-      this.bienApi.update(id, payload).subscribe({
+      this.exerciceApi.update(id, payload).subscribe({
         next: () => {
           this.isSubmitting = false;
-          this.router.navigateByUrl('/biens');
+          this.router.navigateByUrl('/exercices');
         },
         error: (error: HttpErrorResponse) => {
           this.isSubmitting = false;
@@ -143,10 +158,10 @@ export class BienForm implements OnInit {
       return;
     }
 
-    this.bienApi.create(payload).subscribe({
+    this.exerciceApi.create(payload).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.router.navigateByUrl('/biens');
+        this.router.navigateByUrl('/exercices');
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;
@@ -155,17 +170,14 @@ export class BienForm implements OnInit {
     });
   }
 
-  private buildPayload(): BienRequest {
+  private buildPayload(): ExerciceRequest {
     const raw = this.form.getRawValue();
     return {
-      nomUsuel: (raw.nomUsuel ?? '').trim(),
-      adresseSimplifiee: (raw.adresseSimplifiee ?? '').trim(),
-      statutActivite: raw.statutActivite as StatutActiviteBien,
-      typeLocation: raw.typeLocation ? (raw.typeLocation as TypeLocation) : null,
-      dateMiseEnLocation: raw.dateMiseEnLocation
-        ? this.formatDateForApi(raw.dateMiseEnLocation)
-        : null,
-      regimeVise: raw.regimeVise ? (raw.regimeVise as RegimeVise) : null,
+      libelleExercice: (raw.libelleExercice ?? '').trim(),
+      dateDebut: this.formatDateForApi(raw.dateDebut!),
+      dateFin: this.formatDateForApi(raw.dateFin!),
+      statutExercice: raw.statutExercice as StatutExercice,
+      niveauCompletude: raw.niveauCompletude ? (raw.niveauCompletude as NiveauCompletude) : null,
       commentaire: (raw.commentaire ?? '').trim() || null,
     };
   }
@@ -186,12 +198,7 @@ export class BienForm implements OnInit {
 
   private handleError(error: HttpErrorResponse): void {
     if (error.status === 409) {
-      this.submitErrorMessage = 'Un bien existe déjà avec ce nom et cette adresse.';
-      return;
-    }
-
-    if (error.status === 500) {
-      this.submitErrorMessage = "Ce bien existe déjà — vérifiez le nom et l'adresse.";
+      this.submitErrorMessage = 'Un exercice existe déjà avec ce libellé.';
       return;
     }
 
@@ -204,23 +211,22 @@ export class BienForm implements OnInit {
     this.submitErrorMessage = "Une erreur est survenue lors de l'enregistrement.";
   }
 
-  private loadBien(id: number): void {
-    this.bienApi.getById(id).subscribe({
-      next: (bien) => {
+  private loadExercice(id: number): void {
+    this.exerciceApi.getById(id).subscribe({
+      next: (exercice) => {
         this.form.patchValue({
-          nomUsuel: bien.nomUsuel,
-          adresseSimplifiee: bien.adresseSimplifiee,
-          statutActivite: bien.statutActivite,
-          typeLocation: bien.typeLocation ?? '',
-          dateMiseEnLocation: this.parseApiDate(bien.dateMiseEnLocation),
-          regimeVise: bien.regimeVise ?? '',
-          commentaire: bien.commentaire ?? '',
+          libelleExercice: exercice.libelleExercice,
+          dateDebut: this.parseApiDate(exercice.dateDebut),
+          dateFin: this.parseApiDate(exercice.dateFin),
+          statutExercice: exercice.statutExercice,
+          niveauCompletude: exercice.niveauCompletude ?? '',
+          commentaire: exercice.commentaire ?? '',
         });
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
-        this.loadErrorMessage = 'Impossible de charger le bien à modifier.';
+        this.loadErrorMessage = "Impossible de charger l'exercice à modifier.";
         this.isLoading = false;
         this.cdr.detectChanges();
       },

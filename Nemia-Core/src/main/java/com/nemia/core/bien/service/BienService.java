@@ -28,12 +28,10 @@ public class BienService {
     String nomUsuel = request.getNomUsuel().trim();
     String adresse = request.getAdresseSimplifiee().trim();
 
-    bienRepository
-      .findByNomUsuelAndAdresseSimplifiee(nomUsuel, adresse)
-      .ifPresent(existing -> {
-        logger.warn("Doublon détecté à la création : {} — {}", nomUsuel, adresse);
-        throw new BienAlreadyExistsException(nomUsuel, adresse);
-      });
+    if (bienRepository.existsByNomUsuelAndAdresseSimplifiee(nomUsuel, adresse)) {
+      logger.warn("Doublon détecté à la création : {} — {}", nomUsuel, adresse);
+      throw new BienAlreadyExistsException(nomUsuel, adresse);
+    }
 
     Bien bien = new Bien();
     mapRequestToEntity(request, bien);
@@ -74,14 +72,10 @@ public class BienService {
     String nomUsuel = request.getNomUsuel().trim();
     String adresse = request.getAdresseSimplifiee().trim();
 
-    bienRepository
-      .findByNomUsuelAndAdresseSimplifiee(nomUsuel, adresse)
-      .ifPresent(existing -> {
-        if (!existing.getId().equals(id)) {
-          logger.warn("Doublon détecté à la modification : {} — {}", nomUsuel, adresse);
-          throw new BienAlreadyExistsException(nomUsuel, adresse);
-        }
-      });
+    if (bienRepository.existsByNomUsuelAndAdresseSimplifieeAndIdNot(nomUsuel, adresse, id)) {
+      logger.warn("Doublon détecté à la modification : {} — {}", nomUsuel, adresse);
+      throw new BienAlreadyExistsException(nomUsuel, adresse);
+    }
 
     mapRequestToEntity(request, bien);
     Bien updated = bienRepository.save(bien);

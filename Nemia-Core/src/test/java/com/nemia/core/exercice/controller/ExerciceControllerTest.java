@@ -329,4 +329,185 @@ class ExerciceControllerTest {
     response.setUpdatedAt(LocalDateTime.of(2026, 4, 18, 10, 0));
     return response;
   }
+
+  @Test
+  void shouldReturn400WhenDateFinEqualsDateDebut() throws Exception {
+    when(exerciceService.create(any())).thenThrow(
+      new IllegalArgumentException("La date de fin doit être strictement postérieure à la date de début.")
+    );
+
+    String requestBody = """
+      {
+        "libelleExercice": "2026",
+        "dateDebut": "2026-01-01",
+        "dateFin": "2026-01-01",
+        "statutExercice": "OUVERT"
+      }
+      """;
+
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isBadRequest())
+      .andExpect(jsonPath("$.message").value("La date de fin doit être strictement postérieure à la date de début."));
+
+    verify(exerciceService).create(any());
+  }
+
+  @Test
+  void shouldReturn409WhenUpdatingToExistingLibelle() throws Exception {
+    Long id = 1L;
+    when(exerciceService.update(eq(id), any())).thenThrow(new ExerciceAlreadyExistsException("2025"));
+
+    String requestBody = """
+      {
+        "libelleExercice": "2025",
+        "dateDebut": "2026-01-01",
+        "dateFin": "2026-12-31",
+        "statutExercice": "OUVERT"
+      }
+      """;
+
+    mockMvc
+      .perform(put("/api/exercices/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isConflict());
+
+    verify(exerciceService).update(eq(id), any());
+  }
+
+  @Test
+  void shouldReturn200WhenUpdatingExerciceWithSameLibelle() throws Exception {
+    Long id = 1L;
+    ExerciceResponse response = buildExerciceResponse(
+      id,
+      "2026",
+      LocalDate.of(2026, 1, 1),
+      LocalDate.of(2026, 12, 31),
+      StatutExercice.OUVERT,
+      NiveauCompletude.FAIBLE
+    );
+
+    when(exerciceService.update(eq(id), any())).thenReturn(response);
+
+    String requestBody = """
+      {
+        "libelleExercice": "2026",
+        "dateDebut": "2026-01-01",
+        "dateFin": "2026-12-31",
+        "statutExercice": "OUVERT"
+      }
+      """;
+
+    mockMvc
+      .perform(put("/api/exercices/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.libelleExercice").value("2026"));
+
+    verify(exerciceService).update(eq(id), any());
+  }
+
+  @Test
+  void shouldReturnWarningWhenClotureWithFaibleCompletude() throws Exception {
+    ExerciceResponse response = buildExerciceResponse(
+      1L,
+      "2023",
+      LocalDate.of(2023, 1, 1),
+      LocalDate.of(2023, 12, 31),
+      StatutExercice.CLOTURE,
+      NiveauCompletude.FAIBLE
+    );
+    response.setWarnings(List.of("Un exercice clôturé devrait avoir un niveau de complétude Complet."));
+
+    when(exerciceService.create(any())).thenReturn(response);
+
+    String requestBody = """
+      {
+        "libelleExercice": "2023",
+        "dateDebut": "2023-01-01",
+        "dateFin": "2023-12-31",
+        "statutExercice": "CLOTURE",
+        "niveauCompletude": "FAIBLE"
+      }
+      """;
+
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(jsonPath("$.warnings").isArray())
+      .andExpect(jsonPath("$.warnings.length()").value(1))
+      .andExpect(jsonPath("$.warnings[0]").value("Un exercice clôturé devrait avoir un niveau de complétude Complet."));
+
+    verify(exerciceService).create(any());
+  }
+
+  @Test
+  void shouldReturnWarningWhenEnPreparationWithFaibleCompletude() throws Exception {
+    ExerciceResponse response = buildExerciceResponse(
+      1L,
+      "2026",
+      LocalDate.of(2026, 1, 1),
+      LocalDate.of(2026, 12, 31),
+      StatutExercice.EN_PREPARATION_DE_CLOTURE,
+      NiveauCompletude.FAIBLE
+    );
+    response.setWarnings(List.of("Un exercice en préparation de clôture devrait avoir un niveau de complétude au moins Moyen."));
+
+    when(exerciceService.create(any())).thenReturn(response);
+
+    String requestBody = """
+      {
+        "libelleExercice": "2026",
+        "dateDebut": "2026-01-01",
+        "dateFin": "2026-12-31",
+        "statutExercice": "EN_PREPARATION_DE_CLOTURE",
+        "niveauCompletude": "FAIBLE"
+      }
+      """;
+
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(jsonPath("$.warnings").isArray())
+      .andExpect(jsonPath("$.warnings.length()").value(1));
+
+    verify(exerciceService).create(any());
+  }
+
+  @Test
+  void shouldReturnNoWarningWhenOuvertWithFaibleCompletude() throws Exception {
+    ExerciceResponse response = buildExerciceResponse(
+      1L,
+      "2026",
+      LocalDate.of(2026, 1, 1),
+      LocalDate.of(2026, 12, 31),
+      StatutExercice.OUVERT,
+      NiveauCompletude.FAIBLE
+    );
+    response.setWarnings(List.of());
+
+    when(exerciceService.create(any())).thenReturn(response);
+
+    String requestBody = """
+      {
+        "libelleExercice": "2026",
+        "dateDebut": "2026-01-01",
+        "dateFin": "2026-12-31",
+        "statutExercice": "OUVERT",
+        "niveauCompletude": "FAIBLE"
+      }
+      """;
+
+    mockMvc
+      .perform(post("/api/exercices").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(jsonPath("$.warnings").isArray())
+      .andExpect(jsonPath("$.warnings").isEmpty());
+
+    verify(exerciceService).create(any());
+  }
 }

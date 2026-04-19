@@ -4,6 +4,8 @@ import com.nemia.core.exercice.model.NiveauCompletude;
 import com.nemia.core.exercice.model.StatutExercice;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExerciceResponse {
 
@@ -16,6 +18,7 @@ public class ExerciceResponse {
   private String commentaire;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private List<String> warnings = new ArrayList<>();
 
   public ExerciceResponse() {}
 
@@ -89,5 +92,13 @@ public class ExerciceResponse {
 
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public List<String> getWarnings() {
+    return warnings;
+  }
+
+  public void setWarnings(List<String> warnings) {
+    this.warnings = warnings;
   }
 }
