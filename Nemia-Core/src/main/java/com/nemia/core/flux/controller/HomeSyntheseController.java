@@ -21,10 +21,11 @@ public class HomeSyntheseController {
   @GetMapping("/synthese")
   public ResponseEntity<HomeSyntheseResponse> getSynthese(
     @RequestParam(required = false) String mois,
-    @RequestParam(required = false) Long bienId
+    @RequestParam(required = false) Long bienId,
+    @RequestParam(required = false) Long exerciceId
   ) {
     try {
-      HomeSyntheseResponse response = homeSyntheseService.getSynthese(mois, bienId);
+      HomeSyntheseResponse response = homeSyntheseService.getSynthese(mois, bienId, exerciceId);
       return ResponseEntity.ok(response);
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().build();

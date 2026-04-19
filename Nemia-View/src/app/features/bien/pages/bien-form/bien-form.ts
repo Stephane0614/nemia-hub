@@ -136,10 +136,10 @@ export class BienForm implements OnInit {
           this.router.navigateByUrl('/biens');
         },
         error: (error: HttpErrorResponse) => {
-  this.isSubmitting = false;
-  this.handleError(error);
-  this.cdr.detectChanges();
-},
+          this.isSubmitting = false;
+          this.handleError(error);
+          this.cdr.detectChanges();
+        },
       });
       return;
     }
@@ -150,10 +150,10 @@ export class BienForm implements OnInit {
         this.router.navigateByUrl('/biens');
       },
       error: (error: HttpErrorResponse) => {
-  this.isSubmitting = false;
-  this.handleError(error);
-  this.cdr.detectChanges();
-},
+        this.isSubmitting = false;
+        this.handleError(error);
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -187,21 +187,21 @@ export class BienForm implements OnInit {
   }
 
   private handleError(error: HttpErrorResponse): void {
-  if (error.status === 409) {
+    if (error.status === 409) {
+      const apiError = error.error as ApiErrorResponse | undefined;
+      this.submitErrorMessage =
+        apiError?.message ?? 'Un bien existe déjà avec ce nom et cette adresse.';
+      return;
+    }
+
     const apiError = error.error as ApiErrorResponse | undefined;
-    this.submitErrorMessage = apiError?.message
-      ?? 'Un bien existe déjà avec ce nom et cette adresse.';
-    return;
-  }
+    if (apiError?.validationErrors) {
+      this.serverValidationErrors = apiError.validationErrors;
+      return;
+    }
 
-  const apiError = error.error as ApiErrorResponse | undefined;
-  if (apiError?.validationErrors) {
-    this.serverValidationErrors = apiError.validationErrors;
-    return;
+    this.submitErrorMessage = "Une erreur est survenue lors de l'enregistrement.";
   }
-
-  this.submitErrorMessage = 'Une erreur est survenue lors de l\'enregistrement.';
-}
 
   private loadBien(id: number): void {
     this.bienApi.getById(id).subscribe({
