@@ -85,7 +85,7 @@ export class Home implements OnInit {
 
   get nomBienFiltre(): string | null {
     if (!this.selectedBienId) return null;
-    return this.biens.find(b => b.id === this.selectedBienId)?.nomUsuel ?? null;
+    return this.biens.find((b) => b.id === this.selectedBienId)?.nomUsuel ?? null;
   }
 
   loadSynthese(mois?: string): void {
@@ -154,22 +154,22 @@ export class Home implements OnInit {
   }
 
   allerVersSansJustificatif(): void {
-  const params: Record<string, string> = { statutJustificatif: 'A_FOURNIR,INCOMPLET' };
-  if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
-  this.router.navigate(['/flux'], { queryParams: params });
-}
+    const params: Record<string, string> = { statutJustificatif: 'A_FOURNIR,INCOMPLET' };
+    if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
+    this.router.navigate(['/flux'], { queryParams: params });
+  }
 
-allerVersAArbitrer(): void {
-  const params: Record<string, string> = { qualificationPressentie: 'A_ARBITRER' };
-  if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
-  this.router.navigate(['/flux'], { queryParams: params });
-}
+  allerVersAArbitrer(): void {
+    const params: Record<string, string> = { qualificationPressentie: 'A_ARBITRER' };
+    if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
+    this.router.navigate(['/flux'], { queryParams: params });
+  }
 
-allerVersARevoir(): void {
-  const params: Record<string, string> = { statutTraitement: 'A_REVOIR' };
-  if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
-  this.router.navigate(['/flux'], { queryParams: params });
-}
+  allerVersARevoir(): void {
+    const params: Record<string, string> = { statutTraitement: 'A_REVOIR' };
+    if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
+    this.router.navigate(['/flux'], { queryParams: params });
+  }
 
   allerVersFluxDetail(id: number): void {
     this.router.navigate(['/flux', id, 'modifier']);

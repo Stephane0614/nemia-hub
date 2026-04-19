@@ -49,7 +49,7 @@ export class FluxList implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       this.filtresActifs = {};
       this.labelsFiltresActifs = [];
 
@@ -115,7 +115,7 @@ export class FluxList implements OnInit {
     const dialogRef = this.dialog.open(ConfirmDialog, {
       width: '420px',
       data: {
-        title: 'Supprimer l\'opération',
+        title: "Supprimer l'opération",
         message: 'Confirmer la suppression de cette opération ?',
         confirmLabel: 'Supprimer',
         cancelLabel: 'Annuler',
@@ -132,7 +132,7 @@ export class FluxList implements OnInit {
         },
         error: (error) => {
           console.error('Erreur lors de la suppression du flux', error);
-          this.loadErrorMessage = 'Impossible de supprimer l\'opération.';
+          this.loadErrorMessage = "Impossible de supprimer l'opération.";
           this.openErrorSnackBar('La suppression a échoué.');
         },
       });

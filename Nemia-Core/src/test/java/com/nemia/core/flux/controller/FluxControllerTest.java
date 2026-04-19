@@ -97,43 +97,43 @@ class FluxControllerTest {
   }
 
   @Test
-void shouldReturnAllFlux() throws Exception {
-  FluxResponse first = buildFluxResponse(
-    1L,
-    LocalDate.of(2026, 4, 15),
-    FluxType.RECETTE,
-    "Loyer avril",
-    new BigDecimal("850.00"),
-    FluxCategory.LOYER,
-    PaymentMode.VIREMENT,
-    "Payé le 5"
-  );
+  void shouldReturnAllFlux() throws Exception {
+    FluxResponse first = buildFluxResponse(
+      1L,
+      LocalDate.of(2026, 4, 15),
+      FluxType.RECETTE,
+      "Loyer avril",
+      new BigDecimal("850.00"),
+      FluxCategory.LOYER,
+      PaymentMode.VIREMENT,
+      "Payé le 5"
+    );
 
-  FluxResponse second = buildFluxResponse(
-    2L,
-    LocalDate.of(2026, 4, 16),
-    FluxType.DEPENSE,
-    "Internet",
-    new BigDecimal("29.99"),
-    FluxCategory.INTERNET,
-    PaymentMode.PRELEVEMENT,
-    null
-  );
+    FluxResponse second = buildFluxResponse(
+      2L,
+      LocalDate.of(2026, 4, 16),
+      FluxType.DEPENSE,
+      "Internet",
+      new BigDecimal("29.99"),
+      FluxCategory.INTERNET,
+      PaymentMode.PRELEVEMENT,
+      null
+    );
 
-  when(fluxService.findAllWithFilters(null, null, null, null))
-    .thenReturn(List.of(first, second));
+    when(fluxService.findAllWithFilters(null, null, null, null)).thenReturn(List.of(first, second));
 
-  mockMvc
-    .perform(get("/api/flux"))
-    .andDo(print())
-    .andExpect(status().isOk())
-    .andExpect(jsonPath("$").isArray())
-    .andExpect(jsonPath("$.length()").value(2))
-    .andExpect(jsonPath("$[0].libelle").value("Loyer avril"))
-    .andExpect(jsonPath("$[1].libelle").value("Internet"));
+    mockMvc
+      .perform(get("/api/flux"))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$").isArray())
+      .andExpect(jsonPath("$.length()").value(2))
+      .andExpect(jsonPath("$[0].libelle").value("Loyer avril"))
+      .andExpect(jsonPath("$[1].libelle").value("Internet"));
 
-  verify(fluxService).findAllWithFilters(null, null, null, null);
-}
+    verify(fluxService).findAllWithFilters(null, null, null, null);
+  }
+
   @Test
   void shouldReturnFluxById() throws Exception {
     Long id = 1L;
