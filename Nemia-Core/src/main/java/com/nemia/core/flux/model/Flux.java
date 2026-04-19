@@ -64,6 +64,8 @@ public class Flux {
   @Enumerated(EnumType.STRING)
   private StatutTraitement statutTraitement;
 
+  private Long justificatifId;
+
   public Flux() {}
 
   @PrePersist
@@ -200,5 +202,13 @@ public class Flux {
 
   public void setStatutTraitement(StatutTraitement statutTraitement) {
     this.statutTraitement = statutTraitement;
+  }
+
+  public Long getJustificatifId() {
+    return justificatifId;
+  }
+
+  public void setJustificatifId(Long justificatifId) {
+    this.justificatifId = justificatifId;
   }
 }
