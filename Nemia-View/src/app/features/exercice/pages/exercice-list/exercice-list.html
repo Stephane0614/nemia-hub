@@ -36,32 +36,31 @@
       <tbody>
         @for (exercice of exercices; track exercice.id) {
         <tr>
-          <td class="cell-libelle">{{ exercice.libelleExercice }}</td>
+          <td class="cell-libelle">
+            {{ exercice.libelleExercice }}
+            @if (exercice.warnings && exercice.warnings.length > 0) {
+            <span class="warning-icon" [title]="exercice.warnings.join(' | ')">⚠</span>
+            }
+          </td>
 
           <td class="cell-periode">
             {{ exercice.dateDebut | date:'dd/MM/yyyy' }} → {{ exercice.dateFin | date:'dd/MM/yyyy' }}
           </td>
 
           <td>
-            <span
-              class="badge"
-              [class.badge--ouvert]="exercice.statutExercice === 'OUVERT'"
+            <span class="badge" [class.badge--ouvert]="exercice.statutExercice === 'OUVERT'"
               [class.badge--preparation]="exercice.statutExercice === 'EN_PREPARATION_DE_CLOTURE'"
-              [class.badge--cloture]="exercice.statutExercice === 'CLOTURE'"
-            >
+              [class.badge--cloture]="exercice.statutExercice === 'CLOTURE'">
               {{ getStatutLabel(exercice.statutExercice) }}
             </span>
           </td>
 
           <td>
             @if (exercice.niveauCompletude) {
-            <span
-              class="badge"
-              [class.badge--faible]="exercice.niveauCompletude === 'FAIBLE'"
+            <span class="badge" [class.badge--faible]="exercice.niveauCompletude === 'FAIBLE'"
               [class.badge--moyen]="exercice.niveauCompletude === 'MOYEN'"
               [class.badge--avance]="exercice.niveauCompletude === 'AVANCE'"
-              [class.badge--complet]="exercice.niveauCompletude === 'COMPLET'"
-            >
+              [class.badge--complet]="exercice.niveauCompletude === 'COMPLET'">
               {{ getCompletudLabel(exercice.niveauCompletude) }}
             </span>
             } @else {

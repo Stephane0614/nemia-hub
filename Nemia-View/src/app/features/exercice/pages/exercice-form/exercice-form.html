@@ -24,6 +24,22 @@
   <div class="form-alert">{{ submitErrorMessage }}</div>
   }
 
+  @if (submitWarnings.length > 0) {
+  <div class="form-warnings">
+    <p class="form-warnings__title">⚠ Points d'attention détectés</p>
+    <ul class="form-warnings__list">
+      @for (warning of submitWarnings; track warning) {
+        <li>{{ warning }}</li>
+      }
+    </ul>
+    <div class="form-warnings__actions">
+      <button mat-stroked-button type="button" (click)="confirmAndRedirect()">
+        Continuer quand même
+      </button>
+    </div>
+  </div>
+}
+
   <form class="exercice-form" [formGroup]="form" (ngSubmit)="save()">
     <div class="form-grid">
       <mat-form-field appearance="outline" class="field-span-2">

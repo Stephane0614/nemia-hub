@@ -11,4 +11,5 @@ export interface ExerciceResponse {
   commentaire?: string | null;
   createdAt: string;
   updatedAt: string;
+  warnings: string[];
 }

@@ -63,6 +63,7 @@ export class ExerciceForm implements OnInit {
   submitErrorMessage = '';
   isLoading = false;
   isSubmitting = false;
+  submitWarnings: string[] = [];
 
   statutExercices: ReferentialItem[] = [];
   niveauxCompletude: ReferentialItem[] = [];
@@ -146,26 +147,28 @@ export class ExerciceForm implements OnInit {
 
     if (this.isEditMode() && id !== null) {
       this.exerciceApi.update(id, payload).subscribe({
-        next: () => {
+        next: (response) => {
           this.isSubmitting = false;
+          if (response.warnings && response.warnings.length > 0) {
+            this.submitWarnings = response.warnings;
+            this.cdr.detectChanges();
+            return;
+          }
           this.router.navigateByUrl('/exercices');
-        },
-        error: (error: HttpErrorResponse) => {
-          this.isSubmitting = false;
-          this.handleError(error);
         },
       });
       return;
     }
 
     this.exerciceApi.create(payload).subscribe({
-      next: () => {
+      next: (response) => {
         this.isSubmitting = false;
+        if (response.warnings && response.warnings.length > 0) {
+          this.submitWarnings = response.warnings;
+          this.cdr.detectChanges();
+          return;
+        }
         this.router.navigateByUrl('/exercices');
-      },
-      error: (error: HttpErrorResponse) => {
-        this.isSubmitting = false;
-        this.handleError(error);
       },
     });
   }
@@ -231,5 +234,11 @@ export class ExerciceForm implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  confirmAndRedirect(): void {
+    this.submitWarnings = [];
+    this.form.reset();
+    this.router.navigateByUrl('/exercices');
   }
 }
