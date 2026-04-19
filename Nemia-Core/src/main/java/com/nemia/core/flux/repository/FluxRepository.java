@@ -1,6 +1,9 @@
 package com.nemia.core.flux.repository;
 
 import com.nemia.core.flux.model.Flux;
+import com.nemia.core.flux.model.QualificationPressentie;
+import com.nemia.core.flux.model.StatutJustificatif;
+import com.nemia.core.flux.model.StatutTraitement;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -67,5 +70,22 @@ public interface FluxRepository extends JpaRepository<Flux, Long> {
     @Param("debut") LocalDate debut,
     @Param("fin") LocalDate fin,
     org.springframework.data.domain.Pageable pageable
+  );
+
+  @Query(
+    """
+    SELECT f FROM Flux f
+    WHERE (:bienId IS NULL OR f.bienId = :bienId)
+    AND (:qualificationPressentie IS NULL OR f.qualificationPressentie = :qualificationPressentie)
+    AND (:statutTraitement IS NULL OR f.statutTraitement = :statutTraitement)
+    AND (:statutsJustificatif IS NULL OR f.statutJustificatif IN :statutsJustificatif)
+    ORDER BY f.date DESC
+    """
+  )
+  List<Flux> findAllWithFilters(
+    @Param("bienId") Long bienId,
+    @Param("qualificationPressentie") QualificationPressentie qualificationPressentie,
+    @Param("statutTraitement") StatutTraitement statutTraitement,
+    @Param("statutsJustificatif") List<StatutJustificatif> statutsJustificatif
   );
 }

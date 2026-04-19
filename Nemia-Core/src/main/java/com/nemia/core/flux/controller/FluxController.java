@@ -26,9 +26,19 @@ public class FluxController {
   }
 
   @GetMapping
-  public List<FluxResponse> findAll() {
-    return fluxService.findAll();
-  }
+public List<FluxResponse> findAll(
+        @RequestParam(required = false) Long bienId,
+        @RequestParam(required = false) String qualificationPressentie,
+        @RequestParam(required = false) String statutTraitement,
+        @RequestParam(required = false) String statutJustificatif) {
+
+    return fluxService.findAllWithFilters(
+            bienId,
+            qualificationPressentie,
+            statutTraitement,
+            statutJustificatif
+    );
+}
 
   @GetMapping("/{id}")
   public FluxResponse findById(@PathVariable Long id) {

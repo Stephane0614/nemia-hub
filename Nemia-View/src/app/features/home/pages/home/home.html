@@ -26,6 +26,25 @@
   <button mat-icon-button (click)="allerMoisSuivant()" [disabled]="isMoisCourant" title="Mois suivant">&#8250;</button>
 </div>
 
+<!-- ── Filtre Bien ── -->
+<div class="filtres-grid">
+  <mat-form-field appearance="outline" class="filtre-field">
+    <mat-label>Bien</mat-label>
+    <mat-select [(ngModel)]="selectedBienId" (ngModelChange)="onBienChange()">
+      <mat-option [value]="null">Tous les biens</mat-option>
+      @if (biensLoading) {
+      <mat-option disabled>Chargement...</mat-option>
+      } @else if (biens.length === 0) {
+      <mat-option disabled>Aucun bien enregistré</mat-option>
+      } @else {
+      @for (bien of biens; track bien.id) {
+      <mat-option [value]="bien.id">{{ bien.nomUsuel }}</mat-option>
+      }
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
 <!-- ── Cartes métriques ── -->
 <section class="metrics-grid">
   <mat-card class="metric-card metric-card--positive">
@@ -40,11 +59,8 @@
     <p class="metric-detail">Sur {{ synthese.periode.label }}</p>
   </mat-card>
 
-  <mat-card
-    class="metric-card"
-    [class.metric-card--positive]="soldePositif"
-    [class.metric-card--negative]="!soldePositif"
-  >
+  <mat-card class="metric-card" [class.metric-card--positive]="soldePositif"
+    [class.metric-card--negative]="!soldePositif">
     <p class="metric-label">Solde</p>
     <p class="metric-value">{{ metriques?.solde | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</p>
     <p class="metric-detail">Vision mensuelle provisoire</p>
@@ -70,19 +86,19 @@
     } @else {
     <ul class="attention-list">
       @if (alertes && alertes.fluxSansJustificatif > 0) {
-      <li class="attention-item" (click)="allerVersFlux()">
+      <li class="attention-item" (click)="allerVersSansJustificatif()">
         <span class="attention-icon attention-icon--warn">!</span>
         {{ alertes.fluxSansJustificatif }} flux sans justificatif — {{ alertes.montantSansJustificatif | currency: 'EUR'
         : 'symbol' : '1.2-2' : 'fr' }}
       </li>
       } @if (alertes && alertes.fluxAArbitrer > 0) {
-      <li class="attention-item" (click)="allerVersFlux()">
+      <li class="attention-item" (click)="allerVersAArbitrer()">
         <span class="attention-icon attention-icon--warn">?</span>
         {{ alertes.fluxAArbitrer }} flux à arbitrer — {{ alertes.montantAArbitrer | currency: 'EUR' : 'symbol' : '1.2-2'
         : 'fr' }}
       </li>
       } @if (alertes && alertes.fluxARevoir > 0) {
-      <li class="attention-item" (click)="allerVersFlux()">
+      <li class="attention-item" (click)="allerVersARevoir()">
         <span class="attention-icon attention-icon--info">~</span>
         {{ alertes.fluxARevoir }} flux à revoir
       </li>
@@ -159,11 +175,8 @@
         </thead>
         <tbody>
           @for (op of dernieresOperations; track op.id) {
-          <tr
-            class="operation-row"
-            (click)="allerVersFluxDetail(op.id)"
-            [class.operation-row--warning]="op.warnings && op.warnings.length > 0"
-          >
+          <tr class="operation-row" (click)="allerVersFluxDetail(op.id)"
+            [class.operation-row--warning]="op.warnings && op.warnings.length > 0">
             <td>{{ op.date | date:'dd/MM/yyyy' }}</td>
             <td class="cell-libelle">
               {{ op.libelle }} @if (op.warnings && op.warnings.length > 0) {
@@ -171,37 +184,28 @@
               }
             </td>
             <td>
-              <span
-                class="badge"
-                [class.badge--recette]="op.type === 'RECETTE'"
+              <span class="badge" [class.badge--recette]="op.type === 'RECETTE'"
                 [class.badge--depense]="op.type === 'DEPENSE'"
                 [class.badge--mouvement]="op.type === 'MOUVEMENT_FINANCIER'"
-                [class.badge--regularisation]="op.type === 'REGULARISATION'"
-              >
+                [class.badge--regularisation]="op.type === 'REGULARISATION'">
                 {{ op.type }}
               </span>
             </td>
             <td>{{ op.montant | currency: 'EUR' : 'symbol' : '1.2-2' : 'fr' }}</td>
             <td>{{ op.categorie }}</td>
             <td>
-              <span
-                class="badge"
-                [class.badge--ok]="op.statutJustificatif === 'FOURNI'"
+              <span class="badge" [class.badge--ok]="op.statutJustificatif === 'FOURNI'"
                 [class.badge--warn]="op.statutJustificatif === 'A_FOURNIR' || op.statutJustificatif === 'INCOMPLET' || op.statutJustificatif === 'A_VERIFIER'"
                 [class.badge--muted]="op.statutJustificatif === 'NON_REQUIS'"
-                [class.badge--error]="op.statutJustificatif === 'REJETE'"
-              >
+                [class.badge--error]="op.statutJustificatif === 'REJETE'">
                 {{ op.statutJustificatif }}
               </span>
             </td>
             <td>
-              <span
-                class="badge"
-                [class.badge--ok]="op.qualificationPressentie === 'CHARGE_COURANTE'"
+              <span class="badge" [class.badge--ok]="op.qualificationPressentie === 'CHARGE_COURANTE'"
                 [class.badge--info]="op.qualificationPressentie === 'IMMOBILISATION'"
                 [class.badge--warn]="op.qualificationPressentie === 'A_ARBITRER' || op.qualificationPressentie === 'MIXTE_OU_A_VENTILER'"
-                [class.badge--muted]="op.qualificationPressentie === 'HORS_RESULTAT' || op.qualificationPressentie === 'NON_APPLICABLE'"
-              >
+                [class.badge--muted]="op.qualificationPressentie === 'HORS_RESULTAT' || op.qualificationPressentie === 'NON_APPLICABLE'">
                 {{ op.qualificationPressentie }}
               </span>
             </td>

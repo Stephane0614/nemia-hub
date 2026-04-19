@@ -75,6 +75,23 @@ td {
   color: #1f2937;
 }
 
+.filtres-bandeau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  color: #1d4ed8;
+
+  &__label {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}
+
 // Exception libellé — colonne 3
 td:nth-child(3),
 th:nth-child(3) {

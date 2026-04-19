@@ -30,14 +30,14 @@ public class HomeSyntheseService {
     LocalDate dateFin = yearMonth.atEndOfMonth();
 
     return new HomeSyntheseResponse(
-      buildPeriode(yearMonth, dateDebut, dateFin),
-      buildMetriques(dateDebut, dateFin),
-      buildAlertes(dateDebut, dateFin),
-      buildRepartitionDepenses(dateDebut, dateFin),
-      buildRecurrenceDepenses(dateDebut, dateFin),
-      buildDernieresOperations(dateDebut, dateFin)
+        buildPeriode(yearMonth, dateDebut, dateFin),
+        buildMetriques(dateDebut, dateFin, bienId),
+        buildAlertes(dateDebut, dateFin, bienId),
+        buildRepartitionDepenses(dateDebut, dateFin, bienId),
+        buildRecurrenceDepenses(dateDebut, dateFin, bienId),
+        buildDernieresOperations(dateDebut, dateFin, bienId)
     );
-  }
+}
 
   private HomeSyntheseResponse.Periode buildPeriode(YearMonth yearMonth, LocalDate dateDebut, LocalDate dateFin) {
     String label = yearMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.FRENCH));

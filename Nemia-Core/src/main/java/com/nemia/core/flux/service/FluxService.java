@@ -5,8 +5,13 @@ import com.nemia.core.flux.dto.CreateFluxRequest;
 import com.nemia.core.flux.dto.FluxResponse;
 import com.nemia.core.flux.dto.UpdateFluxRequest;
 import com.nemia.core.flux.model.Flux;
+import com.nemia.core.flux.model.QualificationPressentie;
+import com.nemia.core.flux.model.StatutJustificatif;
+import com.nemia.core.flux.model.StatutTraitement;
 import com.nemia.core.flux.repository.FluxRepository;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -169,5 +174,34 @@ public class FluxService {
     String normalizedValue = value.trim();
 
     return normalizedValue.isEmpty() ? null : normalizedValue;
+  }
+
+  public List<FluxResponse> findAllWithFilters(
+    Long bienId,
+    String qualificationPressentieStr,
+    String statutTraitementStr,
+    String statutsJustificatifStr
+  ) {
+    QualificationPressentie qualificationPressentie = null;
+    if (qualificationPressentieStr != null && !qualificationPressentieStr.isBlank()) {
+      qualificationPressentie = QualificationPressentie.valueOf(qualificationPressentieStr);
+    }
+
+    StatutTraitement statutTraitement = null;
+    if (statutTraitementStr != null && !statutTraitementStr.isBlank()) {
+      statutTraitement = StatutTraitement.valueOf(statutTraitementStr);
+    }
+
+    List<StatutJustificatif> statutsJustificatif = null;
+    if (statutsJustificatifStr != null && !statutsJustificatifStr.isBlank()) {
+      statutsJustificatif = Arrays.stream(statutsJustificatifStr.split(","))
+        .map(String::trim)
+        .map(StatutJustificatif::valueOf)
+        .collect(Collectors.toList());
+    }
+
+    List<Flux> fluxes = fluxRepository.findAllWithFilters(bienId, qualificationPressentie, statutTraitement, statutsJustificatif);
+
+    return fluxes.stream().map(this::mapToResponse).collect(Collectors.toList());
   }
 }

@@ -1,13 +1,17 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, registerLocaleData, DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import localeFr from '@angular/common/locales/fr';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { HomeSyntheseApi } from './home-synthese-api';
+import { BienApi } from '../../../bien/services/bien-api';
+import { BienResponse } from '../../../bien/models/bien-response';
 import {
   HomeSyntheseResponse,
   Alertes,
@@ -21,40 +25,76 @@ import {
   selector: 'app-home',
   imports: [
     CommonModule,
+    RouterLink,
+    FormsModule,
     MatCardModule,
-    DatePipe,
     MatDividerModule,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
+    MatSelectModule,
     CurrencyPipe,
+    DatePipe,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
   private readonly homeSyntheseApi = inject(HomeSyntheseApi);
+  private readonly bienApi = inject(BienApi);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   isLoading = false;
   errorMessage = '';
   synthese: HomeSyntheseResponse | null = null;
   moisCourant: string = '';
-  private readonly cdr = inject(ChangeDetectorRef);
+
+  // ── Filtres ──
+  biens: BienResponse[] = [];
+  selectedBienId: number | null = null;
+  biensLoading = false;
 
   constructor() {
     registerLocaleData(localeFr);
   }
 
   ngOnInit(): void {
+    this.loadBiens();
     this.loadSynthese();
+  }
+
+  loadBiens(): void {
+    this.biensLoading = true;
+    this.bienApi.getAll().subscribe({
+      next: (biens) => {
+        this.biens = biens.sort((a, b) => a.nomUsuel.localeCompare(b.nomUsuel));
+        this.biensLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.biensLoading = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  onBienChange(): void {
+    this.loadSynthese(this.moisCourant || undefined);
+  }
+
+  get nomBienFiltre(): string | null {
+    if (!this.selectedBienId) return null;
+    return this.biens.find(b => b.id === this.selectedBienId)?.nomUsuel ?? null;
   }
 
   loadSynthese(mois?: string): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.homeSyntheseApi.getSynthese(mois).subscribe({
+    const bienId = this.selectedBienId ?? undefined;
+
+    this.homeSyntheseApi.getSynthese(mois, bienId).subscribe({
       next: (data) => {
         this.synthese = data;
         this.moisCourant = data.periode.mois;
@@ -112,6 +152,24 @@ export class Home implements OnInit {
   allerVersFlux(): void {
     this.router.navigate(['/flux']);
   }
+
+  allerVersSansJustificatif(): void {
+  const params: Record<string, string> = { statutJustificatif: 'A_FOURNIR,INCOMPLET' };
+  if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
+  this.router.navigate(['/flux'], { queryParams: params });
+}
+
+allerVersAArbitrer(): void {
+  const params: Record<string, string> = { qualificationPressentie: 'A_ARBITRER' };
+  if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
+  this.router.navigate(['/flux'], { queryParams: params });
+}
+
+allerVersARevoir(): void {
+  const params: Record<string, string> = { statutTraitement: 'A_REVOIR' };
+  if (this.selectedBienId) params['bienId'] = this.selectedBienId.toString();
+  this.router.navigate(['/flux'], { queryParams: params });
+}
 
   allerVersFluxDetail(id: number): void {
     this.router.navigate(['/flux', id, 'modifier']);
