@@ -1,13 +1,17 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { CommonModule, CurrencyPipe, registerLocaleData, DatePipe } from '@angular/common';
-import { Router } from '@angular/router';
+import { CommonModule, CurrencyPipe, registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
+import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
 import { HomeSyntheseApi } from './home-synthese-api';
+import { BienApi } from '../../../bien/services/bien-api';
+import { BienResponse } from '../../../bien/models/bien-response';
 import {
   HomeSyntheseResponse,
   Alertes,
@@ -21,12 +25,14 @@ import {
   selector: 'app-home',
   imports: [
     CommonModule,
+    RouterLink,
+    FormsModule,
     MatCardModule,
-    DatePipe,
     MatDividerModule,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
+    MatSelectModule,
     CurrencyPipe,
   ],
   templateUrl: './home.html',
@@ -34,30 +40,54 @@ import {
 })
 export class Home implements OnInit {
   private readonly homeSyntheseApi = inject(HomeSyntheseApi);
+  private readonly bienApi = inject(BienApi);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   isLoading = false;
   errorMessage = '';
   synthese: HomeSyntheseResponse | null = null;
   moisCourant: string = '';
-  private readonly cdr = inject(ChangeDetectorRef);
+
+  // ── Filtres ──
+  biens: BienResponse[] = [];
+  selectedBienId: number | null = null;
+  biensLoading = false;
 
   constructor() {
     registerLocaleData(localeFr);
   }
 
   ngOnInit(): void {
+    this.loadFiltres();
     this.loadSynthese();
+  }
+
+  loadFiltres(): void {
+    this.biensLoading = true;
+    this.bienApi.getAll().subscribe({
+      next: (biens) => {
+        this.biens = biens.sort((a, b) => a.nomUsuel.localeCompare(b.nomUsuel));
+        this.biensLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.biensLoading = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   loadSynthese(mois?: string): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.homeSyntheseApi.getSynthese(mois).subscribe({
+    const bienId = this.selectedBienId ?? undefined;
+
+    this.homeSyntheseApi.getSynthese(mois, bienId).subscribe({
       next: (data) => {
         this.synthese = data;
-        this.moisCourant = data.periode.mois;
+        this.moisCourant = data.periode.mois ?? '';
         this.isLoading = false;
         setTimeout(() => this.cdr.detectChanges());
       },
@@ -67,6 +97,10 @@ export class Home implements OnInit {
         setTimeout(() => this.cdr.detectChanges());
       },
     });
+  }
+
+  onBienChange(): void {
+    this.loadSynthese();
   }
 
   // ── Navigation entre mois ──
@@ -83,6 +117,11 @@ export class Home implements OnInit {
     const now = new Date();
     const moisActuel = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     return this.moisCourant === moisActuel;
+  }
+
+  get nomBienFiltre(): string | null {
+    if (!this.selectedBienId) return null;
+    return this.biens.find((b) => b.id === this.selectedBienId)?.nomUsuel ?? null;
   }
 
   allerMoisPrecedent(): void {

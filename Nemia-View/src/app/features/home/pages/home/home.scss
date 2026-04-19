@@ -184,6 +184,7 @@
     background: #fef9c3;
     color: #854d0e;
   }
+
   &--info {
     background: #dbeafe;
     color: #1d4ed8;
@@ -321,38 +322,57 @@ td {
     background: #ccfbf1;
     color: #0f766e;
   }
+
   &--depense {
     background: #fee2e2;
     color: #b91c1c;
   }
+
   &--mouvement {
     background: #ede9fe;
     color: #6d28d9;
   }
+
   &--regularisation {
     background: #fef9c3;
     color: #854d0e;
   }
+
   &--ok {
     background: #dcfce7;
     color: #15803d;
   }
+
   &--warn {
     background: #fef9c3;
     color: #854d0e;
   }
+
   &--error {
     background: #fee2e2;
     color: #b91c1c;
   }
+
   &--info {
     background: #dbeafe;
     color: #1d4ed8;
   }
+
   &--muted {
     background: #f1f5f9;
     color: #64748b;
   }
+}
+
+.filtres-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.filtre-field {
+  width: 100%;
 }
 
 // ── Responsive ──

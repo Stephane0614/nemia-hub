@@ -26,6 +26,23 @@
   <button mat-icon-button (click)="allerMoisSuivant()" [disabled]="isMoisCourant" title="Mois suivant">&#8250;</button>
 </div>
 
+<!-- ── Filtres Bien + Exercice ── -->
+<div class="filtres-grid">
+  <mat-form-field appearance="outline" class="filtre-field">
+    <mat-label>Bien</mat-label>
+    <mat-select [(ngModel)]="selectedBienId" (ngModelChange)="onBienChange()">
+      <mat-option [value]="null">Tous les biens</mat-option>
+      @if (biensLoading) {
+      <mat-option disabled>Chargement...</mat-option>
+      } @else if (biens.length === 0) {
+      <mat-option disabled>Aucun bien enregistré</mat-option>
+      } @else { @for (bien of biens; track bien.id) {
+      <mat-option [value]="bien.id">{{ bien.nomUsuel }}</mat-option>
+      } }
+    </mat-select>
+  </mat-form-field>
+</div>
+
 <!-- ── Cartes métriques ── -->
 <section class="metrics-grid">
   <mat-card class="metric-card metric-card--positive">

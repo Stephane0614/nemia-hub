@@ -1,6 +1,8 @@
 package com.nemia.core.flux.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -36,9 +38,9 @@ class HomeSyntheseControllerTest {
       .build();
   }
 
-  private HomeSyntheseResponse buildEmptyResponse(String moisCode) {
+  private HomeSyntheseResponse buildEmptyResponse(String moisCode, Long exerciceId, Long bienId) {
     return new HomeSyntheseResponse(
-      new HomeSyntheseResponse.Periode("Avril 2026", "2026-04-01", "2026-04-30", moisCode),
+      new HomeSyntheseResponse.Periode("Avril 2026", "2026-04-01", "2026-04-30", moisCode, exerciceId, bienId),
       new HomeSyntheseResponse.Metriques(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 0),
       new HomeSyntheseResponse.Alertes(0, BigDecimal.ZERO, 0, BigDecimal.ZERO, 0),
       List.of(),
@@ -49,7 +51,7 @@ class HomeSyntheseControllerTest {
 
   @Test
   void getSynthese_sansParametre_retourne200() throws Exception {
-    when(homeSyntheseService.getSynthese(any(), any())).thenReturn(buildEmptyResponse("2026-04"));
+    when(homeSyntheseService.getSynthese(any(), any(), any())).thenReturn(buildEmptyResponse("2026-04", null, null));
 
     mockMvc
       .perform(get("/api/home/synthese"))
@@ -64,7 +66,7 @@ class HomeSyntheseControllerTest {
 
   @Test
   void getSynthese_avecMoisValide_retourne200AvecBonnePeriode() throws Exception {
-    when(homeSyntheseService.getSynthese(any(), any())).thenReturn(buildEmptyResponse("2026-04"));
+    when(homeSyntheseService.getSynthese(any(), any(), any())).thenReturn(buildEmptyResponse("2026-04", null, null));
 
     mockMvc
       .perform(get("/api/home/synthese").param("mois", "2026-04"))
@@ -76,14 +78,14 @@ class HomeSyntheseControllerTest {
 
   @Test
   void getSynthese_avecMoisMalFormate_retourne400() throws Exception {
-    when(homeSyntheseService.getSynthese(any(), any())).thenThrow(new IllegalArgumentException("Format de mois invalide"));
+    when(homeSyntheseService.getSynthese(any(), any(), any())).thenThrow(new IllegalArgumentException("Format de mois invalide"));
 
     mockMvc.perform(get("/api/home/synthese").param("mois", "mauvais-format")).andExpect(status().isBadRequest());
   }
 
   @Test
   void getSynthese_retourneMetriquesAZero_siBaseVide() throws Exception {
-    when(homeSyntheseService.getSynthese(any(), any())).thenReturn(buildEmptyResponse("2026-04"));
+    when(homeSyntheseService.getSynthese(any(), any(), any())).thenReturn(buildEmptyResponse("2026-04", null, null));
 
     mockMvc
       .perform(get("/api/home/synthese").param("mois", "2026-04"))
@@ -96,7 +98,7 @@ class HomeSyntheseControllerTest {
 
   @Test
   void getSynthese_retourneAlertesAZero_siBaseVide() throws Exception {
-    when(homeSyntheseService.getSynthese(any(), any())).thenReturn(buildEmptyResponse("2026-04"));
+    when(homeSyntheseService.getSynthese(any(), any(), any())).thenReturn(buildEmptyResponse("2026-04", null, null));
 
     mockMvc
       .perform(get("/api/home/synthese").param("mois", "2026-04"))
@@ -108,7 +110,7 @@ class HomeSyntheseControllerTest {
 
   @Test
   void getSynthese_retourneListesVides_siBaseVide() throws Exception {
-    when(homeSyntheseService.getSynthese(any(), any())).thenReturn(buildEmptyResponse("2026-04"));
+    when(homeSyntheseService.getSynthese(any(), any(), any())).thenReturn(buildEmptyResponse("2026-04", null, null));
 
     mockMvc
       .perform(get("/api/home/synthese").param("mois", "2026-04"))
@@ -117,5 +119,99 @@ class HomeSyntheseControllerTest {
       .andExpect(jsonPath("$.repartitionDepenses").isEmpty())
       .andExpect(jsonPath("$.dernieresOperations").isArray())
       .andExpect(jsonPath("$.dernieresOperations").isEmpty());
+  }
+
+  @Test
+  void getSynthese_avecBienId_retourne200AvecBienIdDansReponse() throws Exception {
+    when(homeSyntheseService.getSynthese(any(), eq(1L), any())).thenReturn(buildEmptyResponse("2026-04", null, 1L));
+
+    mockMvc
+      .perform(get("/api/home/synthese").param("bienId", "1"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.periode.bienId").value(1));
+  }
+
+  @Test
+  void getSynthese_avecBienIdInconnu_retourne200AvecZeros() throws Exception {
+    when(homeSyntheseService.getSynthese(any(), eq(999L), any())).thenReturn(buildEmptyResponse("2026-04", null, 999L));
+
+    mockMvc
+      .perform(get("/api/home/synthese").param("bienId", "999"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.metriques.totalRecettes").value(0))
+      .andExpect(jsonPath("$.metriques.totalDepenses").value(0));
+  }
+
+  @Test
+  void getSynthese_avecExerciceId_retourne200AvecExerciceIdDansReponse() throws Exception {
+    HomeSyntheseResponse response = new HomeSyntheseResponse(
+      new HomeSyntheseResponse.Periode("2026", "2026-01-01", "2026-12-31", null, 1L, null),
+      new HomeSyntheseResponse.Metriques(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 0),
+      new HomeSyntheseResponse.Alertes(0, BigDecimal.ZERO, 0, BigDecimal.ZERO, 0),
+      List.of(),
+      new HomeSyntheseResponse.RecurrenceDepenses(BigDecimal.ZERO, BigDecimal.ZERO),
+      List.of()
+    );
+
+    when(homeSyntheseService.getSynthese(any(), any(), eq(1L))).thenReturn(response);
+
+    mockMvc
+      .perform(get("/api/home/synthese").param("exerciceId", "1"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.periode.exerciceId").value(1))
+      .andExpect(jsonPath("$.periode.mois").doesNotExist())
+      .andExpect(jsonPath("$.periode.label").value("2026"))
+      .andExpect(jsonPath("$.periode.dateDebut").value("2026-01-01"))
+      .andExpect(jsonPath("$.periode.dateFin").value("2026-12-31"));
+  }
+
+  @Test
+  void getSynthese_avecExerciceIdInconnu_retourne200AvecFallbackMois() throws Exception {
+    when(homeSyntheseService.getSynthese(any(), any(), eq(999L))).thenReturn(buildEmptyResponse("2026-04", null, null));
+
+    mockMvc
+      .perform(get("/api/home/synthese").param("exerciceId", "999"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.periode.mois").value("2026-04"));
+  }
+
+  @Test
+  void getSynthese_avecBienIdEtExerciceId_retourne200AvecLesDeux() throws Exception {
+    HomeSyntheseResponse response = new HomeSyntheseResponse(
+      new HomeSyntheseResponse.Periode("2026", "2026-01-01", "2026-12-31", null, 1L, 1L),
+      new HomeSyntheseResponse.Metriques(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 0),
+      new HomeSyntheseResponse.Alertes(0, BigDecimal.ZERO, 0, BigDecimal.ZERO, 0),
+      List.of(),
+      new HomeSyntheseResponse.RecurrenceDepenses(BigDecimal.ZERO, BigDecimal.ZERO),
+      List.of()
+    );
+
+    when(homeSyntheseService.getSynthese(any(), eq(1L), eq(1L))).thenReturn(response);
+
+    mockMvc
+      .perform(get("/api/home/synthese").param("bienId", "1").param("exerciceId", "1"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.periode.bienId").value(1))
+      .andExpect(jsonPath("$.periode.exerciceId").value(1));
+  }
+
+  @Test
+  void getSynthese_avecExerciceIdValideEtMois_exerciceIdPrioritaire() throws Exception {
+    HomeSyntheseResponse response = new HomeSyntheseResponse(
+      new HomeSyntheseResponse.Periode("2026", "2026-01-01", "2026-12-31", null, 1L, null),
+      new HomeSyntheseResponse.Metriques(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 0),
+      new HomeSyntheseResponse.Alertes(0, BigDecimal.ZERO, 0, BigDecimal.ZERO, 0),
+      List.of(),
+      new HomeSyntheseResponse.RecurrenceDepenses(BigDecimal.ZERO, BigDecimal.ZERO),
+      List.of()
+    );
+
+    when(homeSyntheseService.getSynthese(any(), any(), eq(1L))).thenReturn(response);
+
+    mockMvc
+      .perform(get("/api/home/synthese").param("mois", "2026-04").param("exerciceId", "1"))
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.periode.exerciceId").value(1))
+      .andExpect(jsonPath("$.periode.label").value("2026"));
   }
 }

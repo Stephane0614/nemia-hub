@@ -66,12 +66,16 @@ public class HomeSyntheseResponse {
     private String dateDebut;
     private String dateFin;
     private String mois;
+    private Long exerciceId;
+    private Long bienId;
 
-    public Periode(String label, String dateDebut, String dateFin, String mois) {
+    public Periode(String label, String dateDebut, String dateFin, String mois, Long exerciceId, Long bienId) {
       this.label = label;
       this.dateDebut = dateDebut;
       this.dateFin = dateFin;
       this.mois = mois;
+      this.exerciceId = exerciceId;
+      this.bienId = bienId;
     }
 
     public String getLabel() {
@@ -88,6 +92,14 @@ public class HomeSyntheseResponse {
 
     public String getMois() {
       return mois;
+    }
+
+    public Long getExerciceId() {
+      return exerciceId;
+    }
+
+    public Long getBienId() {
+      return bienId;
     }
   }
 

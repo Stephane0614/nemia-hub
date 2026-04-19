@@ -85,30 +85,30 @@ mat-form-field {
   }
 
   .form-warnings {
-  margin-bottom: 20px;
-  padding: 14px 16px;
-  border-left: 4px solid #d97706;
-  border-radius: 8px;
-  background: #fffbeb;
-  color: #92400e;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border-left: 4px solid #d97706;
+    border-radius: 8px;
+    background: #fffbeb;
+    color: #92400e;
 
-  &__title {
-    margin: 0 0 8px;
-    font-weight: 600;
-  }
+    &__title {
+      margin: 0 0 8px;
+      font-weight: 600;
+    }
 
-  &__list {
-    margin: 0 0 12px;
-    padding-left: 18px;
+    &__list {
+      margin: 0 0 12px;
+      padding-left: 18px;
 
-    li + li {
-      margin-top: 4px;
+      li + li {
+        margin-top: 4px;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      justify-content: flex-end;
     }
   }
-
-  &__actions {
-    display: flex;
-    justify-content: flex-end;
-  }
-}
 }

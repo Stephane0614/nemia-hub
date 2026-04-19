@@ -159,31 +159,178 @@ mat-divider {
   line-height: 1.6;
 }
 
-// ── Zone synthèse future ──
+// ── Zone synthèse financière ──
 
 .synthese-card {
   padding: 28px;
   border-radius: 16px;
-  border: 2px dashed #e2e8f0;
-  background: #f8fafc;
 }
 
-.synthese-placeholder {
-  text-align: center;
-  padding: 16px 0;
+.synthese-titre {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
 }
 
-.synthese-placeholder__titre {
-  margin: 0 0 8px;
-  font-size: 1rem;
-  font-weight: 600;
+.synthese-sous-titre {
+  margin: 0 0 20px;
+  font-size: 0.85rem;
   color: #94a3b8;
 }
 
-.synthese-placeholder__texte {
-  margin: 0;
-  color: #94a3b8;
+.synthese-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+}
+
+.synthese-erreur {
+  color: #b91c1c;
   font-size: 0.9rem;
+}
+
+.synthese-vide {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.synthese-metriques {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.synthese-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+  }
+
+  &__value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+
+    &--positive {
+      color: #0f766e;
+    }
+    &--negative {
+      color: #b91c1c;
+    }
+  }
+}
+
+.synthese-alertes {
+  margin: 16px 0;
+}
+
+.alerte-ok {
+  margin: 0;
+  color: #0f766e;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.alerte-item {
+  margin: 0 0 6px;
+  color: #854d0e;
+  font-size: 0.88rem;
+}
+
+.synthese-operations {
+  margin-top: 16px;
+
+  &__titre {
+    margin: 0 0 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+  }
+
+  &__lien {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+.synthese-op-ligne {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 0.5px solid #f1f5f9;
+}
+
+.synthese-op-date {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.synthese-op-libelle {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.synthese-op-montant {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.warning-icon {
+  font-size: 0.85rem;
+  color: #d97706;
+  margin-left: 4px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &--recette {
+    background: #ccfbf1;
+    color: #0f766e;
+  }
+  &--depense {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  &--mouvement {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+  &--regularisation {
+    background: #fef9c3;
+    color: #854d0e;
+  }
 }
 
 // ── Responsive ──

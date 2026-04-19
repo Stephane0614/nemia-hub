@@ -85,13 +85,100 @@
     </mat-card>
 
     <!-- ── Zone réservée aux futures synthèses ── -->
+    <!-- ── Zone synthèse financière ── -->
     <mat-card class="synthese-card">
-      <div class="synthese-placeholder">
-        <p class="synthese-placeholder__titre">Synthèse financière</p>
-        <p class="synthese-placeholder__texte">
-          Les données financières par bien seront disponibles ici prochainement.
-        </p>
+      <h2 class="synthese-titre">Synthèse financière</h2>
+      <p class="synthese-sous-titre">Toutes périodes confondues sur ce bien</p>
+
+      @if (syntheseLoading) {
+      <div class="synthese-loading">
+        <mat-spinner diameter="28"></mat-spinner>
+        <p>Chargement...</p>
       </div>
+      } @else if (syntheseError) {
+      <p class="synthese-erreur">Impossible de charger la synthèse.</p>
+      } @else if (aucuneOperation) {
+      <p class="synthese-vide">Aucune opération enregistrée sur ce bien.</p>
+      } @else if (synthese) {
+
+      <!-- Cartes métriques -->
+      <div class="synthese-metriques">
+        <div class="synthese-metric">
+          <span class="synthese-metric__label">Recettes</span>
+          <span class="synthese-metric__value synthese-metric__value--positive">
+            {{ synthese.metriques.totalRecettes | currency:'EUR':'symbol':'1.2-2':'fr' }}
+          </span>
+        </div>
+        <div class="synthese-metric">
+          <span class="synthese-metric__label">Dépenses</span>
+          <span class="synthese-metric__value synthese-metric__value--negative">
+            {{ synthese.metriques.totalDepenses | currency:'EUR':'symbol':'1.2-2':'fr' }}
+          </span>
+        </div>
+        <div class="synthese-metric">
+          <span class="synthese-metric__label">Solde</span>
+          <span
+            class="synthese-metric__value"
+            [class.synthese-metric__value--positive]="soldePositif"
+            [class.synthese-metric__value--negative]="!soldePositif"
+          >
+            {{ synthese.metriques.solde | currency:'EUR':'symbol':'1.2-2':'fr' }}
+          </span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Alertes compactes -->
+      <div class="synthese-alertes">
+        @if (aucuneAlerte) {
+        <p class="alerte-ok">✓ Aucun point d'attention sur ce bien.</p>
+        } @else { @if (synthese.alertes.fluxSansJustificatif > 0) {
+        <p class="alerte-item">
+          ⚠ {{ synthese.alertes.fluxSansJustificatif }} flux sans justificatif — {{
+          synthese.alertes.montantSansJustificatif | currency:'EUR':'symbol':'1.2-2':'fr' }}
+        </p>
+        } @if (synthese.alertes.fluxAArbitrer > 0) {
+        <p class="alerte-item">
+          ⚠ {{ synthese.alertes.fluxAArbitrer }} flux à arbitrer — {{ synthese.alertes.montantAArbitrer |
+          currency:'EUR':'symbol':'1.2-2':'fr' }}
+        </p>
+        } @if (synthese.alertes.fluxARevoir > 0) {
+        <p class="alerte-item">~ {{ synthese.alertes.fluxARevoir }} flux à revoir</p>
+        } }
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Dernières opérations -->
+      <div class="synthese-operations">
+        <p class="synthese-operations__titre">Dernières opérations</p>
+        @for (op of dernieresTrois; track op.id) {
+        <div class="synthese-op-ligne">
+          <span class="synthese-op-date">{{ op.date | date:'dd/MM/yyyy' }}</span>
+          <span class="synthese-op-libelle">
+            {{ op.libelle }} @if (op.warnings && op.warnings.length > 0) {
+            <span class="warning-icon" [title]="op.warnings.join(' | ')">⚠</span>
+            }
+          </span>
+          <span
+            class="badge"
+            [class.badge--recette]="op.type === 'RECETTE'"
+            [class.badge--depense]="op.type === 'DEPENSE'"
+            [class.badge--mouvement]="op.type === 'MOUVEMENT_FINANCIER'"
+            [class.badge--regularisation]="op.type === 'REGULARISATION'"
+          >
+            {{ op.type }}
+          </span>
+          <span class="synthese-op-montant"> {{ op.montant | currency:'EUR':'symbol':'1.2-2':'fr' }} </span>
+        </div>
+        }
+        <div class="synthese-operations__lien">
+          <button mat-button (click)="allerVersFlux()">Voir toutes les opérations →</button>
+        </div>
+      </div>
+
+      }
     </mat-card>
   </div>
 </div>

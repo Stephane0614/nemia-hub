@@ -11,7 +11,11 @@ export class HomeSyntheseApi {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${API_BASE_URL}/home/synthese`;
 
-  getSynthese(mois?: string, bienId?: number): Observable<HomeSyntheseResponse> {
+  getSynthese(
+    mois?: string,
+    bienId?: number,
+    exerciceId?: number,
+  ): Observable<HomeSyntheseResponse> {
     let params = new HttpParams();
 
     if (mois) {
@@ -20,6 +24,10 @@ export class HomeSyntheseApi {
 
     if (bienId !== undefined && bienId !== null) {
       params = params.set('bienId', bienId.toString());
+    }
+
+    if (exerciceId !== undefined && exerciceId !== null) {
+      params = params.set('exerciceId', exerciceId.toString());
     }
 
     return this.http.get<HomeSyntheseResponse>(this.baseUrl, { params });
