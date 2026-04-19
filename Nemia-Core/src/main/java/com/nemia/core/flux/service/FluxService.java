@@ -9,6 +9,7 @@ import com.nemia.core.flux.model.QualificationPressentie;
 import com.nemia.core.flux.model.StatutJustificatif;
 import com.nemia.core.flux.model.StatutTraitement;
 import com.nemia.core.flux.repository.FluxRepository;
+import com.nemia.core.justificatif.repository.JustificatifRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,10 +24,16 @@ public class FluxService {
 
   private final FluxRepository fluxRepository;
   private final FluxValidationService fluxValidationService;
+  private final JustificatifRepository justificatifRepository;
 
-  public FluxService(FluxRepository fluxRepository, FluxValidationService fluxValidationService) {
+  public FluxService(
+    FluxRepository fluxRepository,
+    FluxValidationService fluxValidationService,
+    JustificatifRepository justificatifRepository
+  ) {
     this.fluxRepository = fluxRepository;
     this.fluxValidationService = fluxValidationService;
+    this.justificatifRepository = justificatifRepository;
   }
 
   private List<String> validateFlux(Flux flux) {
@@ -43,11 +50,9 @@ public class FluxService {
   public FluxResponse create(CreateFluxRequest request) {
     Flux flux = new Flux();
     mapCreateRequestToEntity(request, flux);
-
+    validateJustificatifId(flux.getJustificatifId());
     List<String> warnings = validateFlux(flux);
-
     Flux savedFlux = fluxRepository.save(flux);
-
     FluxResponse response = mapToResponse(savedFlux);
     response.setWarnings(warnings);
     return response;
@@ -78,13 +83,10 @@ public class FluxService {
 
   public FluxResponse update(Long id, UpdateFluxRequest request) {
     Flux flux = fluxRepository.findById(id).orElseThrow(() -> new FluxNotFoundException(id));
-
     mapUpdateRequestToEntity(request, flux);
-
+    validateJustificatifId(flux.getJustificatifId());
     List<String> warnings = validateFlux(flux);
-
     Flux updatedFlux = fluxRepository.save(flux);
-
     FluxResponse response = mapToResponse(updatedFlux);
     response.setWarnings(warnings);
     return response;
@@ -203,5 +205,11 @@ public class FluxService {
     List<Flux> fluxes = fluxRepository.findAllWithFilters(bienId, qualificationPressentie, statutTraitement, statutsJustificatif);
 
     return fluxes.stream().map(this::mapToResponse).collect(Collectors.toList());
+  }
+
+  private void validateJustificatifId(Long justificatifId) {
+    if (justificatifId != null && !justificatifRepository.existsById(justificatifId)) {
+      throw new IllegalArgumentException("Justificatif introuvable avec l'id : " + justificatifId);
+    }
   }
 }
