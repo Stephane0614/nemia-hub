@@ -1,90 +1,92 @@
-<div class="page-container">
+<div [class.page-container]="!isDialogMode">
+  @if (isDialogMode) {
+  <h2 mat-dialog-title>{{ isEditMode ? 'Modifier le justificatif' : 'Nouveau justificatif' }}</h2>
+  } @if (!isDialogMode) {
   <mat-card class="form-card">
     <mat-card-header>
       <mat-card-title> {{ isEditMode ? 'Modifier le justificatif' : 'Nouveau justificatif' }} </mat-card-title>
     </mat-card-header>
-
     <mat-card-content>
-      @if (isLoading) {
-      <div class="loading-container">
-        <mat-spinner diameter="40" />
-      </div>
-      } @if (!isLoading) {
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-grid">
-          <!-- Type de pièce -->
-          <mat-form-field appearance="outline">
-            <mat-label>Type de pièce *</mat-label>
-            <mat-select formControlName="typePiece">
-              @for (item of typePieces; track item.code) {
-              <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (form.get('typePiece')?.invalid && form.get('typePiece')?.touched) {
-            <mat-error>Le type de pièce est obligatoire</mat-error>
-            }
-          </mat-form-field>
-
-          <!-- Statut documentaire -->
-          <mat-form-field appearance="outline">
-            <mat-label>Statut documentaire *</mat-label>
-            <mat-select formControlName="statutDocumentaire">
-              @for (item of statutDocumentaires; track item.code) {
-              <mat-option [value]="item.code">{{ item.label }}</mat-option>
-              }
-            </mat-select>
-            @if (form.get('statutDocumentaire')?.invalid && form.get('statutDocumentaire')?.touched) {
-            <mat-error>Le statut documentaire est obligatoire</mat-error>
-            }
-          </mat-form-field>
-
-          <!-- Date de pièce -->
-          <mat-form-field appearance="outline">
-            <mat-label>Date de pièce</mat-label>
-            <input matInput [matDatepicker]="picker" formControlName="datePiece" />
-            <mat-datepicker-toggle matIconSuffix [for]="picker" />
-            <mat-datepicker #picker />
-          </mat-form-field>
-
-          <!-- Référence -->
-          <mat-form-field appearance="outline">
-            <mat-label>Référence</mat-label>
-            <input matInput formControlName="referencePiece" maxlength="100" />
-          </mat-form-field>
-
-          <!-- Émetteur -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Émetteur / Fournisseur</mat-label>
-            <input matInput formControlName="emetteur" maxlength="150" />
-          </mat-form-field>
-
-          <!-- Commentaire -->
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Commentaire</mat-label>
-            <textarea matInput formControlName="commentaire" rows="3" maxlength="500"></textarea>
-          </mat-form-field>
-        </div>
-
-        <!-- Zone upload réservée -->
-        <div class="upload-reserved">
-          <span class="upload-reserved__icon">📎</span>
-          <span class="upload-reserved__label"> Ajout de pièce justificative — disponible prochainement </span>
-        </div>
-
-        <!-- Erreur globale -->
-        @if (errorMessage) {
-        <p class="error-message">{{ errorMessage }}</p>
-        }
-
-        <!-- Actions -->
-        <div class="form-actions">
-          <button mat-stroked-button type="button" (click)="onCancel()">Annuler</button>
-          <button mat-flat-button color="primary" type="submit" [disabled]="isSubmitting">
-            {{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
-          </button>
-        </div>
-      </form>
-      }
+      <ng-container *ngTemplateOutlet="formContent"></ng-container>
     </mat-card-content>
   </mat-card>
+  } @if (isDialogMode) {
+  <mat-dialog-content>
+    <ng-container *ngTemplateOutlet="formContent"></ng-container>
+  </mat-dialog-content>
+  }
 </div>
+
+<ng-template #formContent>
+  @if (isLoading) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+  } @if (!isLoading) {
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Type de pièce *</mat-label>
+        <mat-select formControlName="typePiece">
+          @for (item of typePieces; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('typePiece')?.invalid && form.get('typePiece')?.touched) {
+        <mat-error>Le type de pièce est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut documentaire *</mat-label>
+        <mat-select formControlName="statutDocumentaire">
+          @for (item of statutDocumentaires; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('statutDocumentaire')?.invalid && form.get('statutDocumentaire')?.touched) {
+        <mat-error>Le statut documentaire est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date de pièce</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="datePiece" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker" />
+        <mat-datepicker #picker />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Référence</mat-label>
+        <input matInput formControlName="referencePiece" maxlength="100" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Émetteur / Fournisseur</mat-label>
+        <input matInput formControlName="emetteur" maxlength="150" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput formControlName="commentaire" rows="3" maxlength="500"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="upload-reserved">
+      <span class="upload-reserved__icon">📎</span>
+      <span class="upload-reserved__label"> Ajout de pièce justificative — disponible prochainement </span>
+    </div>
+
+    @if (errorMessage) {
+    <p class="error-message">{{ errorMessage }}</p>
+    }
+
+    <div class="form-actions">
+      <button mat-stroked-button type="button" (click)="onCancel()">Annuler</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
+      </button>
+    </div>
+  </form>
+  }
+</ng-template>

@@ -22,6 +22,11 @@ import { ExerciceResponse } from '../../../exercice/models/exercice-response';
 import { DatePipe } from '@angular/common';
 import { JustificatifApi } from '../../../justificatif/services/justificatif-api';
 import { JustificatifResponse } from '../../../justificatif/models/justificatif-response';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import {
+  JustificatifForm,
+  JustificatifDialogData,
+} from '../../../justificatif/pages/justificatif-form/justificatif-form';
 
 import {
   Occurrence,
@@ -54,6 +59,7 @@ export class FluxForm implements OnInit {
   private readonly fluxApi = inject(FluxApi);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly bienApi = inject(BienApi);
+  private readonly dialog = inject(MatDialog);
 
   serverValidationErrors: Record<string, string> = {};
   loadErrorMessage = '';
@@ -380,5 +386,26 @@ export class FluxForm implements OnInit {
     if (j.referencePiece) return j.referencePiece;
     if (j.datePiece) return `${j.typePiece} — ${j.datePiece}`;
     return `${j.typePiece} #${j.id}`;
+  }
+
+  ouvrirDialogJustificatif(): void {
+    const dialogRef = this.dialog.open(JustificatifForm, {
+      width: '640px',
+      disableClose: false,
+      data: {} as JustificatifDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((justificatif: JustificatifResponse | null) => {
+      if (!justificatif) return;
+
+      // Rafraîchit la liste et positionne sur le nouveau justificatif
+      this.justificatifApi.getAll().subscribe({
+        next: (justificatifs) => {
+          this.justificatifs = justificatifs;
+          this.form.patchValue({ justificatifId: justificatif.id });
+          this.cdr.detectChanges();
+        },
+      });
+    });
   }
 }
