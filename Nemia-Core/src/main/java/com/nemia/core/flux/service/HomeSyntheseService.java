@@ -129,7 +129,7 @@ public class HomeSyntheseService {
     return fluxes
       .stream()
       .map(flux -> {
-        List<String> warnings = fluxValidationService.validate(
+        List<String> warnings = fluxValidationService.computeWarnings(
           flux.getType(),
           flux.getCategorie(),
           flux.getQualificationPressentie(),

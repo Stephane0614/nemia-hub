@@ -218,12 +218,12 @@ class FluxControllerTest {
       FluxType.DEPENSE,
       "Charges copro",
       new BigDecimal("200.00"),
-      FluxCategory.CHARGES_COPRO,
+      FluxCategory.COPROPRIETE,
       PaymentMode.VIREMENT,
       null
     );
     response.setOccurrence(Occurrence.PONCTUEL);
-    response.setWarnings(List.of("Occurrence PONCTUEL suspecte pour une catégorie structurellement récurrente : Charges copropriété"));
+    response.setWarnings(List.of("Occurrence PONCTUEL inhabituelle pour une catégorie structurellement récurrente"));
 
     when(fluxService.create(any())).thenReturn(response);
 
@@ -233,7 +233,7 @@ class FluxControllerTest {
         "type": "DEPENSE",
         "libelle": "Charges copro",
         "montant": 200.00,
-        "categorie": "CHARGES_COPRO",
+        "categorie": "COPROPRIETE",
         "modePaiement": "VIREMENT",
         "occurrence": "PONCTUEL",
         "statutJustificatif": "FOURNI",

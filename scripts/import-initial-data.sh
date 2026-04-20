@@ -2,19 +2,24 @@
 
 set -u
 
-API_URL="http://localhost:8080/api/flux"
+BASE_URL="http://localhost:8080/api"
+FLUX_URL="$BASE_URL/flux"
+BIENS_URL="$BASE_URL/biens"
+EXERCICES_URL="$BASE_URL/exercices"
 
-post_flux() {
+# ── Helpers ──────────────────────────────────────────────────────────
+
+post_json() {
   local label="$1"
-  local payload="$2"
+  local url="$2"
+  local payload="$3"
 
   echo "--------------------------------------------------"
   echo "Insertion: $label"
-  echo "Payload: $payload"
 
   local response
   response=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" \
-    -X POST "$API_URL" \
+    -X POST "$url" \
     -H "Content-Type: application/json; charset=UTF-8" \
     -d "$payload")
 
@@ -28,113 +33,231 @@ post_flux() {
   echo "Response: $body"
 
   if [[ "$status" != "200" && "$status" != "201" ]]; then
-    echo "Erreur sur l'insertion: $label"
+    echo "ERREUR sur: $label"
     exit 1
   fi
+
+  echo "$body"
 }
 
-echo "Debut import initial data..."
-echo "API cible: $API_URL"
+extract_id() {
+  echo "$1" | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*'
+}
 
-post_flux "Loyer studio Bordeaux" '{
-  "date":"2026-04-01",
-  "type":"RECETTE",
-  "libelle":"Loyer studio Bordeaux",
-  "montant":650.00,
-  "categorie":"LOYER",
-  "modePaiement":"VIREMENT",
-  "commentaire":"Locataire avril"
-}'
+# ── Création du bien de référence ────────────────────────────────────
 
-post_flux "Charges copro T2" '{
-  "date":"2026-04-02",
-  "type":"DEPENSE",
-  "libelle":"Charges copro T2",
-  "montant":120.50,
-  "categorie":"CHARGES_COPRO",
-  "modePaiement":"PRELEVEMENT",
-  "commentaire":"Appel de charges"
-}'
+echo "=================================================="
+echo "Creation du bien de reference"
+echo "=================================================="
 
-post_flux "Facture electricite" '{
-  "date":"2026-04-03",
-  "type":"DEPENSE",
-  "libelle":"Facture electricite",
-  "montant":48.20,
-  "categorie":"ELECTRICITE",
-  "modePaiement":"PRELEVEMENT",
-  "commentaire":"EDF avril"
-}'
+BIEN_RESPONSE=$(post_json "Bien Studio Bordeaux Victoire" "$BIENS_URL" '{
+  "nomUsuel": "Studio Bordeaux Victoire",
+  "adresseSimplifiee": "12 place de la Victoire, 33000 Bordeaux",
+  "statutActivite": "ACTIF",
+  "typeLocation": "LMNP_LONGUE_DUREE",
+  "regimeVise": "REEL",
+  "commentaire": "Studio meuble 25m2 - bien de test"
+}')
 
-post_flux "Facture eau" '{
-  "date":"2026-04-04",
-  "type":"DEPENSE",
-  "libelle":"Facture eau",
-  "montant":22.90,
-  "categorie":"EAU",
-  "modePaiement":"PRELEVEMENT",
-  "commentaire":"Consommation mars"
-}'
+BIEN_ID=$(extract_id "$BIEN_RESPONSE")
+echo "Bien cree avec id: $BIEN_ID"
 
-post_flux "Internet logement" '{
-  "date":"2026-04-05",
-  "type":"DEPENSE",
-  "libelle":"Internet logement",
-  "montant":29.99,
-  "categorie":"INTERNET",
-  "modePaiement":"CARTE",
-  "commentaire":"Box fibre"
-}'
+# ── Création de l'exercice de référence ──────────────────────────────
 
-post_flux "Assurance PNO" '{
-  "date":"2026-04-06",
-  "type":"DEPENSE",
-  "libelle":"Assurance PNO",
-  "montant":18.75,
-  "categorie":"ASSURANCE",
-  "modePaiement":"VIREMENT",
-  "commentaire":"Mensualite"
-}'
+echo "=================================================="
+echo "Creation de l exercice de reference"
+echo "=================================================="
 
-post_flux "Interets emprunt avril" '{
-  "date":"2026-04-07",
-  "type":"DEPENSE",
-  "libelle":"Interets emprunt avril",
-  "montant":210.40,
-  "categorie":"INTERETS_EMPRUNT",
-  "modePaiement":"PRELEVEMENT",
-  "commentaire":"Banque"
-}'
+EXERCICE_RESPONSE=$(post_json "Exercice 2026" "$EXERCICES_URL" '{
+  "libelleExercice": "2026",
+  "dateDebut": "2026-01-01",
+  "dateFin": "2026-12-31",
+  "statutExercice": "OUVERT",
+  "niveauCompletude": "FAIBLE",
+  "commentaire": "Exercice de test"
+}')
 
-post_flux "Achat mobilier" '{
-  "date":"2026-04-08",
-  "type":"DEPENSE",
-  "libelle":"Achat mobilier",
-  "montant":89.90,
-  "categorie":"MOBILIER",
-  "modePaiement":"CARTE",
-  "commentaire":"Table de chevet"
-}'
+EXERCICE_ID=$(extract_id "$EXERCICE_RESPONSE")
+echo "Exercice cree avec id: $EXERCICE_ID"
 
-post_flux "Taxe fonciere provision" '{
-  "date":"2026-04-09",
-  "type":"DEPENSE",
-  "libelle":"Taxe fonciere provision",
-  "montant":95.00,
-  "categorie":"TAXE_FONCIERE",
-  "modePaiement":"CHEQUE",
-  "commentaire":"Provision mensuelle"
-}'
+# ── Insertion des flux ────────────────────────────────────────────────
 
-post_flux "Petits consommables" '{
-  "date":"2026-04-10",
-  "type":"DEPENSE",
-  "libelle":"Petits consommables",
-  "montant":14.30,
-  "categorie":"CONSOMMABLES",
-  "modePaiement":"CARTE",
-  "commentaire":"Ampoules et produits menagers"
-}'
+echo "=================================================="
+echo "Insertion des flux"
+echo "=================================================="
 
-echo "--------------------------------------------------"
+# 1. Recette — Loyer
+post_json "Loyer avril 2026" "$FLUX_URL" "{
+  \"date\": \"2026-04-01\",
+  \"type\": \"RECETTE\",
+  \"libelle\": \"Loyer avril 2026\",
+  \"montant\": 650.00,
+  \"categorie\": \"LOYER\",
+  \"modePaiement\": \"VIREMENT\",
+  \"occurrence\": \"RECURRENT\",
+  \"statutJustificatif\": \"NON_REQUIS\",
+  \"qualificationPressentie\": \"NON_APPLICABLE\",
+  \"statutTraitement\": \"VALIDE\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Locataire Martin avril\"
+}"
+
+# 2. Dépense — Charges copropriété
+post_json "Charges copropriete T2 2026" "$FLUX_URL" "{
+  \"date\": \"2026-04-02\",
+  \"type\": \"DEPENSE\",
+  \"libelle\": \"Charges copropriete T2 2026\",
+  \"montant\": 120.50,
+  \"categorie\": \"COPROPRIETE\",
+  \"modePaiement\": \"PRELEVEMENT\",
+  \"occurrence\": \"RECURRENT\",
+  \"statutJustificatif\": \"FOURNI\",
+  \"qualificationPressentie\": \"CHARGE_COURANTE\",
+  \"statutTraitement\": \"VALIDE\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Appel de charges syndic\"
+}"
+
+# 3. Dépense — Électricité
+post_json "Facture electricite avril" "$FLUX_URL" "{
+  \"date\": \"2026-04-03\",
+  \"type\": \"DEPENSE\",
+  \"libelle\": \"Facture electricite avril\",
+  \"montant\": 48.20,
+  \"categorie\": \"ELECTRICITE\",
+  \"modePaiement\": \"PRELEVEMENT\",
+  \"occurrence\": \"RECURRENT\",
+  \"statutJustificatif\": \"FOURNI\",
+  \"qualificationPressentie\": \"CHARGE_COURANTE\",
+  \"statutTraitement\": \"VALIDE\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"EDF avril 2026\"
+}"
+
+# 4. Dépense — Taxe
+post_json "Taxe fonciere provision avril" "$FLUX_URL" "{
+  \"date\": \"2026-04-04\",
+  \"type\": \"DEPENSE\",
+  \"libelle\": \"Taxe fonciere provision avril\",
+  \"montant\": 95.00,
+  \"categorie\": \"TAXE\",
+  \"modePaiement\": \"CHEQUE\",
+  \"occurrence\": \"RECURRENT\",
+  \"statutJustificatif\": \"A_FOURNIR\",
+  \"qualificationPressentie\": \"CHARGE_COURANTE\",
+  \"statutTraitement\": \"QUALIFIE\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Provision mensuelle taxe fonciere\"
+}"
+
+# 5. Dépense — Réparation importante
+post_json "Remplacement robinetterie salle de bain" "$FLUX_URL" "{
+  \"date\": \"2026-04-05\",
+  \"type\": \"DEPENSE\",
+  \"libelle\": \"Remplacement robinetterie salle de bain\",
+  \"montant\": 380.00,
+  \"categorie\": \"REPARATION_IMPORTANTE\",
+  \"modePaiement\": \"VIREMENT\",
+  \"occurrence\": \"PONCTUEL\",
+  \"statutJustificatif\": \"FOURNI\",
+  \"qualificationPressentie\": \"A_ARBITRER\",
+  \"statutTraitement\": \"A_REVOIR\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Plombier - a qualifier charge ou immobilisation\"
+}"
+
+# 6. Dépense — Mobilier
+post_json "Achat canape convertible" "$FLUX_URL" "{
+  \"date\": \"2026-04-06\",
+  \"type\": \"DEPENSE\",
+  \"libelle\": \"Achat canape convertible\",
+  \"montant\": 490.00,
+  \"categorie\": \"MOBILIER\",
+  \"modePaiement\": \"CARTE\",
+  \"occurrence\": \"PONCTUEL\",
+  \"statutJustificatif\": \"FOURNI\",
+  \"qualificationPressentie\": \"IMMOBILISATION\",
+  \"statutTraitement\": \"QUALIFIE\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Ikea - mobilier meuble\"
+}"
+
+# 7. Dépense — Emprunt intérêts
+post_json "Interets emprunt avril 2026" "$FLUX_URL" "{
+  \"date\": \"2026-04-07\",
+  \"type\": \"DEPENSE\",
+  \"libelle\": \"Interets emprunt avril 2026\",
+  \"montant\": 210.40,
+  \"categorie\": \"EMPRUNT_INTERETS\",
+  \"modePaiement\": \"PRELEVEMENT\",
+  \"occurrence\": \"RECURRENT\",
+  \"statutJustificatif\": \"FOURNI\",
+  \"qualificationPressentie\": \"CHARGE_COURANTE\",
+  \"statutTraitement\": \"VALIDE\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Credit immobilier BNP\"
+}"
+
+# 8. Mouvement financier — Capital emprunt
+post_json "Remboursement capital emprunt avril" "$FLUX_URL" "{
+  \"date\": \"2026-04-07\",
+  \"type\": \"MOUVEMENT_FINANCIER\",
+  \"libelle\": \"Remboursement capital emprunt avril\",
+  \"montant\": 540.00,
+  \"categorie\": \"EMPRUNT_CAPITAL\",
+  \"modePaiement\": \"PRELEVEMENT\",
+  \"occurrence\": \"RECURRENT\",
+  \"statutJustificatif\": \"NON_REQUIS\",
+  \"qualificationPressentie\": \"HORS_RESULTAT\",
+  \"statutTraitement\": \"VALIDE\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Part capital mensualite BNP\"
+}"
+
+# 9. Dépense — Honoraires
+post_json "Honoraires comptable 2025" "$FLUX_URL" "{
+  \"date\": \"2026-04-10\",
+  \"type\": \"DEPENSE\",
+  \"libelle\": \"Honoraires comptable 2025\",
+  \"montant\": 350.00,
+  \"categorie\": \"HONORAIRES\",
+  \"modePaiement\": \"VIREMENT\",
+  \"occurrence\": \"PONCTUEL\",
+  \"statutJustificatif\": \"A_VERIFIER\",
+  \"qualificationPressentie\": \"CHARGE_COURANTE\",
+  \"statutTraitement\": \"A_REVOIR\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Cabinet Durand - facture a verifier\"
+}"
+
+# 10. Recette — Indemnité reçue
+post_json "Indemnite assurance degat des eaux" "$FLUX_URL" "{
+  \"date\": \"2026-04-15\",
+  \"type\": \"RECETTE\",
+  \"libelle\": \"Indemnite assurance degat des eaux\",
+  \"montant\": 1200.00,
+  \"categorie\": \"INDEMNITE_RECUE\",
+  \"modePaiement\": \"VIREMENT\",
+  \"occurrence\": \"PONCTUEL\",
+  \"statutJustificatif\": \"FOURNI\",
+  \"qualificationPressentie\": \"A_ARBITRER\",
+  \"statutTraitement\": \"A_REVOIR\",
+  \"bienId\": $BIEN_ID,
+  \"exerciceId\": $EXERCICE_ID,
+  \"commentaire\": \"Remboursement sinistre - a qualifier\"
+}"
+
+echo "=================================================="
 echo "Import termine avec succes."
+echo "Bien id: $BIEN_ID"
+echo "Exercice id: $EXERCICE_ID"
+echo "=================================================="

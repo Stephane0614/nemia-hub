@@ -37,7 +37,11 @@ public class FluxService {
   }
 
   private List<String> validateFlux(Flux flux) {
-    return fluxValidationService.validate(
+    fluxValidationService.validateBlocking(
+      flux.getType(),
+      flux.getCategorie()
+    );
+    return fluxValidationService.computeWarnings(
       flux.getType(),
       flux.getCategorie(),
       flux.getQualificationPressentie(),

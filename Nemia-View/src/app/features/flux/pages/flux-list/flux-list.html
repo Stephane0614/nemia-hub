@@ -51,13 +51,10 @@
         <tr [class.row--warning]="flux.warnings && flux.warnings.length > 0">
           <td>{{ flux.date | date:'dd/MM/yyyy' }}</td>
           <td>
-            <span
-              class="badge"
-              [class.badge--recette]="flux.type === 'RECETTE'"
+            <span class="badge" [class.badge--recette]="flux.type === 'RECETTE'"
               [class.badge--depense]="flux.type === 'DEPENSE'"
               [class.badge--mouvement]="flux.type === 'MOUVEMENT_FINANCIER'"
-              [class.badge--regularisation]="flux.type === 'REGULARISATION'"
-            >
+              [class.badge--regularisation]="flux.type === 'REGULARISATION'">
               {{ flux.type }}
             </span>
           </td>
@@ -67,40 +64,40 @@
             }
           </td>
           <td>{{ flux.montant | number: '1.2-2' }} €</td>
-          <td>{{ flux.categorie }}</td>
+          <td>
+            <span class="badge" [class.badge--recette]="isCategorieRecette(flux.categorie)"
+              [class.badge--charge]="isCategorieCharge(flux.categorie)"
+              [class.badge--travaux]="isCategorieTravaux(flux.categorie)"
+              [class.badge--financement]="isCategorieFinancement(flux.categorie)"
+              [class.badge--mouvement]="isCategorieMouvement(flux.categorie)"
+              [class.badge--neutral]="isCategorieDivers(flux.categorie)">
+              {{ flux.categorie }}
+            </span>
+          </td>
           <td>
             <span class="badge badge--neutral">{{ flux.occurrence }}</span>
           </td>
           <td>
-            <span
-              class="badge"
-              [class.badge--ok]="flux.statutJustificatif === 'FOURNI'"
+            <span class="badge" [class.badge--ok]="flux.statutJustificatif === 'FOURNI'"
               [class.badge--warn]="flux.statutJustificatif === 'A_FOURNIR' || flux.statutJustificatif === 'INCOMPLET' || flux.statutJustificatif === 'A_VERIFIER'"
               [class.badge--muted]="flux.statutJustificatif === 'NON_REQUIS'"
-              [class.badge--error]="flux.statutJustificatif === 'REJETE'"
-            >
+              [class.badge--error]="flux.statutJustificatif === 'REJETE'">
               {{ flux.statutJustificatif }}
             </span>
           </td>
           <td>
-            <span
-              class="badge"
-              [class.badge--ok]="flux.qualificationPressentie === 'CHARGE_COURANTE'"
+            <span class="badge" [class.badge--ok]="flux.qualificationPressentie === 'CHARGE_COURANTE'"
               [class.badge--info]="flux.qualificationPressentie === 'IMMOBILISATION'"
               [class.badge--warn]="flux.qualificationPressentie === 'A_ARBITRER' || flux.qualificationPressentie === 'MIXTE_OU_A_VENTILER'"
-              [class.badge--muted]="flux.qualificationPressentie === 'HORS_RESULTAT' || flux.qualificationPressentie === 'NON_APPLICABLE'"
-            >
+              [class.badge--muted]="flux.qualificationPressentie === 'HORS_RESULTAT' || flux.qualificationPressentie === 'NON_APPLICABLE'">
               {{ flux.qualificationPressentie }}
             </span>
           </td>
           <td>
-            <span
-              class="badge"
-              [class.badge--ok]="flux.statutTraitement === 'VALIDE'"
+            <span class="badge" [class.badge--ok]="flux.statutTraitement === 'VALIDE'"
               [class.badge--info]="flux.statutTraitement === 'QUALIFIE'"
               [class.badge--warn]="flux.statutTraitement === 'A_REVOIR'"
-              [class.badge--muted]="flux.statutTraitement === 'BRUT'"
-            >
+              [class.badge--muted]="flux.statutTraitement === 'BRUT'">
               {{ flux.statutTraitement }}
             </span>
           </td>
