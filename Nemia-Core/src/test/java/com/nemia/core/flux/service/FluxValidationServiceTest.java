@@ -14,119 +14,165 @@ import org.junit.jupiter.api.Test;
 
 class FluxValidationServiceTest {
 
-  private final FluxValidationService service = new FluxValidationService();
+    private final FluxValidationService service = new FluxValidationService();
 
-  // --- RÈGLES BLOQUANTES ---
+    // -------------------------------------------------------------------------
+    // Règles bloquantes — validateBlocking
+    // -------------------------------------------------------------------------
 
-  @Test
-  void shouldThrowWhenRecetteHasDepenseCategory() {
-    assertThatThrownBy(() -> service.validate(FluxType.RECETTE, FluxCategory.ELECTRICITE, null, null, null, null))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("RECETTE");
-  }
+    @Test
+    void shouldThrowWhenRecetteHasDepenseCategory() {
+        assertThatThrownBy(() ->
+            service.validateBlocking(FluxType.RECETTE, FluxCategory.ELECTRICITE))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("recette");
+    }
 
-  @Test
-  void shouldThrowWhenDepenseHasRecetteCategory() {
-    assertThatThrownBy(() -> service.validate(FluxType.DEPENSE, FluxCategory.LOYER, null, null, null, null))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("DEPENSE");
-  }
+    @Test
+    void shouldNotThrowWhenRecetteHasRecetteCategory() {
+        // LOYER est une catégorie valide pour RECETTE
+        service.validateBlocking(FluxType.RECETTE, FluxCategory.LOYER);
+    }
 
-  @Test
-  void shouldThrowWhenMouvementFinancierHasChargeCategory() {
-    assertThatThrownBy(() -> service.validate(FluxType.MOUVEMENT_FINANCIER, FluxCategory.ELECTRICITE, null, null, null, null))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("MOUVEMENT_FINANCIER");
-  }
+    @Test
+    void shouldThrowWhenDepenseHasRecetteCategory() {
+        assertThatThrownBy(() ->
+            service.validateBlocking(FluxType.DEPENSE, FluxCategory.LOYER))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("dépense");
+    }
 
-  @Test
-  void shouldThrowWhenMouvementFinancierHasRecetteCategory() {
-    assertThatThrownBy(() -> service.validate(FluxType.MOUVEMENT_FINANCIER, FluxCategory.LOYER, null, null, null, null))
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("MOUVEMENT_FINANCIER");
-  }
+    @Test
+    void shouldNotThrowWhenDepenseHasChargeCategory() {
+        // ELECTRICITE est une catégorie valide pour DEPENSE
+        service.validateBlocking(FluxType.DEPENSE, FluxCategory.ELECTRICITE);
+    }
 
-  // --- WARNINGS ---
+    @Test
+    void shouldThrowWhenMouvementFinancierHasChargeCategory() {
+        assertThatThrownBy(() ->
+            service.validateBlocking(FluxType.MOUVEMENT_FINANCIER, FluxCategory.ELECTRICITE))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("mouvement financier");
+    }
 
-  @Test
-  void shouldWarnWhenImmobilisationWithChargeCategory() {
-    List<String> warnings = service.validate(
-      FluxType.DEPENSE,
-      FluxCategory.ELECTRICITE,
-      QualificationPressentie.IMMOBILISATION,
-      null,
-      null,
-      null
-    );
-    assertThat(warnings).anyMatch(w -> w.contains("IMMOBILISATION"));
-  }
+    @Test
+    void shouldThrowWhenMouvementFinancierHasRecetteCategory() {
+        assertThatThrownBy(() ->
+            service.validateBlocking(FluxType.MOUVEMENT_FINANCIER, FluxCategory.LOYER))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("mouvement financier");
+    }
 
-  @Test
-  void shouldWarnWhenChargeCouranteWithTravaux() {
-    List<String> warnings = service.validate(
-      FluxType.DEPENSE,
-      FluxCategory.TRAVAUX,
-      QualificationPressentie.CHARGE_COURANTE,
-      null,
-      null,
-      null
-    );
-    assertThat(warnings).anyMatch(w -> w.contains("CHARGE_COURANTE"));
-  }
+    @Test
+    void shouldNotThrowWhenMouvementFinancierHasMouvementCategory() {
+        // APPORT est une catégorie valide pour MOUVEMENT_FINANCIER
+        service.validateBlocking(FluxType.MOUVEMENT_FINANCIER, FluxCategory.APPORT);
+    }
 
-  @Test
-  void shouldWarnWhenNonRequisOnDepenseExploitation() {
-    List<String> warnings = service.validate(FluxType.DEPENSE, FluxCategory.ELECTRICITE, null, StatutJustificatif.NON_REQUIS, null, null);
-    assertThat(warnings).anyMatch(w -> w.contains("NON_REQUIS"));
-  }
+    // -------------------------------------------------------------------------
+    // Warnings — computeWarnings
+    // -------------------------------------------------------------------------
 
-  @Test
-  void shouldWarnWhenPonctuelOnRecurrentCategory() {
-    List<String> warnings = service.validate(FluxType.DEPENSE, FluxCategory.ELECTRICITE, null, null, Occurrence.PONCTUEL, null);
-    assertThat(warnings).anyMatch(w -> w.contains("PONCTUEL"));
-  }
+    @Test
+    void shouldWarnWhenImmobilisationWithChargeCouranteManifeste() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.DEPENSE,
+            FluxCategory.ELECTRICITE,
+            QualificationPressentie.IMMOBILISATION,
+            null, null, null
+        );
+        assertThat(warnings).anyMatch(w -> w.contains("IMMOBILISATION"));
+    }
 
-  @Test
-  void shouldWarnWhenAArbitrer() {
-    List<String> warnings = service.validate(FluxType.DEPENSE, FluxCategory.TRAVAUX, QualificationPressentie.A_ARBITRER, null, null, null);
-    assertThat(warnings).anyMatch(w -> w.contains("A_ARBITRER"));
-  }
+    @Test
+    void shouldWarnWhenChargeCouranteWithTravaux() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.DEPENSE,
+            FluxCategory.TRAVAUX,
+            QualificationPressentie.CHARGE_COURANTE,
+            null, null, null
+        );
+        assertThat(warnings).anyMatch(w -> w.contains("CHARGE_COURANTE"));
+    }
 
-  @Test
-  void shouldWarnWhenARevoir() {
-    List<String> warnings = service.validate(FluxType.DEPENSE, FluxCategory.ELECTRICITE, null, null, null, StatutTraitement.A_REVOIR);
-    assertThat(warnings).anyMatch(w -> w.contains("A_REVOIR"));
-  }
+    @Test
+    void shouldWarnWhenNonRequisOnDepenseExploitation() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.DEPENSE,
+            FluxCategory.ELECTRICITE,
+            null,
+            StatutJustificatif.NON_REQUIS,
+            null, null
+        );
+        assertThat(warnings).anyMatch(w -> w.contains("NON_REQUIS"));
+    }
 
-  @Test
-  void shouldWarnWhenRegularisationWithAnyCategory() {
-    List<String> warnings = service.validate(FluxType.REGULARISATION, FluxCategory.ELECTRICITE, null, null, null, null);
-    assertThat(warnings).anyMatch(w -> w.contains("REGULARISATION"));
-  }
+    @Test
+    void shouldWarnWhenPonctuelOnRecurrentCategory() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.DEPENSE,
+            FluxCategory.ELECTRICITE,
+            null, null,
+            Occurrence.PONCTUEL,
+            null
+        );
+        assertThat(warnings).anyMatch(w -> w.contains("PONCTUEL"));
+    }
 
-  @Test
-  void shouldWarnWhenMouvementFinancierWithChargeCouranteQualification() {
-    List<String> warnings = service.validate(
-      FluxType.MOUVEMENT_FINANCIER,
-      FluxCategory.AUTRE,
-      QualificationPressentie.CHARGE_COURANTE,
-      null,
-      null,
-      null
-    );
-    assertThat(warnings).anyMatch(w -> w.contains("MOUVEMENT_FINANCIER"));
-  }
+    @Test
+    void shouldWarnWhenAArbitrer() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.DEPENSE,
+            FluxCategory.TRAVAUX,
+            QualificationPressentie.A_ARBITRER,
+            null, null, null
+        );
+        assertThat(warnings).anyMatch(w -> w.contains("arbitrer"));
+    }
 
-  @Test
-  void shouldReturnNoWarningsForValidFlux() {
-    List<String> warnings = service.validate(
-      FluxType.DEPENSE,
-      FluxCategory.ELECTRICITE,
-      QualificationPressentie.CHARGE_COURANTE,
-      StatutJustificatif.FOURNI,
-      Occurrence.RECURRENT,
-      StatutTraitement.BRUT
-    );
-    assertThat(warnings).isEmpty();
-  }
+    @Test
+    void shouldWarnWhenARevoir() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.DEPENSE,
+            FluxCategory.ELECTRICITE,
+            null, null, null,
+            StatutTraitement.A_REVOIR
+        );
+        assertThat(warnings).anyMatch(w -> w.contains("REVOIR"));
+    }
+
+    @Test
+    void shouldWarnWhenRegularisationTypeFlux() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.REGULARISATION,
+            FluxCategory.AUTRE,
+            null, null, null, null
+        );
+        assertThat(warnings).anyMatch(w -> w.contains("égularisation"));
+    }
+
+    @Test
+    void shouldWarnWhenMouvementFinancierWithChargeCouranteQualification() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.MOUVEMENT_FINANCIER,
+            FluxCategory.AUTRE,
+            QualificationPressentie.CHARGE_COURANTE,
+            null, null, null
+        );
+        assertThat(warnings).anyMatch(w -> w.contains("mouvement financier"));
+    }
+
+    @Test
+    void shouldReturnNoWarningsForValidFlux() {
+        List<String> warnings = service.computeWarnings(
+            FluxType.DEPENSE,
+            FluxCategory.ELECTRICITE,
+            QualificationPressentie.CHARGE_COURANTE,
+            StatutJustificatif.FOURNI,
+            Occurrence.RECURRENT,
+            StatutTraitement.BRUT
+        );
+        assertThat(warnings).isEmpty();
+    }
 }

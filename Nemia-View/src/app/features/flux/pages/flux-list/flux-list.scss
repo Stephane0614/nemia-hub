@@ -92,6 +92,21 @@ td {
   }
 }
 
+.badge--charge {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge--travaux {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.badge--financement {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
 // Exception libellé — colonne 3
 td:nth-child(3),
 th:nth-child(3) {
@@ -148,14 +163,17 @@ tbody tr:hover td {
     background: #ccfbf1;
     color: #0f766e;
   }
+
   &--depense {
     background: #fee2e2;
     color: #b91c1c;
   }
+
   &--mouvement {
     background: #ede9fe;
     color: #6d28d9;
   }
+
   &--regularisation {
     background: #fef9c3;
     color: #854d0e;
@@ -165,22 +183,27 @@ tbody tr:hover td {
     background: #dcfce7;
     color: #15803d;
   }
+
   &--warn {
     background: #fef9c3;
     color: #854d0e;
   }
+
   &--error {
     background: #fee2e2;
     color: #b91c1c;
   }
+
   &--info {
     background: #dbeafe;
     color: #1d4ed8;
   }
+
   &--muted {
     background: #f1f5f9;
     color: #64748b;
   }
+
   &--neutral {
     background: #e2e8f0;
     color: #334155;
@@ -217,6 +240,7 @@ tbody tr:hover td {
 .scroll-btn-left {
   left: 50px;
 }
+
 .scroll-btn-right {
   right: 50px;
 }

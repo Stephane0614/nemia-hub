@@ -156,4 +156,31 @@ export class FluxList implements OnInit {
       panelClass: ['app-snackbar-error'],
     });
   }
+
+  isCategorieRecette(cat: string): boolean {
+  return ['LOYER', 'CHARGES_REFACTUREES', 'INDEMNITE_RECUE', 'AUTRE_RECETTE_EXPLOITATION'].includes(cat);
+}
+
+isCategorieCharge(cat: string): boolean {
+  return ['ELECTRICITE', 'EAU', 'INTERNET', 'ASSURANCE', 'TAXE', 'COPROPRIETE',
+    'FRAIS_BANCAIRES', 'HONORAIRES', 'ENTRETIEN_COURANT', 'CONSOMMABLES',
+    'MENAGE', 'FOURNITURES', 'AUTRE_CHARGE_EXPLOITATION'].includes(cat);
+}
+
+isCategorieTravaux(cat: string): boolean {
+  return ['TRAVAUX', 'REPARATION_IMPORTANTE', 'AMELIORATION', 'MOBILIER',
+    'ELECTROMENAGER', 'EQUIPEMENT', 'DECORATION'].includes(cat);
+}
+
+isCategorieFinancement(cat: string): boolean {
+  return ['FRAIS_FINANCEMENT', 'EMPRUNT_INTERETS', 'EMPRUNT_ASSURANCE', 'EMPRUNT_CAPITAL'].includes(cat);
+}
+
+isCategorieMouvement(cat: string): boolean {
+  return ['APPORT', 'RETRAIT', 'VIREMENT_INTERNE'].includes(cat);
+}
+
+isCategorieDivers(cat: string): boolean {
+  return ['REGULARISATION', 'AUTRE'].includes(cat);
+}
 }
