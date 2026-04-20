@@ -19,7 +19,9 @@ import { BienApi } from '../.././../bien/services/bien-api';
 import { BienResponse } from '../../../bien/models/bien-response';
 import { ExerciceApi } from '../../../exercice/services/exercice-api';
 import { ExerciceResponse } from '../../../exercice/models/exercice-response';
-import { CommonModule, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
+import { JustificatifApi } from '../../../justificatif/services/justificatif-api';
+import { JustificatifResponse } from '../../../justificatif/models/justificatif-response';
 
 import {
   Occurrence,
@@ -69,6 +71,8 @@ export class FluxForm implements OnInit {
   statutsTraitement: { code: string; label: string }[] = [];
   biens: BienResponse[] = [];
   exercices: ExerciceResponse[] = [];
+  justificatifs: JustificatifResponse[] = [];
+  justificatifsLoading = false;
   exercicesLoading = false;
   biensLoading = false;
 
@@ -79,6 +83,7 @@ export class FluxForm implements OnInit {
 
   readonly isEditMode = computed(() => this.fluxId() !== null);
   private readonly exerciceApi = inject(ExerciceApi);
+  private readonly justificatifApi = inject(JustificatifApi);
 
   readonly form = this.formBuilder.group({
     date: [null as Date | null, Validators.required],
@@ -95,6 +100,7 @@ export class FluxForm implements OnInit {
     bienId: [null as number | null],
     exerciceId: [null as number | null],
     commentaire: ['', Validators.maxLength(500)],
+    justificatifId: [null as number | null],
   });
 
   ngOnInit(): void {
@@ -131,6 +137,18 @@ export class FluxForm implements OnInit {
           },
           error: () => {
             this.biensLoading = false;
+            this.cdr.detectChanges();
+          },
+        });
+        this.justificatifsLoading = true;
+        this.justificatifApi.getAll().subscribe({
+          next: (justificatifs) => {
+            this.justificatifs = justificatifs;
+            this.justificatifsLoading = false;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.justificatifsLoading = false;
             this.cdr.detectChanges();
           },
         });
@@ -253,6 +271,7 @@ export class FluxForm implements OnInit {
       commentaire: (rawValue.commentaire ?? '').trim() || null,
       bienId: rawValue.bienId ? Number(rawValue.bienId) : null,
       exerciceId: rawValue.exerciceId ? Number(rawValue.exerciceId) : null,
+      justificatifId: rawValue.justificatifId ? Number(rawValue.justificatifId) : null,
     };
   }
 
@@ -328,6 +347,7 @@ export class FluxForm implements OnInit {
           statutTraitement: flux.statutTraitement,
           bienId: flux.bienId,
           exerciceId: flux.exerciceId,
+          justificatifId: flux.justificatifId ?? null,
         });
 
         this.isLoading = false;
@@ -354,5 +374,11 @@ export class FluxForm implements OnInit {
       return `${day}/${month}/${year}`;
     };
     return `${exercice.libelleExercice} (${formatDate(exercice.dateDebut)} → ${formatDate(exercice.dateFin)})`;
+  }
+
+  formatJustificatifLabel(j: JustificatifResponse): string {
+    if (j.referencePiece) return j.referencePiece;
+    if (j.datePiece) return `${j.typePiece} — ${j.datePiece}`;
+    return `${j.typePiece} #${j.id}`;
   }
 }

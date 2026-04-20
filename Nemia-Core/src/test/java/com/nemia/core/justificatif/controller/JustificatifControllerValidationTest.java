@@ -29,11 +29,9 @@ class JustificatifControllerValidationTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(justificatifController)
+    mockMvc = MockMvcBuilders.standaloneSetup(justificatifController)
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
-      
   }
 
   @Test
@@ -44,7 +42,8 @@ class JustificatifControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.typePiece").exists());
@@ -60,7 +59,8 @@ class JustificatifControllerValidationTest {
       }
       """;
 
-    mockMvc.perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.statutDocumentaire").exists());
@@ -80,7 +80,8 @@ class JustificatifControllerValidationTest {
       }
       """.formatted(referenceTropLongue);
 
-    mockMvc.perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.referencePiece").exists());
@@ -100,7 +101,8 @@ class JustificatifControllerValidationTest {
       }
       """.formatted(emetteurTropLong);
 
-    mockMvc.perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.emetteur").exists());
@@ -120,7 +122,8 @@ class JustificatifControllerValidationTest {
       }
       """.formatted(commentaireTropLong);
 
-    mockMvc.perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.commentaire").exists());

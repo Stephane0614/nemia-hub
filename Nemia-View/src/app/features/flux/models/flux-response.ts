@@ -28,4 +28,5 @@ export interface FluxResponse {
   bienId: number | null;
   exerciceId: number | null;
   warnings: string[];
+  justificatifId?: number | null;
 }

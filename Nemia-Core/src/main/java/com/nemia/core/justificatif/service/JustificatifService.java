@@ -32,17 +32,15 @@ public class JustificatifService {
 
   public List<JustificatifResponse> findAll() {
     logger.info("Récupération de tous les justificatifs");
-    List<JustificatifResponse> list = justificatifRepository.findAll()
-      .stream()
-      .map(this::mapToResponse)
-      .toList();
+    List<JustificatifResponse> list = justificatifRepository.findAll().stream().map(this::mapToResponse).toList();
     logger.info("Nombre de justificatifs récupérés : {}", list.size());
     return list;
   }
 
   public JustificatifResponse findById(Long id) {
     logger.info("Recherche du justificatif id={}", id);
-    Justificatif justificatif = justificatifRepository.findById(id)
+    Justificatif justificatif = justificatifRepository
+      .findById(id)
       .orElseThrow(() -> {
         logger.warn("Justificatif introuvable id={}", id);
         return new JustificatifNotFoundException(id);
@@ -53,7 +51,8 @@ public class JustificatifService {
 
   public JustificatifResponse update(Long id, JustificatifRequest request) {
     logger.info("Mise à jour du justificatif id={}", id);
-    Justificatif justificatif = justificatifRepository.findById(id)
+    Justificatif justificatif = justificatifRepository
+      .findById(id)
       .orElseThrow(() -> {
         logger.warn("Justificatif introuvable pour mise à jour id={}", id);
         return new JustificatifNotFoundException(id);
@@ -66,7 +65,8 @@ public class JustificatifService {
 
   public void delete(Long id) {
     logger.info("Suppression du justificatif id={}", id);
-    Justificatif justificatif = justificatifRepository.findById(id)
+    Justificatif justificatif = justificatifRepository
+      .findById(id)
       .orElseThrow(() -> {
         logger.warn("Justificatif introuvable pour suppression id={}", id);
         return new JustificatifNotFoundException(id);

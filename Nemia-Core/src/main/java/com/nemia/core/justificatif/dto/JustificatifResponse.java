@@ -20,33 +20,83 @@ public class JustificatifResponse {
 
   public JustificatifResponse() {}
 
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+  public Long getId() {
+    return id;
+  }
 
-  public TypePiece getTypePiece() { return typePiece; }
-  public void setTypePiece(TypePiece typePiece) { this.typePiece = typePiece; }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-  public StatutDocumentaire getStatutDocumentaire() { return statutDocumentaire; }
-  public void setStatutDocumentaire(StatutDocumentaire statutDocumentaire) { this.statutDocumentaire = statutDocumentaire; }
+  public TypePiece getTypePiece() {
+    return typePiece;
+  }
 
-  public LocalDate getDatePiece() { return datePiece; }
-  public void setDatePiece(LocalDate datePiece) { this.datePiece = datePiece; }
+  public void setTypePiece(TypePiece typePiece) {
+    this.typePiece = typePiece;
+  }
 
-  public String getReferencePiece() { return referencePiece; }
-  public void setReferencePiece(String referencePiece) { this.referencePiece = referencePiece; }
+  public StatutDocumentaire getStatutDocumentaire() {
+    return statutDocumentaire;
+  }
 
-  public String getEmetteur() { return emetteur; }
-  public void setEmetteur(String emetteur) { this.emetteur = emetteur; }
+  public void setStatutDocumentaire(StatutDocumentaire statutDocumentaire) {
+    this.statutDocumentaire = statutDocumentaire;
+  }
 
-  public String getCommentaire() { return commentaire; }
-  public void setCommentaire(String commentaire) { this.commentaire = commentaire; }
+  public LocalDate getDatePiece() {
+    return datePiece;
+  }
 
-  public String getFichierAssocie() { return fichierAssocie; }
-  public void setFichierAssocie(String fichierAssocie) { this.fichierAssocie = fichierAssocie; }
+  public void setDatePiece(LocalDate datePiece) {
+    this.datePiece = datePiece;
+  }
 
-  public LocalDateTime getCreatedAt() { return createdAt; }
-  public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+  public String getReferencePiece() {
+    return referencePiece;
+  }
 
-  public LocalDateTime getUpdatedAt() { return updatedAt; }
-  public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+  public void setReferencePiece(String referencePiece) {
+    this.referencePiece = referencePiece;
+  }
+
+  public String getEmetteur() {
+    return emetteur;
+  }
+
+  public void setEmetteur(String emetteur) {
+    this.emetteur = emetteur;
+  }
+
+  public String getCommentaire() {
+    return commentaire;
+  }
+
+  public void setCommentaire(String commentaire) {
+    this.commentaire = commentaire;
+  }
+
+  public String getFichierAssocie() {
+    return fichierAssocie;
+  }
+
+  public void setFichierAssocie(String fichierAssocie) {
+    this.fichierAssocie = fichierAssocie;
+  }
+
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
 }
