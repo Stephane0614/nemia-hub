@@ -44,8 +44,7 @@ class JustificatifControllerTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(justificatifController)
+    mockMvc = MockMvcBuilders.standaloneSetup(justificatifController)
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }
@@ -53,7 +52,13 @@ class JustificatifControllerTest {
   @Test
   void shouldCreateJustificatif() throws Exception {
     JustificatifResponse response = buildJustificatifResponse(
-      1L, TypePiece.FACTURE, StatutDocumentaire.FOURNI, "FAC-2026-001", "EDF", null);
+      1L,
+      TypePiece.FACTURE,
+      StatutDocumentaire.FOURNI,
+      "FAC-2026-001",
+      "EDF",
+      null
+    );
 
     when(justificatifService.create(any())).thenReturn(response);
 
@@ -68,7 +73,8 @@ class JustificatifControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(1))
@@ -81,8 +87,7 @@ class JustificatifControllerTest {
 
   @Test
   void shouldCreateJustificatifWithOptionalFieldsAbsent() throws Exception {
-    JustificatifResponse response = buildJustificatifResponse(
-      2L, TypePiece.TICKET, StatutDocumentaire.A_FOURNIR, null, null, null);
+    JustificatifResponse response = buildJustificatifResponse(2L, TypePiece.TICKET, StatutDocumentaire.A_FOURNIR, null, null, null);
 
     when(justificatifService.create(any())).thenReturn(response);
 
@@ -93,7 +98,8 @@ class JustificatifControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(2))
@@ -105,7 +111,13 @@ class JustificatifControllerTest {
   @Test
   void shouldCreateJustificatifWithFichierAssocie() throws Exception {
     JustificatifResponse response = buildJustificatifResponse(
-      3L, TypePiece.FACTURE, StatutDocumentaire.FOURNI, null, null, "path/to/file.pdf");
+      3L,
+      TypePiece.FACTURE,
+      StatutDocumentaire.FOURNI,
+      null,
+      null,
+      "path/to/file.pdf"
+    );
 
     when(justificatifService.create(any())).thenReturn(response);
 
@@ -117,7 +129,8 @@ class JustificatifControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(post("/api/justificatifs").contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.fichierAssocie").value("path/to/file.pdf"));
@@ -127,14 +140,13 @@ class JustificatifControllerTest {
 
   @Test
   void shouldReturnAllJustificatifs() throws Exception {
-    JustificatifResponse first = buildJustificatifResponse(
-      1L, TypePiece.FACTURE, StatutDocumentaire.FOURNI, "FAC-001", "EDF", null);
-    JustificatifResponse second = buildJustificatifResponse(
-      2L, TypePiece.TICKET, StatutDocumentaire.A_FOURNIR, null, null, null);
+    JustificatifResponse first = buildJustificatifResponse(1L, TypePiece.FACTURE, StatutDocumentaire.FOURNI, "FAC-001", "EDF", null);
+    JustificatifResponse second = buildJustificatifResponse(2L, TypePiece.TICKET, StatutDocumentaire.A_FOURNIR, null, null, null);
 
     when(justificatifService.findAll()).thenReturn(List.of(first, second));
 
-    mockMvc.perform(get("/api/justificatifs"))
+    mockMvc
+      .perform(get("/api/justificatifs"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$").isArray())
@@ -148,12 +160,12 @@ class JustificatifControllerTest {
   @Test
   void shouldReturnJustificatifById() throws Exception {
     Long id = 1L;
-    JustificatifResponse response = buildJustificatifResponse(
-      id, TypePiece.FACTURE, StatutDocumentaire.FOURNI, "FAC-001", "EDF", null);
+    JustificatifResponse response = buildJustificatifResponse(id, TypePiece.FACTURE, StatutDocumentaire.FOURNI, "FAC-001", "EDF", null);
 
     when(justificatifService.findById(id)).thenReturn(response);
 
-    mockMvc.perform(get("/api/justificatifs/{id}", id))
+    mockMvc
+      .perform(get("/api/justificatifs/{id}", id))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
@@ -167,7 +179,8 @@ class JustificatifControllerTest {
     Long id = 99L;
     when(justificatifService.findById(id)).thenThrow(new JustificatifNotFoundException(id));
 
-    mockMvc.perform(get("/api/justificatifs/{id}", id))
+    mockMvc
+      .perform(get("/api/justificatifs/{id}", id))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message").value("Justificatif introuvable : 99"));
@@ -179,7 +192,13 @@ class JustificatifControllerTest {
   void shouldUpdateJustificatif() throws Exception {
     Long id = 1L;
     JustificatifResponse response = buildJustificatifResponse(
-      id, TypePiece.FACTURE, StatutDocumentaire.A_VERIFIER, "FAC-001-MAJ", "EDF", null);
+      id,
+      TypePiece.FACTURE,
+      StatutDocumentaire.A_VERIFIER,
+      "FAC-001-MAJ",
+      "EDF",
+      null
+    );
 
     when(justificatifService.update(eq(id), any())).thenReturn(response);
 
@@ -192,7 +211,8 @@ class JustificatifControllerTest {
       }
       """;
 
-    mockMvc.perform(put("/api/justificatifs/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(put("/api/justificatifs/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.statutDocumentaire").value("A_VERIFIER"))
@@ -213,7 +233,8 @@ class JustificatifControllerTest {
       }
       """;
 
-    mockMvc.perform(put("/api/justificatifs/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
+    mockMvc
+      .perform(put("/api/justificatifs/{id}", id).contentType(MediaType.APPLICATION_JSON).content(requestBody))
       .andDo(print())
       .andExpect(status().isNotFound());
 
@@ -225,9 +246,7 @@ class JustificatifControllerTest {
     Long id = 1L;
     doNothing().when(justificatifService).delete(id);
 
-    mockMvc.perform(delete("/api/justificatifs/{id}", id))
-      .andDo(print())
-      .andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/justificatifs/{id}", id)).andDo(print()).andExpect(status().isNoContent());
 
     verify(justificatifService).delete(id);
   }
@@ -237,16 +256,19 @@ class JustificatifControllerTest {
     Long id = 99L;
     doThrow(new JustificatifNotFoundException(id)).when(justificatifService).delete(id);
 
-    mockMvc.perform(delete("/api/justificatifs/{id}", id))
-      .andDo(print())
-      .andExpect(status().isNotFound());
+    mockMvc.perform(delete("/api/justificatifs/{id}", id)).andDo(print()).andExpect(status().isNotFound());
 
     verify(justificatifService).delete(id);
   }
 
   private JustificatifResponse buildJustificatifResponse(
-    Long id, TypePiece typePiece, StatutDocumentaire statutDocumentaire,
-    String referencePiece, String emetteur, String fichierAssocie) {
+    Long id,
+    TypePiece typePiece,
+    StatutDocumentaire statutDocumentaire,
+    String referencePiece,
+    String emetteur,
+    String fichierAssocie
+  ) {
     JustificatifResponse response = new JustificatifResponse();
     response.setId(id);
     response.setTypePiece(typePiece);

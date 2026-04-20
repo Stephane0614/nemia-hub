@@ -24,4 +24,5 @@ export interface FluxRequest {
   commentaire?: string | null;
   bienId?: number | null;
   exerciceId?: number | null;
+  justificatifId?: number | null;
 }

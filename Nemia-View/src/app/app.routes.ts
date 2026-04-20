@@ -3,6 +3,7 @@ import { Home } from './features/home/pages/home/home';
 import { fluxRoutes } from './features/flux/flux.routes';
 import { bienRoutes } from './features/bien/bien.routes';
 import { exerciceRoutes } from './features/exercice/exercice.routes';
+import { justificatifRoutes } from './features/justificatif/justificatif.routes';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,10 @@ export const routes: Routes = [
   {
     path: 'exercices',
     children: exerciceRoutes,
+  },
+  {
+    path: 'justificatifs',
+    children: justificatifRoutes,
   },
   {
     path: '**',

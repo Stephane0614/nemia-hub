@@ -252,6 +252,38 @@
       </mat-form-field>
     </div>
 
+    <!-- Justificatif rattaché -->
+    <div class="justificatif-block field-span-2">
+      <mat-form-field appearance="outline" class="justificatif-select">
+        <mat-label>Justificatif rattaché</mat-label>
+        <mat-select formControlName="justificatifId">
+          @if (justificatifsLoading) {
+          <mat-option disabled>Chargement...</mat-option>
+          } @else {
+          <mat-option [value]="null">— Aucun justificatif sélectionné</mat-option>
+          @for (j of justificatifs; track j.id) {
+          <mat-option [value]="j.id">{{ formatJustificatifLabel(j) }}</mat-option>
+          } }
+        </mat-select>
+        <mat-hint>Optionnel — associer un justificatif existant</mat-hint>
+      </mat-form-field>
+
+      <a
+        mat-stroked-button
+        routerLink="/justificatifs/nouveau"
+        [queryParams]="{ returnTo: 'flux-form' }"
+        class="justificatif-create-link"
+      >
+        + Créer un justificatif
+      </a>
+    </div>
+
+    <!-- Zone upload réservée -->
+    <div class="upload-reserved field-span-2">
+      <span class="upload-reserved__icon">📎</span>
+      <span class="upload-reserved__label"> Ajout de pièce justificative — disponible prochainement </span>
+    </div>
+
     <!-- ── Actions ── -->
     <div class="form-actions">
       <a mat-stroked-button routerLink="/flux">Annuler</a>

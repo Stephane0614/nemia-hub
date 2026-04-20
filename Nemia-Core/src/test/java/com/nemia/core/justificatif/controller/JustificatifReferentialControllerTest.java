@@ -19,8 +19,7 @@ class JustificatifReferentialControllerTest {
 
   @BeforeEach
   void setup() {
-    mockMvc = MockMvcBuilders
-      .standaloneSetup(new JustificatifReferentialController())
+    mockMvc = MockMvcBuilders.standaloneSetup(new JustificatifReferentialController())
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }

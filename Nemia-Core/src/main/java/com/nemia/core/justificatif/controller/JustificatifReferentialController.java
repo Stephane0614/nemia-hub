@@ -14,7 +14,6 @@ public class JustificatifReferentialController {
 
   @GetMapping("/api/justificatifs/referentials")
   public JustificatifReferentialsResponse getJustificatifReferentials() {
-
     List<ReferentialItemResponse> typePieces = Arrays.stream(TypePiece.values())
       .map(t -> new ReferentialItemResponse(t.name(), t.getLabel()))
       .toList();
