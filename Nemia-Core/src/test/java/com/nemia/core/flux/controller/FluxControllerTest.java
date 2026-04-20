@@ -99,39 +99,35 @@ class FluxControllerTest {
   @Test
   void shouldReturnAllFlux() throws Exception {
     FluxResponse first = buildFluxResponse(
-      1L,
-      LocalDate.of(2026, 4, 15),
-      FluxType.RECETTE,
-      "Loyer avril",
-      new BigDecimal("850.00"),
-      FluxCategory.LOYER,
-      PaymentMode.VIREMENT,
-      "Payé le 5"
+      1L, LocalDate.of(2026, 4, 15), FluxType.RECETTE, "Loyer avril",
+      new BigDecimal("850.00"), FluxCategory.LOYER, PaymentMode.VIREMENT, "Payé le 5"
     );
-
     FluxResponse second = buildFluxResponse(
-      2L,
-      LocalDate.of(2026, 4, 16),
-      FluxType.DEPENSE,
-      "Internet",
-      new BigDecimal("29.99"),
-      FluxCategory.INTERNET,
-      PaymentMode.PRELEVEMENT,
-      null
+      2L, LocalDate.of(2026, 4, 16), FluxType.DEPENSE, "Internet",
+      new BigDecimal("29.99"), FluxCategory.INTERNET, PaymentMode.PRELEVEMENT, null
     );
 
-    when(fluxService.findAllWithFilters(null, null, null, null)).thenReturn(List.of(first, second));
+    com.nemia.core.flux.dto.FluxPageResponse pageResponse =
+      new com.nemia.core.flux.dto.FluxPageResponse(List.of(first, second), 0, 20, 2L, 1);
+
+    when(fluxService.findAllWithFilters(
+      null, null, null, null, null, null, null, null, null, 0, 20
+    )).thenReturn(pageResponse);
 
     mockMvc
       .perform(get("/api/flux"))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$").isArray())
-      .andExpect(jsonPath("$.length()").value(2))
-      .andExpect(jsonPath("$[0].libelle").value("Loyer avril"))
-      .andExpect(jsonPath("$[1].libelle").value("Internet"));
+      .andExpect(jsonPath("$.contenu").isArray())
+      .andExpect(jsonPath("$.contenu.length()").value(2))
+      .andExpect(jsonPath("$.contenu[0].libelle").value("Loyer avril"))
+      .andExpect(jsonPath("$.contenu[1].libelle").value("Internet"))
+      .andExpect(jsonPath("$.totalElements").value(2))
+      .andExpect(jsonPath("$.totalPages").value(1));
 
-    verify(fluxService).findAllWithFilters(null, null, null, null);
+    verify(fluxService).findAllWithFilters(
+      null, null, null, null, null, null, null, null, null, 0, 20
+    );
   }
 
   @Test

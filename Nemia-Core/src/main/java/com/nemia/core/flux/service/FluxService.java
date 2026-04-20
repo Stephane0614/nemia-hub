@@ -2,19 +2,27 @@ package com.nemia.core.flux.service;
 
 import com.nemia.core.common.exception.FluxNotFoundException;
 import com.nemia.core.flux.dto.CreateFluxRequest;
+import com.nemia.core.flux.dto.FluxPageResponse;
 import com.nemia.core.flux.dto.FluxResponse;
 import com.nemia.core.flux.dto.UpdateFluxRequest;
 import com.nemia.core.flux.model.Flux;
+import com.nemia.core.flux.model.FluxCategory;
+import com.nemia.core.flux.model.FluxType;
 import com.nemia.core.flux.model.QualificationPressentie;
 import com.nemia.core.flux.model.StatutJustificatif;
 import com.nemia.core.flux.model.StatutTraitement;
 import com.nemia.core.flux.repository.FluxRepository;
 import com.nemia.core.justificatif.repository.JustificatifRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -182,12 +190,39 @@ public class FluxService {
     return normalizedValue.isEmpty() ? null : normalizedValue;
   }
 
-  public List<FluxResponse> findAllWithFilters(
+  public FluxPageResponse findAllWithFilters(
     Long bienId,
+    Long exerciceId,
+    String typeFluxStr,
+    String categorieStr,
+    String dateDebutStr,
+    String dateFinStr,
     String qualificationPressentieStr,
     String statutTraitementStr,
-    String statutsJustificatifStr
+    String statutsJustificatifStr,
+    int page,
+    int size
   ) {
+    FluxType typeFlux = null;
+    if (typeFluxStr != null && !typeFluxStr.isBlank()) {
+      typeFlux = FluxType.valueOf(typeFluxStr);
+    }
+
+    FluxCategory categorie = null;
+    if (categorieStr != null && !categorieStr.isBlank()) {
+      categorie = FluxCategory.valueOf(categorieStr);
+    }
+
+    LocalDate dateDebut = null;
+    if (dateDebutStr != null && !dateDebutStr.isBlank()) {
+      dateDebut = LocalDate.parse(dateDebutStr);
+    }
+
+    LocalDate dateFin = null;
+    if (dateFinStr != null && !dateFinStr.isBlank()) {
+      dateFin = LocalDate.parse(dateFinStr);
+    }
+
     QualificationPressentie qualificationPressentie = null;
     if (qualificationPressentieStr != null && !qualificationPressentieStr.isBlank()) {
       qualificationPressentie = QualificationPressentie.valueOf(qualificationPressentieStr);
@@ -206,11 +241,34 @@ public class FluxService {
         .collect(Collectors.toList());
     }
 
-    List<Flux> fluxes = fluxRepository.findAllWithFilters(bienId, qualificationPressentie, statutTraitement, statutsJustificatif);
+    Pageable pageable = PageRequest.of(page, size);
 
-    return fluxes.stream().map(this::mapToResponse).collect(Collectors.toList());
+    Page<Flux> resultPage = fluxRepository.findAllWithFilters(
+      bienId,
+      exerciceId,
+      typeFlux,
+      categorie,
+      dateDebut,
+      dateFin,
+      qualificationPressentie,
+      statutTraitement,
+      statutsJustificatif,
+      pageable
+    );
+
+    List<FluxResponse> contenu = resultPage.getContent()
+      .stream()
+      .map(this::mapToResponse)
+      .collect(Collectors.toList());
+
+    return new FluxPageResponse(
+      contenu,
+      resultPage.getNumber(),
+      resultPage.getSize(),
+      resultPage.getTotalElements(),
+      resultPage.getTotalPages()
+    );
   }
-
   private void validateJustificatifId(Long justificatifId) {
     if (justificatifId != null && !justificatifRepository.existsById(justificatifId)) {
       throw new IllegalArgumentException("Justificatif introuvable avec l'id : " + justificatifId);

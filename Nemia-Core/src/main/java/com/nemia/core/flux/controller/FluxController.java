@@ -1,11 +1,11 @@
 package com.nemia.core.flux.controller;
 
 import com.nemia.core.flux.dto.CreateFluxRequest;
+import com.nemia.core.flux.dto.FluxPageResponse;
 import com.nemia.core.flux.dto.FluxResponse;
 import com.nemia.core.flux.dto.UpdateFluxRequest;
 import com.nemia.core.flux.service.FluxService;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +26,32 @@ public class FluxController {
   }
 
   @GetMapping
-  public List<FluxResponse> findAll(
+  public FluxPageResponse findAll(
     @RequestParam(required = false) Long bienId,
+    @RequestParam(required = false) Long exerciceId,
+    @RequestParam(required = false) String typeFlux,
+    @RequestParam(required = false) String categorie,
+    @RequestParam(required = false) String dateDebut,
+    @RequestParam(required = false) String dateFin,
     @RequestParam(required = false) String qualificationPressentie,
     @RequestParam(required = false) String statutTraitement,
-    @RequestParam(required = false) String statutJustificatif
+    @RequestParam(required = false) String statutJustificatif,
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "20") int size
   ) {
-    return fluxService.findAllWithFilters(bienId, qualificationPressentie, statutTraitement, statutJustificatif);
+    return fluxService.findAllWithFilters(
+      bienId,
+      exerciceId,
+      typeFlux,
+      categorie,
+      dateDebut,
+      dateFin,
+      qualificationPressentie,
+      statutTraitement,
+      statutJustificatif,
+      page,
+      size
+    );
   }
 
   @GetMapping("/{id}")

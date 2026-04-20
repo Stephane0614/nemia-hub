@@ -1,18 +1,22 @@
 package com.nemia.core.flux.repository;
 
 import com.nemia.core.flux.model.Flux;
+import com.nemia.core.flux.model.FluxCategory;
+import com.nemia.core.flux.model.FluxType;
 import com.nemia.core.flux.model.QualificationPressentie;
 import com.nemia.core.flux.model.StatutJustificatif;
 import com.nemia.core.flux.model.StatutTraitement;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface FluxRepository extends JpaRepository<Flux, Long> {
+
   // ── Métriques ──
 
   @Query(
@@ -84,20 +88,33 @@ public interface FluxRepository extends JpaRepository<Flux, Long> {
     Pageable pageable
   );
 
+  // ── Liste filtrée + pagination ──
+
   @Query(
     """
     SELECT f FROM Flux f
     WHERE (:bienId IS NULL OR f.bienId = :bienId)
+    AND (:exerciceId IS NULL OR f.exerciceId = :exerciceId)
+    AND (:typeFlux IS NULL OR f.type = :typeFlux)
+    AND (:categorie IS NULL OR f.categorie = :categorie)
+    AND (:dateDebut IS NULL OR f.date >= :dateDebut)
+    AND (:dateFin IS NULL OR f.date <= :dateFin)
     AND (:qualificationPressentie IS NULL OR f.qualificationPressentie = :qualificationPressentie)
     AND (:statutTraitement IS NULL OR f.statutTraitement = :statutTraitement)
     AND (:statutsJustificatif IS NULL OR f.statutJustificatif IN :statutsJustificatif)
     ORDER BY f.date DESC
     """
   )
-  List<Flux> findAllWithFilters(
+  Page<Flux> findAllWithFilters(
     @Param("bienId") Long bienId,
+    @Param("exerciceId") Long exerciceId,
+    @Param("typeFlux") FluxType typeFlux,
+    @Param("categorie") FluxCategory categorie,
+    @Param("dateDebut") LocalDate dateDebut,
+    @Param("dateFin") LocalDate dateFin,
     @Param("qualificationPressentie") QualificationPressentie qualificationPressentie,
     @Param("statutTraitement") StatutTraitement statutTraitement,
-    @Param("statutsJustificatif") List<StatutJustificatif> statutsJustificatif
+    @Param("statutsJustificatif") List<StatutJustificatif> statutsJustificatif,
+    Pageable pageable
   );
 }
