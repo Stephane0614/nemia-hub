@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, Optional } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,10 +12,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 
 import { JustificatifApi } from '../../services/justificatif-api';
 import { JustificatifReferentialsResponse } from '../../models/justificatif-referentials-response';
+import { JustificatifResponse } from '../../models/justificatif-response';
 import { ReferentialItem } from '../../../flux/models/referential-item';
+
+export interface JustificatifDialogData {
+  justificatifId?: number;
+}
 
 @Component({
   selector: 'app-justificatif-form',
@@ -30,21 +36,27 @@ import { ReferentialItem } from '../../../flux/models/referential-item';
     MatButtonModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    MatDialogModule,
   ],
   templateUrl: './justificatif-form.html',
   styleUrl: './justificatif-form.scss',
 })
 export class JustificatifForm implements OnInit {
   private readonly fb = inject(FormBuilder);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly justificatifApi = inject(JustificatifApi);
   private readonly cdr = inject(ChangeDetectorRef);
+
+  // Injectés optionnellement — présents en mode dialog, absents en mode page
+  private readonly dialogRef = inject(MatDialogRef<JustificatifForm>, { optional: true });
+  private readonly dialogData = inject<JustificatifDialogData>(MAT_DIALOG_DATA, { optional: true });
+
+  // Injectés optionnellement — présents en mode page, absents en mode dialog
+  private readonly route = inject(ActivatedRoute, { optional: true });
+  private readonly router = inject(Router, { optional: true });
 
   form!: FormGroup;
   isEditMode = false;
   justificatifId: number | null = null;
-  returnTo: string | null = null;
 
   isLoading = false;
   isSubmitting = false;
@@ -52,6 +64,10 @@ export class JustificatifForm implements OnInit {
 
   typePieces: ReferentialItem[] = [];
   statutDocumentaires: ReferentialItem[] = [];
+
+  get isDialogMode(): boolean {
+    return this.dialogRef !== null;
+  }
 
   constructor() {
     registerLocaleData(localeFr);
@@ -61,13 +77,22 @@ export class JustificatifForm implements OnInit {
     this.initForm();
     this.loadReferentials();
 
-    const id = this.route.snapshot.paramMap.get('id');
-    this.returnTo = this.route.snapshot.queryParamMap.get('returnTo');
-
-    if (id) {
-      this.isEditMode = true;
-      this.justificatifId = Number(id);
-      this.loadJustificatif(this.justificatifId);
+    if (this.isDialogMode) {
+      // Mode dialog — id éventuel passé via MAT_DIALOG_DATA
+      const id = this.dialogData?.justificatifId;
+      if (id) {
+        this.isEditMode = true;
+        this.justificatifId = id;
+        this.loadJustificatif(id);
+      }
+    } else {
+      // Mode page — id lu depuis les params de route
+      const id = this.route?.snapshot.paramMap.get('id');
+      if (id) {
+        this.isEditMode = true;
+        this.justificatifId = Number(id);
+        this.loadJustificatif(this.justificatifId);
+      }
     }
   }
 
@@ -145,9 +170,14 @@ export class JustificatifForm implements OnInit {
         : this.justificatifApi.create(payload);
 
     request$.subscribe({
-      next: () => {
+      next: (justificatif: JustificatifResponse) => {
         this.isSubmitting = false;
-        this.navigateBack();
+        if (this.isDialogMode) {
+          // Ferme la dialog en renvoyant le justificatif créé
+          this.dialogRef!.close(justificatif);
+        } else {
+          this.router?.navigateByUrl('/');
+        }
       },
       error: (err) => {
         this.errorMessage = err?.error?.message ?? 'Une erreur est survenue.';
@@ -158,14 +188,10 @@ export class JustificatifForm implements OnInit {
   }
 
   onCancel(): void {
-    this.navigateBack();
-  }
-
-  private navigateBack(): void {
-    if (this.returnTo === 'flux-form') {
-      this.router.navigateByUrl('/flux/nouveau');
+    if (this.isDialogMode) {
+      this.dialogRef!.close(null);
     } else {
-      this.router.navigateByUrl('/');
+      this.router?.navigateByUrl('/');
     }
   }
 }

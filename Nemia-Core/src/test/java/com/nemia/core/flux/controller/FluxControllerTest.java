@@ -99,20 +99,35 @@ class FluxControllerTest {
   @Test
   void shouldReturnAllFlux() throws Exception {
     FluxResponse first = buildFluxResponse(
-      1L, LocalDate.of(2026, 4, 15), FluxType.RECETTE, "Loyer avril",
-      new BigDecimal("850.00"), FluxCategory.LOYER, PaymentMode.VIREMENT, "Payé le 5"
+      1L,
+      LocalDate.of(2026, 4, 15),
+      FluxType.RECETTE,
+      "Loyer avril",
+      new BigDecimal("850.00"),
+      FluxCategory.LOYER,
+      PaymentMode.VIREMENT,
+      "Payé le 5"
     );
     FluxResponse second = buildFluxResponse(
-      2L, LocalDate.of(2026, 4, 16), FluxType.DEPENSE, "Internet",
-      new BigDecimal("29.99"), FluxCategory.INTERNET, PaymentMode.PRELEVEMENT, null
+      2L,
+      LocalDate.of(2026, 4, 16),
+      FluxType.DEPENSE,
+      "Internet",
+      new BigDecimal("29.99"),
+      FluxCategory.INTERNET,
+      PaymentMode.PRELEVEMENT,
+      null
     );
 
-    com.nemia.core.flux.dto.FluxPageResponse pageResponse =
-      new com.nemia.core.flux.dto.FluxPageResponse(List.of(first, second), 0, 20, 2L, 1);
+    com.nemia.core.flux.dto.FluxPageResponse pageResponse = new com.nemia.core.flux.dto.FluxPageResponse(
+      List.of(first, second),
+      0,
+      20,
+      2L,
+      1
+    );
 
-    when(fluxService.findAllWithFilters(
-      null, null, null, null, null, null, null, null, null, 0, 20
-    )).thenReturn(pageResponse);
+    when(fluxService.findAllWithFilters(null, null, null, null, null, null, null, null, null, 0, 20)).thenReturn(pageResponse);
 
     mockMvc
       .perform(get("/api/flux"))
@@ -125,9 +140,7 @@ class FluxControllerTest {
       .andExpect(jsonPath("$.totalElements").value(2))
       .andExpect(jsonPath("$.totalPages").value(1));
 
-    verify(fluxService).findAllWithFilters(
-      null, null, null, null, null, null, null, null, null, 0, 20
-    );
+    verify(fluxService).findAllWithFilters(null, null, null, null, null, null, null, null, null, 0, 20);
   }
 
   @Test

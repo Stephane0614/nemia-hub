@@ -268,14 +268,9 @@
         <mat-hint>Optionnel — associer un justificatif existant</mat-hint>
       </mat-form-field>
 
-      <a
-        mat-stroked-button
-        routerLink="/justificatifs/nouveau"
-        [queryParams]="{ returnTo: 'flux-form' }"
-        class="justificatif-create-link"
-      >
+      <button mat-stroked-button type="button" class="justificatif-create-link" (click)="ouvrirDialogJustificatif()">
         + Créer un justificatif
-      </a>
+      </button>
     </div>
 
     <!-- Zone upload réservée -->

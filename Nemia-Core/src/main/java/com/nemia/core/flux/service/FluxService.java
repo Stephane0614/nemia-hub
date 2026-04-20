@@ -13,16 +13,15 @@ import com.nemia.core.flux.model.StatutJustificatif;
 import com.nemia.core.flux.model.StatutTraitement;
 import com.nemia.core.flux.repository.FluxRepository;
 import com.nemia.core.justificatif.repository.JustificatifRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,10 +44,7 @@ public class FluxService {
   }
 
   private List<String> validateFlux(Flux flux) {
-    fluxValidationService.validateBlocking(
-      flux.getType(),
-      flux.getCategorie()
-    );
+    fluxValidationService.validateBlocking(flux.getType(), flux.getCategorie());
     return fluxValidationService.computeWarnings(
       flux.getType(),
       flux.getCategorie(),
@@ -256,10 +252,7 @@ public class FluxService {
       pageable
     );
 
-    List<FluxResponse> contenu = resultPage.getContent()
-      .stream()
-      .map(this::mapToResponse)
-      .collect(Collectors.toList());
+    List<FluxResponse> contenu = resultPage.getContent().stream().map(this::mapToResponse).collect(Collectors.toList());
 
     return new FluxPageResponse(
       contenu,
@@ -269,6 +262,7 @@ public class FluxService {
       resultPage.getTotalPages()
     );
   }
+
   private void validateJustificatifId(Long justificatifId) {
     if (justificatifId != null && !justificatifRepository.existsById(justificatifId)) {
       throw new IllegalArgumentException("Justificatif introuvable avec l'id : " + justificatifId);
