@@ -116,6 +116,7 @@ public interface FluxRepository extends JpaRepository<Flux, Long> {
     @Param("statutsJustificatif") List<StatutJustificatif> statutsJustificatif,
     Pageable pageable
   );
+<<<<<<< HEAD
 
   // ── Synthèse par exercice ──
 
@@ -180,4 +181,6 @@ public interface FluxRepository extends JpaRepository<Flux, Long> {
       "GROUP BY f.qualificationPressentie"
   )
   List<Object[]> repartitionQualificationParExercice(@Param("exerciceId") Long exerciceId);
+=======
+>>>>>>> develop
 }
