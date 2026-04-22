@@ -1,0 +1,237 @@
+package com.nemia.core.exercice.controller;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.nemia.core.common.exception.ExerciceNotFoundException;
+import com.nemia.core.exercice.dto.ExerciceResponse;
+import com.nemia.core.exercice.dto.ExerciceSyntheseResponse;
+import com.nemia.core.exercice.model.NiveauCompletude;
+import com.nemia.core.exercice.model.StatutExercice;
+import com.nemia.core.flux.model.QualificationPressentie;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+@ExtendWith(MockitoExtension.class)
+class ExerciceSyntheseControllerTest {
+
+  @Mock
+  private com.nemia.core.exercice.service.ExerciceService exerciceService;
+
+  @InjectMocks
+  private ExerciceController exerciceController;
+
+  private MockMvc mockMvc;
+
+  @BeforeEach
+  void setup() {
+    mockMvc = MockMvcBuilders.standaloneSetup(exerciceController)
+      .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
+      .build();
+  }
+
+  // -------------------------------------------------------------------------
+  // Helpers
+  // -------------------------------------------------------------------------
+
+  private ExerciceSyntheseResponse buildSyntheseComplete() {
+    ExerciceSyntheseResponse.IdentiteExercice identite = new ExerciceSyntheseResponse.IdentiteExercice(
+      1L, "2026",
+      LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31),
+      StatutExercice.OUVERT, NiveauCompletude.MOYEN
+    );
+
+    List<ExerciceSyntheseResponse.RepartitionCategorie> repartitionRecettes = List.of(
+      new ExerciceSyntheseResponse.RepartitionCategorie("LOYER", "Loyer", new BigDecimal("10200.00"))
+    );
+
+    List<ExerciceSyntheseResponse.RepartitionCategorie> repartitionDepenses = List.of(
+      new ExerciceSyntheseResponse.RepartitionCategorie("ELECTRICITE", "Électricité", new BigDecimal("480.00")),
+      new ExerciceSyntheseResponse.RepartitionCategorie("ASSURANCE", "Assurance", new BigDecimal("360.00"))
+    );
+
+    List<ExerciceSyntheseResponse.RepartitionTypeFlux> repartitionTypes = List.of(
+      new ExerciceSyntheseResponse.RepartitionTypeFlux("RECETTE", 12L, new BigDecimal("10200.00")),
+      new ExerciceSyntheseResponse.RepartitionTypeFlux("DEPENSE", 24L, new BigDecimal("840.00")),
+      new ExerciceSyntheseResponse.RepartitionTypeFlux("MOUVEMENT_FINANCIER", 12L, new BigDecimal("6000.00"))
+    );
+
+    ExerciceSyntheseResponse.BlocFinancier financier = new ExerciceSyntheseResponse.BlocFinancier(
+      new BigDecimal("10200.00"),
+      new BigDecimal("840.00"),
+      48L,
+      repartitionRecettes,
+      repartitionDepenses,
+      repartitionTypes
+    );
+
+    // 24 dépenses total, 20 fournies → taux = 83.3%
+    ExerciceSyntheseResponse.BlocCompletude completude = new ExerciceSyntheseResponse.BlocCompletude(
+      3L, new BigDecimal("180.00"),
+      2L, new BigDecimal("500.00"),
+      1L, new BigDecimal("120.00"),
+      24L, 20L
+    );
+
+    List<ExerciceSyntheseResponse.RepartitionQualification> repartitionQual =
+      Arrays.stream(QualificationPressentie.values())
+        .map(q -> new ExerciceSyntheseResponse.RepartitionQualification(
+          q.name(), 0L, BigDecimal.ZERO
+        )).toList();
+
+    ExerciceSyntheseResponse.BlocQualification qualification =
+      new ExerciceSyntheseResponse.BlocQualification(repartitionQual);
+
+    return new ExerciceSyntheseResponse(identite, financier, completude, qualification);
+  }
+
+  private ExerciceSyntheseResponse buildSyntheseVide() {
+    ExerciceSyntheseResponse.IdentiteExercice identite = new ExerciceSyntheseResponse.IdentiteExercice(
+      2L, "2025",
+      LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31),
+      StatutExercice.CLOTURE, NiveauCompletude.COMPLET
+    );
+
+    ExerciceSyntheseResponse.BlocFinancier financier = new ExerciceSyntheseResponse.BlocFinancier(
+      BigDecimal.ZERO, BigDecimal.ZERO, 0L,
+      List.of(), List.of(), List.of()
+    );
+
+    ExerciceSyntheseResponse.BlocCompletude completude = new ExerciceSyntheseResponse.BlocCompletude(
+      0L, BigDecimal.ZERO,
+      0L, BigDecimal.ZERO,
+      0L, BigDecimal.ZERO,
+      0L, 0L
+    );
+
+    List<ExerciceSyntheseResponse.RepartitionQualification> repartitionQual =
+      Arrays.stream(QualificationPressentie.values())
+        .map(q -> new ExerciceSyntheseResponse.RepartitionQualification(
+          q.name(), 0L, BigDecimal.ZERO
+        )).toList();
+
+    ExerciceSyntheseResponse.BlocQualification qualification =
+      new ExerciceSyntheseResponse.BlocQualification(repartitionQual);
+
+    return new ExerciceSyntheseResponse(identite, financier, completude, qualification);
+  }
+
+  private ExerciceResponse buildExerciceResponse(Long id, String libelle) {
+    ExerciceResponse response = new ExerciceResponse();
+    response.setId(id);
+    response.setLibelleExercice(libelle);
+    response.setDateDebut(LocalDate.of(2026, 1, 1));
+    response.setDateFin(LocalDate.of(2026, 12, 31));
+    response.setStatutExercice(StatutExercice.OUVERT);
+    response.setNiveauCompletude(NiveauCompletude.FAIBLE);
+    response.setCreatedAt(LocalDateTime.of(2026, 1, 1, 0, 0));
+    response.setUpdatedAt(LocalDateTime.of(2026, 1, 1, 0, 0));
+    return response;
+  }
+
+  // -------------------------------------------------------------------------
+  // Tests GET /api/exercices/{id}/synthese
+  // -------------------------------------------------------------------------
+
+  @Test
+  void synthese_avecFluxVaries_retourneLesBlocsComplets() throws Exception {
+    when(exerciceService.getSynthese(1L)).thenReturn(buildSyntheseComplete());
+
+    mockMvc.perform(get("/api/exercices/{id}/synthese", 1L))
+      .andDo(print())
+      .andExpect(status().isOk())
+      // Identité
+      .andExpect(jsonPath("$.identite.libelle").value("2026"))
+      .andExpect(jsonPath("$.identite.statut").value("OUVERT"))
+      .andExpect(jsonPath("$.identite.niveauCompletude").value("MOYEN"))
+      // Financier
+      .andExpect(jsonPath("$.financier.totalRecettes").value(10200.00))
+      .andExpect(jsonPath("$.financier.totalDepenses").value(840.00))
+      .andExpect(jsonPath("$.financier.solde").value(9360.00))
+      .andExpect(jsonPath("$.financier.nombreFluxTotal").value(48))
+      .andExpect(jsonPath("$.financier.repartitionRecettes").isArray())
+      .andExpect(jsonPath("$.financier.repartitionRecettes.length()").value(1))
+      .andExpect(jsonPath("$.financier.repartitionRecettes[0].code").value("LOYER"))
+      .andExpect(jsonPath("$.financier.repartitionDepenses").isArray())
+      .andExpect(jsonPath("$.financier.repartitionDepenses.length()").value(2))
+      .andExpect(jsonPath("$.financier.repartitionTypeFlux").isArray())
+      .andExpect(jsonPath("$.financier.repartitionTypeFlux.length()").value(3))
+      // Complétude
+      .andExpect(jsonPath("$.completude.nombreFluxSansJustificatif").value(3))
+      .andExpect(jsonPath("$.completude.montantSansJustificatif").value(180.00))
+      .andExpect(jsonPath("$.completude.nombreFluxAArbitrer").value(2))
+      .andExpect(jsonPath("$.completude.nombreFluxARevoir").value(1))
+      .andExpect(jsonPath("$.completude.tauxJustificationGlobal").value(83.3))
+      // Qualification
+      .andExpect(jsonPath("$.qualification.repartition").isArray())
+      .andExpect(jsonPath("$.qualification.repartition.length()").value(QualificationPressentie.values().length));
+  }
+
+  @Test
+  void synthese_exerciceVide_retourneZerosPropres() throws Exception {
+    when(exerciceService.getSynthese(2L)).thenReturn(buildSyntheseVide());
+
+    mockMvc.perform(get("/api/exercices/{id}/synthese", 2L))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.identite.libelle").value("2025"))
+      .andExpect(jsonPath("$.financier.totalRecettes").value(0))
+      .andExpect(jsonPath("$.financier.totalDepenses").value(0))
+      .andExpect(jsonPath("$.financier.solde").value(0))
+      .andExpect(jsonPath("$.financier.nombreFluxTotal").value(0))
+      .andExpect(jsonPath("$.financier.repartitionRecettes").isEmpty())
+      .andExpect(jsonPath("$.financier.repartitionDepenses").isEmpty())
+      .andExpect(jsonPath("$.completude.nombreFluxSansJustificatif").value(0))
+      .andExpect(jsonPath("$.completude.tauxJustificationGlobal").value(0));
+  }
+
+  @Test
+  void synthese_exerciceInexistant_retourne404() throws Exception {
+    when(exerciceService.getSynthese(99L)).thenThrow(new ExerciceNotFoundException(99L));
+
+    mockMvc.perform(get("/api/exercices/{id}/synthese", 99L))
+      .andDo(print())
+      .andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.message").value("Exercice introuvable : 99"));
+  }
+
+  // -------------------------------------------------------------------------
+  // Tests GET /api/exercices/en-cours
+  // -------------------------------------------------------------------------
+
+  @Test
+  void enCours_exerciceTrouve_retourneExercice() throws Exception {
+    when(exerciceService.getExerciceEnCours()).thenReturn(buildExerciceResponse(1L, "2026"));
+
+    mockMvc.perform(get("/api/exercices/en-cours"))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.id").value(1))
+      .andExpect(jsonPath("$.libelleExercice").value("2026"))
+      .andExpect(jsonPath("$.statutExercice").value("OUVERT"));
+  }
+
+  @Test
+  void enCours_aucunExerciceOuvert_retourne404() throws Exception {
+    when(exerciceService.getExerciceEnCours()).thenThrow(new ExerciceNotFoundException(0L));
+
+    mockMvc.perform(get("/api/exercices/en-cours"))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+  }
+  
+}

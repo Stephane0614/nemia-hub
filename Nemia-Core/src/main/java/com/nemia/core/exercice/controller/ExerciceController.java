@@ -2,6 +2,7 @@ package com.nemia.core.exercice.controller;
 
 import com.nemia.core.exercice.dto.ExerciceRequest;
 import com.nemia.core.exercice.dto.ExerciceResponse;
+import com.nemia.core.exercice.dto.ExerciceSyntheseResponse;
 import com.nemia.core.exercice.service.ExerciceService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -29,9 +30,19 @@ public class ExerciceController {
     return exerciceService.findAll();
   }
 
+  @GetMapping("/en-cours")
+  public ExerciceResponse getExerciceEnCours() {
+    return exerciceService.getExerciceEnCours();
+  }
+
   @GetMapping("/{id}")
   public ExerciceResponse findById(@PathVariable Long id) {
     return exerciceService.findById(id);
+  }
+
+  @GetMapping("/{id}/synthese")
+  public ExerciceSyntheseResponse getSynthese(@PathVariable Long id) {
+    return exerciceService.getSynthese(id);
   }
 
   @PutMapping("/{id}")

@@ -116,4 +116,71 @@ public interface FluxRepository extends JpaRepository<Flux, Long> {
     @Param("statutsJustificatif") List<StatutJustificatif> statutsJustificatif,
     Pageable pageable
   );
+<<<<<<< HEAD
+
+  // ── Synthèse par exercice ──
+
+  @Query("SELECT COALESCE(SUM(f.montant), 0) FROM Flux f WHERE f.exerciceId = :exerciceId AND f.type = 'RECETTE'")
+  BigDecimal sumRecettesParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT COALESCE(SUM(f.montant), 0) FROM Flux f WHERE f.exerciceId = :exerciceId AND f.type = 'DEPENSE'")
+  BigDecimal sumDepensesParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT COUNT(f) FROM Flux f WHERE f.exerciceId = :exerciceId")
+  long countFluxParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query(
+    "SELECT f.categorie, COALESCE(SUM(f.montant), 0) FROM Flux f " +
+      "WHERE f.exerciceId = :exerciceId AND f.type = 'RECETTE' " +
+      "GROUP BY f.categorie ORDER BY SUM(f.montant) DESC"
+  )
+  List<Object[]> sumRecettesParCategorieEtExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query(
+    "SELECT f.categorie, COALESCE(SUM(f.montant), 0) FROM Flux f " +
+      "WHERE f.exerciceId = :exerciceId AND f.type = 'DEPENSE' " +
+      "GROUP BY f.categorie ORDER BY SUM(f.montant) DESC"
+  )
+  List<Object[]> sumDepensesParCategorieEtExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT f.type, COUNT(f), COALESCE(SUM(f.montant), 0) FROM Flux f " + "WHERE f.exerciceId = :exerciceId " + "GROUP BY f.type")
+  List<Object[]> repartitionParTypeEtExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT COUNT(f) FROM Flux f WHERE f.exerciceId = :exerciceId " + "AND f.statutJustificatif IN ('A_FOURNIR', 'INCOMPLET')")
+  long countSansJustificatifParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query(
+    "SELECT COALESCE(SUM(f.montant), 0) FROM Flux f WHERE f.exerciceId = :exerciceId " +
+      "AND f.statutJustificatif IN ('A_FOURNIR', 'INCOMPLET')"
+  )
+  BigDecimal sumMontantSansJustificatifParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT COUNT(f) FROM Flux f WHERE f.exerciceId = :exerciceId " + "AND f.qualificationPressentie = 'A_ARBITRER'")
+  long countAArbitrerParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query(
+    "SELECT COALESCE(SUM(f.montant), 0) FROM Flux f WHERE f.exerciceId = :exerciceId " + "AND f.qualificationPressentie = 'A_ARBITRER'"
+  )
+  BigDecimal sumMontantAArbitrerParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT COUNT(f) FROM Flux f WHERE f.exerciceId = :exerciceId " + "AND f.statutTraitement = 'A_REVOIR'")
+  long countARevoirParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT COALESCE(SUM(f.montant), 0) FROM Flux f WHERE f.exerciceId = :exerciceId " + "AND f.statutTraitement = 'A_REVOIR'")
+  BigDecimal sumMontantARevoirParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT COUNT(f) FROM Flux f WHERE f.exerciceId = :exerciceId AND f.type = 'DEPENSE'")
+  long countDepensesParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query("SELECT COUNT(f) FROM Flux f WHERE f.exerciceId = :exerciceId " + "AND f.type = 'DEPENSE' AND f.statutJustificatif = 'FOURNI'")
+  long countDepensesFournisParExercice(@Param("exerciceId") Long exerciceId);
+
+  @Query(
+    "SELECT f.qualificationPressentie, COUNT(f), COALESCE(SUM(f.montant), 0) FROM Flux f " +
+      "WHERE f.exerciceId = :exerciceId AND f.qualificationPressentie IS NOT NULL " +
+      "GROUP BY f.qualificationPressentie"
+  )
+  List<Object[]> repartitionQualificationParExercice(@Param("exerciceId") Long exerciceId);
+=======
+>>>>>>> develop
 }

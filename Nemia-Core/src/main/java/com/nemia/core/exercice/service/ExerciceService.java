@@ -4,12 +4,20 @@ import com.nemia.core.common.exception.ExerciceAlreadyExistsException;
 import com.nemia.core.common.exception.ExerciceNotFoundException;
 import com.nemia.core.exercice.dto.ExerciceRequest;
 import com.nemia.core.exercice.dto.ExerciceResponse;
+import com.nemia.core.exercice.dto.ExerciceSyntheseResponse;
 import com.nemia.core.exercice.model.Exercice;
 import com.nemia.core.exercice.model.NiveauCompletude;
 import com.nemia.core.exercice.model.StatutExercice;
 import com.nemia.core.exercice.repository.ExerciceRepository;
+import com.nemia.core.flux.model.FluxCategory;
+import com.nemia.core.flux.repository.FluxRepository;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,9 +28,11 @@ public class ExerciceService {
   private static final Logger logger = LoggerFactory.getLogger(ExerciceService.class);
 
   private final ExerciceRepository exerciceRepository;
+  private final FluxRepository fluxRepository;
 
-  public ExerciceService(ExerciceRepository exerciceRepository) {
+  public ExerciceService(ExerciceRepository exerciceRepository, FluxRepository fluxRepository) {
     this.exerciceRepository = exerciceRepository;
+    this.fluxRepository = fluxRepository;
   }
 
   public ExerciceResponse create(ExerciceRequest request) {
@@ -155,5 +165,125 @@ public class ExerciceService {
     if (value == null) return null;
     String trimmed = value.trim();
     return trimmed.isEmpty() ? null : trimmed;
+  }
+
+  public ExerciceSyntheseResponse getSynthese(Long id) {
+    Exercice exercice = exerciceRepository.findById(id).orElseThrow(() -> new ExerciceNotFoundException(id));
+
+    // -- Identité
+    ExerciceSyntheseResponse.IdentiteExercice identite = new ExerciceSyntheseResponse.IdentiteExercice(
+      exercice.getId(),
+      exercice.getLibelleExercice(),
+      exercice.getDateDebut(),
+      exercice.getDateFin(),
+      exercice.getStatutExercice(),
+      exercice.getNiveauCompletude()
+    );
+
+    // -- Financier
+    BigDecimal totalRecettes = fluxRepository.sumRecettesParExercice(id);
+    BigDecimal totalDepenses = fluxRepository.sumDepensesParExercice(id);
+    long nombreFluxTotal = fluxRepository.countFluxParExercice(id);
+
+    List<ExerciceSyntheseResponse.RepartitionCategorie> repartitionRecettes = fluxRepository
+      .sumRecettesParCategorieEtExercice(id)
+      .stream()
+      .map(row ->
+        new ExerciceSyntheseResponse.RepartitionCategorie(row[0].toString(), labelCategorie(row[0].toString()), (BigDecimal) row[1])
+      )
+      .toList();
+
+    List<ExerciceSyntheseResponse.RepartitionCategorie> repartitionDepenses = fluxRepository
+      .sumDepensesParCategorieEtExercice(id)
+      .stream()
+      .map(row ->
+        new ExerciceSyntheseResponse.RepartitionCategorie(row[0].toString(), labelCategorie(row[0].toString()), (BigDecimal) row[1])
+      )
+      .toList();
+
+    List<ExerciceSyntheseResponse.RepartitionTypeFlux> repartitionTypeFlux = fluxRepository
+      .repartitionParTypeEtExercice(id)
+      .stream()
+      .map(row -> new ExerciceSyntheseResponse.RepartitionTypeFlux(row[0].toString(), ((Number) row[1]).longValue(), (BigDecimal) row[2]))
+      .toList();
+
+    ExerciceSyntheseResponse.BlocFinancier financier = new ExerciceSyntheseResponse.BlocFinancier(
+      totalRecettes,
+      totalDepenses,
+      nombreFluxTotal,
+      repartitionRecettes,
+      repartitionDepenses,
+      repartitionTypeFlux
+    );
+
+    // -- Complétude
+    long nbSansJustificatif = fluxRepository.countSansJustificatifParExercice(id);
+    BigDecimal montantSansJustificatif = fluxRepository.sumMontantSansJustificatifParExercice(id);
+    long nbAArbitrer = fluxRepository.countAArbitrerParExercice(id);
+    BigDecimal montantAArbitrer = fluxRepository.sumMontantAArbitrerParExercice(id);
+    long nbARevoir = fluxRepository.countARevoirParExercice(id);
+    BigDecimal montantARevoir = fluxRepository.sumMontantARevoirParExercice(id);
+    long nbDepensesTotal = fluxRepository.countDepensesParExercice(id);
+    long nbDepensesFournis = fluxRepository.countDepensesFournisParExercice(id);
+
+    ExerciceSyntheseResponse.BlocCompletude completude = new ExerciceSyntheseResponse.BlocCompletude(
+      nbSansJustificatif,
+      montantSansJustificatif,
+      nbAArbitrer,
+      montantAArbitrer,
+      nbARevoir,
+      montantARevoir,
+      nbDepensesTotal,
+      nbDepensesFournis
+    );
+
+    // -- Qualification
+    // On s'assure que toutes les valeurs de l'enum sont présentes, même à zéro
+    Map<String, long[]> qualMap = fluxRepository
+      .repartitionQualificationParExercice(id)
+      .stream()
+      .collect(
+        Collectors.toMap(row -> row[0].toString(), row -> new long[] { ((Number) row[1]).longValue(), ((Number) row[2]).longValue() })
+      );
+
+    List<ExerciceSyntheseResponse.RepartitionQualification> repartitionQual = Arrays.stream(
+      com.nemia.core.flux.model.QualificationPressentie.values()
+    )
+      .map(q -> {
+        long[] vals = qualMap.getOrDefault(q.name(), new long[] { 0L, 0L });
+        return new ExerciceSyntheseResponse.RepartitionQualification(q.name(), vals[0], BigDecimal.valueOf(vals[1]));
+      })
+      .toList();
+
+    ExerciceSyntheseResponse.BlocQualification qualification = new ExerciceSyntheseResponse.BlocQualification(repartitionQual);
+
+    return new ExerciceSyntheseResponse(identite, financier, completude, qualification);
+  }
+
+  public ExerciceResponse getExerciceEnCours() {
+    LocalDate today = LocalDate.now();
+
+    // Priorité 1 : exercice OUVERT couvrant la date du jour
+    List<Exercice> couvrants = exerciceRepository.findByStatutAndDateCovering(StatutExercice.OUVERT, today);
+    if (!couvrants.isEmpty()) {
+      return mapToResponse(couvrants.get(0));
+    }
+
+    // Priorité 2 : dernier exercice OUVERT en fallback
+    List<Exercice> ouverts = exerciceRepository.findByStatutOrderByDateFinDesc(StatutExercice.OUVERT);
+    if (!ouverts.isEmpty()) {
+      return mapToResponse(ouverts.get(0));
+    }
+
+    // Aucun exercice OUVERT
+    throw new ExerciceNotFoundException(0L);
+  }
+
+  private String labelCategorie(String code) {
+    try {
+      return FluxCategory.valueOf(code).getLabel();
+    } catch (IllegalArgumentException e) {
+      return code;
+    }
   }
 }
