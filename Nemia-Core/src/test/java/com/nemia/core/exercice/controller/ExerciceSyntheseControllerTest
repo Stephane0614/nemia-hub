@@ -233,4 +233,5 @@ class ExerciceSyntheseControllerTest {
       .andDo(print())
       .andExpect(status().isNotFound());
   }
+  
 }
