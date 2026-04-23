@@ -4,6 +4,7 @@ import { fluxRoutes } from './features/flux/flux.routes';
 import { bienRoutes } from './features/bien/bien.routes';
 import { exerciceRoutes } from './features/exercice/exercice.routes';
 import { justificatifRoutes } from './features/justificatif/justificatif.routes';
+import { ExerciceSynthese } from './features/exercice/pages/exercice-synthese/exercice-synthese';
 
 export const routes: Routes = [
   {
@@ -25,6 +26,10 @@ export const routes: Routes = [
   {
     path: 'justificatifs',
     children: justificatifRoutes,
+  },
+  {
+    path: 'exercice',
+    component: ExerciceSynthese,
   },
   {
     path: '**',

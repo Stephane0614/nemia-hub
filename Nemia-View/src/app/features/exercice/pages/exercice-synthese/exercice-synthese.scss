@@ -1,0 +1,266 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.page-subtitle {
+  margin: 0;
+  color: #64748b;
+}
+
+.exercice-select-row {
+  margin-bottom: 20px;
+}
+
+.exercice-select {
+  width: 280px;
+}
+
+.state-card {
+  padding: 24px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+
+.state-card--error {
+  border-left: 4px solid #b91c1c;
+}
+
+.state-card--warn {
+  border-left: 4px solid #d97706;
+}
+
+.state-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.bloc-card {
+  padding: 24px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+
+.bloc-title {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.sous-titre {
+  margin: 20px 0 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ── Identité ──
+
+.identite-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.identite-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.identite-label {
+  font-size: 0.78rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.identite-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+// ── Métriques ──
+
+.metriques-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.metrique {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f8fafc;
+
+  &__label {
+    font-size: 0.78rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  &--recette {
+    background: #f0fdf4;
+  }
+  &--depense {
+    background: #fef2f2;
+  }
+  &--ok .metrique__value {
+    color: #15803d;
+  }
+  &--warn .metrique__value {
+    color: #b91c1c;
+  }
+  &--neutre {
+    background: #f8fafc;
+  }
+}
+
+// ── Répartition ──
+
+.repartition-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.repartition-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  font-size: 0.88rem;
+
+  &__label {
+    flex: 1;
+    font-weight: 500;
+    color: #1e293b;
+  }
+
+  &__count {
+    color: #64748b;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  &__montant {
+    font-weight: 600;
+    color: #b91c1c;
+    min-width: 120px;
+    text-align: right;
+
+    &--recette {
+      color: #15803d;
+    }
+  }
+}
+
+// ── Complétude ──
+
+.completude-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.alerte-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+
+  &__label {
+    font-size: 0.78rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+
+    &--big {
+      font-size: 1.6rem;
+    }
+  }
+
+  &__montant {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  &--active {
+    background: #fffbeb;
+    border-color: #fcd34d;
+
+    .alerte-item__value {
+      color: #d97706;
+    }
+  }
+
+  &--taux {
+    background: #f0f9ff;
+    border-color: #bae6fd;
+  }
+}
+
+// ── Badges ──
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &--ok {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  &--warn {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+  &--error {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  &--info {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  &--muted {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+}
