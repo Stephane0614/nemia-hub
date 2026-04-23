@@ -1,0 +1,181 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Synthèse exercice</h1>
+    <p class="page-subtitle">Vue financière et documentaire par exercice comptable.</p>
+  </div>
+</section>
+
+<!-- Select exercice -->
+<div class="exercice-select-row">
+  <mat-form-field appearance="outline" class="exercice-select">
+    <mat-label>Exercice</mat-label>
+    <mat-select [(ngModel)]="selectedExerciceId" (ngModelChange)="onExerciceChange()">
+      @for (ex of exercices; track ex.id) {
+      <mat-option [value]="ex.id">{{ ex.libelleExercice }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (isLoading) {
+<mat-card class="state-card">
+  <div class="state-content">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement...</p>
+  </div>
+</mat-card>
+} @if (!isLoading && aucunExerciceEnCours && !selectedExerciceId) {
+<mat-card class="state-card state-card--warn">
+  <p>Aucun exercice en cours détecté. Sélectionne un exercice dans la liste ci-dessus.</p>
+  <a mat-stroked-button routerLink="/exercices">Gérer les exercices</a>
+</mat-card>
+} @if (errorMessage) {
+<mat-card class="state-card state-card--error">
+  <p>{{ errorMessage }}</p>
+</mat-card>
+} @if (isLoadingSynthese) {
+<mat-card class="state-card">
+  <div class="state-content">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement de la synthèse...</p>
+  </div>
+</mat-card>
+} @if (synthese && !isLoadingSynthese) {
+
+<!-- Bloc identité -->
+<mat-card class="bloc-card">
+  <h2 class="bloc-title">Identité</h2>
+  <div class="identite-grid">
+    <div class="identite-item">
+      <span class="identite-label">Exercice</span>
+      <span class="identite-value">{{ synthese.identite.libelle }}</span>
+    </div>
+    <div class="identite-item">
+      <span class="identite-label">Période</span>
+      <span class="identite-value">
+        {{ formatDate(synthese.identite.dateDebut) }} → {{ formatDate(synthese.identite.dateFin) }}
+      </span>
+    </div>
+    <div class="identite-item">
+      <span class="identite-label">Statut</span>
+      <span
+        class="badge"
+        [class.badge--ok]="synthese.identite.statut === 'OUVERT'"
+        [class.badge--warn]="synthese.identite.statut === 'EN_PREPARATION_DE_CLOTURE'"
+        [class.badge--muted]="synthese.identite.statut === 'CLOTURE'"
+      >
+        {{ synthese.identite.statut }}
+      </span>
+    </div>
+    <div class="identite-item">
+      <span class="identite-label">Complétude</span>
+      <span
+        class="badge"
+        [class.badge--error]="synthese.identite.niveauCompletude === 'FAIBLE'"
+        [class.badge--warn]="synthese.identite.niveauCompletude === 'MOYEN'"
+        [class.badge--info]="synthese.identite.niveauCompletude === 'AVANCE'"
+        [class.badge--ok]="synthese.identite.niveauCompletude === 'COMPLET'"
+      >
+        {{ synthese.identite.niveauCompletude }}
+      </span>
+    </div>
+  </div>
+</mat-card>
+
+<!-- Bloc financier -->
+<mat-card class="bloc-card">
+  <h2 class="bloc-title">Financier</h2>
+  <div class="metriques-grid">
+    <div class="metrique metrique--recette">
+      <span class="metrique__label">Recettes</span>
+      <span class="metrique__value">{{ formatMontant(synthese.financier.totalRecettes) }}</span>
+    </div>
+    <div class="metrique metrique--depense">
+      <span class="metrique__label">Dépenses</span>
+      <span class="metrique__value">{{ formatMontant(synthese.financier.totalDepenses) }}</span>
+    </div>
+    <div
+      class="metrique"
+      [class.metrique--ok]="synthese.financier.solde >= 0"
+      [class.metrique--warn]="synthese.financier.solde < 0"
+    >
+      <span class="metrique__label">Solde</span>
+      <span class="metrique__value">{{ formatMontant(synthese.financier.solde) }}</span>
+    </div>
+    <div class="metrique metrique--neutre">
+      <span class="metrique__label">Opérations</span>
+      <span class="metrique__value">{{ synthese.financier.nombreFluxTotal }}</span>
+    </div>
+  </div>
+
+  @if (synthese.financier.repartitionDepenses.length > 0) {
+  <h3 class="sous-titre">Répartition des dépenses</h3>
+  <div class="repartition-list">
+    @for (item of synthese.financier.repartitionDepenses; track item.code) {
+    <div class="repartition-item">
+      <span class="repartition-item__label">{{ item.label }}</span>
+      <span class="repartition-item__montant">{{ formatMontant(item.montant) }}</span>
+    </div>
+    }
+  </div>
+  } @if (synthese.financier.repartitionRecettes.length > 0) {
+  <h3 class="sous-titre">Répartition des recettes</h3>
+  <div class="repartition-list">
+    @for (item of synthese.financier.repartitionRecettes; track item.code) {
+    <div class="repartition-item">
+      <span class="repartition-item__label">{{ item.label }}</span>
+      <span class="repartition-item__montant repartition-item__montant--recette">
+        {{ formatMontant(item.montant) }}
+      </span>
+    </div>
+    }
+  </div>
+  }
+</mat-card>
+
+<!-- Bloc complétude documentaire -->
+<mat-card class="bloc-card">
+  <h2 class="bloc-title">Complétude documentaire</h2>
+  <div class="completude-grid">
+    <div class="alerte-item" [class.alerte-item--active]="synthese.completude.nombreFluxSansJustificatif > 0">
+      <span class="alerte-item__label">Sans justificatif</span>
+      <span class="alerte-item__value"> {{ synthese.completude.nombreFluxSansJustificatif }} flux </span>
+      <span class="alerte-item__montant"> {{ formatMontant(synthese.completude.montantSansJustificatif) }} </span>
+    </div>
+
+    <div class="alerte-item" [class.alerte-item--active]="synthese.completude.nombreFluxAArbitrer > 0">
+      <span class="alerte-item__label">À arbitrer</span>
+      <span class="alerte-item__value"> {{ synthese.completude.nombreFluxAArbitrer }} flux </span>
+      <span class="alerte-item__montant"> {{ formatMontant(synthese.completude.montantAArbitrer) }} </span>
+    </div>
+
+    <div class="alerte-item" [class.alerte-item--active]="synthese.completude.nombreFluxARevoir > 0">
+      <span class="alerte-item__label">À revoir</span>
+      <span class="alerte-item__value"> {{ synthese.completude.nombreFluxARevoir }} flux </span>
+      <span class="alerte-item__montant"> {{ formatMontant(synthese.completude.montantARevoir) }} </span>
+    </div>
+
+    <div class="alerte-item alerte-item--taux">
+      <span class="alerte-item__label">Taux de justification</span>
+      <span class="alerte-item__value alerte-item__value--big">
+        {{ formatPourcent(synthese.completude.tauxJustificationGlobal) }}
+      </span>
+    </div>
+  </div>
+</mat-card>
+
+<!-- Bloc qualification pressentie -->
+@if (synthese.qualification.repartition.length > 0) {
+<mat-card class="bloc-card">
+  <h2 class="bloc-title">Qualification pressentie</h2>
+  <div class="repartition-list">
+    @for (item of synthese.qualification.repartition; track item.qualification) { @if (item.nombre > 0) {
+    <div class="repartition-item">
+      <span class="repartition-item__label">{{ item.qualification }}</span>
+      <span class="repartition-item__count">{{ item.nombre }} flux</span>
+      <span class="repartition-item__montant">{{ formatMontant(item.montant) }}</span>
+    </div>
+    } }
+  </div>
+</mat-card>
+} }

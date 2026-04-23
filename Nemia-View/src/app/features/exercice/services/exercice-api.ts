@@ -5,6 +5,7 @@ import { API_BASE_URL } from '../../../core/api/api.config';
 import { ExerciceRequest } from '../models/exercice-request';
 import { ExerciceResponse } from '../models/exercice-response';
 import { ExerciceReferentialsResponse } from '../models/exercice-referentials-response';
+import { ExerciceSyntheseResponse } from '../models/exercice-synthese-response';
 
 @Injectable({
   providedIn: 'root',
@@ -35,5 +36,13 @@ export class ExerciceApi {
 
   getReferentials(): Observable<ExerciceReferentialsResponse> {
     return this.http.get<ExerciceReferentialsResponse>(`${this.baseUrl}/referentials`);
+  }
+
+  getSynthese(id: number): Observable<ExerciceSyntheseResponse> {
+    return this.http.get<ExerciceSyntheseResponse>(`${this.baseUrl}/${id}/synthese`);
+  }
+
+  getEnCours(): Observable<ExerciceResponse> {
+    return this.http.get<ExerciceResponse>(`${this.baseUrl}/en-cours`);
   }
 }
