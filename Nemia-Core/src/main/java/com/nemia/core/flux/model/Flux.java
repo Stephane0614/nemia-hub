@@ -66,6 +66,8 @@ public class Flux {
 
   private Long justificatifId;
 
+  private Long travauxId;
+
   public Flux() {}
 
   @PrePersist
@@ -210,5 +212,13 @@ public class Flux {
 
   public void setJustificatifId(Long justificatifId) {
     this.justificatifId = justificatifId;
+  }
+
+  public Long getTravauxId() {
+    return travauxId;
+  }
+
+  public void setTravauxId(Long travauxId) {
+    this.travauxId = travauxId;
   }
 }
