@@ -1,0 +1,106 @@
+<section class="page-header">
+  <div>
+    <h1 class="page-title">Travaux</h1>
+    <p class="page-subtitle">Suivi des travaux et opérations immobilières.</p>
+  </div>
+  <a mat-flat-button routerLink="/travaux/nouveau">Créer des travaux</a>
+</section>
+
+<!-- Filtre bien -->
+<div class="filtre-row">
+  <mat-form-field appearance="outline" class="filtre-bien">
+    <mat-label>Filtrer par bien</mat-label>
+    <mat-select [(ngModel)]="selectedBienId" (ngModelChange)="onBienChange()">
+      <mat-option [value]="null">Tous les biens</mat-option>
+      @for (bien of biens; track bien.id) {
+      <mat-option [value]="bien.id">{{ bien.nomUsuel }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (isLoading) {
+<mat-card class="state-card">
+  <div class="state-content">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement des travaux...</p>
+  </div>
+</mat-card>
+} @else if (loadErrorMessage) {
+<mat-card class="state-card state-card--error">
+  <p>{{ loadErrorMessage }}</p>
+</mat-card>
+} @else if (travaux.length === 0) {
+<mat-card class="state-card">
+  <p>Aucun travaux enregistré.</p>
+  <a mat-flat-button routerLink="/travaux/nouveau">Créer les premiers travaux</a>
+</mat-card>
+} @else {
+<mat-card class="table-card">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Libellé</th>
+          <th>Bien</th>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Montant</th>
+          <th>Finalité</th>
+          <th>Qualification</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of travaux; track t.id) {
+        <tr>
+          <td class="cell-libelle">{{ t.libelleTravaux }}</td>
+          <td>{{ getBienNom(t.bienId) }}</td>
+          <td>{{ formatDate(t.dateDebut) }}</td>
+          <td>{{ formatDate(t.dateFin) }}</td>
+          <td>{{ t.montantTotal | number:'1.2-2' }} €</td>
+          <td>
+            <span
+              class="badge"
+              [class.badge--ok]="t.finalitePressentie === 'ENTRETIEN' || t.finalitePressentie === 'REMISE_EN_ETAT'"
+              [class.badge--info]="t.finalitePressentie === 'AMELIORATION' || t.finalitePressentie === 'CREATION'"
+              [class.badge--warn]="t.finalitePressentie === 'REPARATION'"
+              [class.badge--muted]="t.finalitePressentie === 'A_ARBITRER'"
+            >
+              {{ t.finalitePressentie }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="badge"
+              [class.badge--ok]="t.qualificationPressentie === 'CHARGE_COURANTE'"
+              [class.badge--info]="t.qualificationPressentie === 'IMMOBILISATION'"
+              [class.badge--warn]="t.qualificationPressentie === 'A_ARBITRER' || t.qualificationPressentie === 'MIXTE_OU_A_VENTILER'"
+              [class.badge--muted]="t.qualificationPressentie === 'HORS_RESULTAT' || t.qualificationPressentie === 'NON_APPLICABLE'"
+            >
+              {{ t.qualificationPressentie }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="badge"
+              [class.badge--ok]="t.statutTravaux === 'VALIDE'"
+              [class.badge--info]="t.statutTravaux === 'QUALIFIE'"
+              [class.badge--warn]="t.statutTravaux === 'A_REVOIR'"
+              [class.badge--muted]="t.statutTravaux === 'BRUT'"
+            >
+              {{ t.statutTravaux }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <a mat-button [routerLink]="['/travaux', t.id, 'modifier']">Modifier</a>
+            <button mat-stroked-button type="button" (click)="deleteTravaux(t.id)">Supprimer</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</mat-card>
+}

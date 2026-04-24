@@ -23,6 +23,9 @@ import { DatePipe } from '@angular/common';
 import { JustificatifApi } from '../../../justificatif/services/justificatif-api';
 import { JustificatifResponse } from '../../../justificatif/models/justificatif-response';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { TravauxApi } from '../../../travaux/services/travaux-api';
+import { TravauxResponse } from '../../../travaux/models/travaux-response';
+import { TravauxForm, TravauxDialogData } from '../../../travaux/pages/travaux-form/travaux-form';
 import {
   JustificatifForm,
   JustificatifDialogData,
@@ -60,6 +63,10 @@ export class FluxForm implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly bienApi = inject(BienApi);
   private readonly dialog = inject(MatDialog);
+  readonly isEditMode = computed(() => this.fluxId() !== null);
+  private readonly exerciceApi = inject(ExerciceApi);
+  private readonly justificatifApi = inject(JustificatifApi);
+  private readonly travauxApi = inject(TravauxApi);
 
   serverValidationErrors: Record<string, string> = {};
   loadErrorMessage = '';
@@ -67,6 +74,8 @@ export class FluxForm implements OnInit {
   isLoading = false;
   isSubmitting = false;
   submitWarnings: string[] = [];
+  travaux: TravauxResponse[] = [];
+  travauxLoading = false;
 
   fluxTypes: { code: string; label: string }[] = [];
   fluxCategories: { code: string; label: string }[] = [];
@@ -81,15 +90,12 @@ export class FluxForm implements OnInit {
   justificatifsLoading = false;
   exercicesLoading = false;
   biensLoading = false;
+  fluxCreatedId: number | null = null;
 
   readonly fluxId = computed(() => {
     const id = this.route.snapshot.paramMap.get('id');
     return id ? Number(id) : null;
   });
-
-  readonly isEditMode = computed(() => this.fluxId() !== null);
-  private readonly exerciceApi = inject(ExerciceApi);
-  private readonly justificatifApi = inject(JustificatifApi);
 
   readonly form = this.formBuilder.group({
     date: [null as Date | null, Validators.required],
@@ -107,6 +113,7 @@ export class FluxForm implements OnInit {
     exerciceId: [null as number | null],
     commentaire: ['', Validators.maxLength(500)],
     justificatifId: [null as number | null],
+    travauxId: [null as number | null],
   });
 
   ngOnInit(): void {
@@ -155,6 +162,18 @@ export class FluxForm implements OnInit {
           },
           error: () => {
             this.justificatifsLoading = false;
+            this.cdr.detectChanges();
+          },
+        });
+        this.travauxLoading = true;
+        this.travauxApi.getAll().subscribe({
+          next: (travaux) => {
+            this.travaux = travaux;
+            this.travauxLoading = false;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.travauxLoading = false;
             this.cdr.detectChanges();
           },
         });
@@ -208,53 +227,42 @@ export class FluxForm implements OnInit {
 
     const payload = this.buildPayload();
 
-    if (this.isEditMode()) {
-      const fluxId = this.fluxId();
+    // Si flux déjà créé (après warning en mode création) → update
+    const effectiveId = this.fluxId() ?? this.fluxCreatedId;
+    const effectiveEditMode = this.isEditMode() || this.fluxCreatedId !== null;
 
-      if (fluxId === null) {
-        return;
-      }
-
-      this.fluxApi.update(fluxId, payload).subscribe({
+    if (effectiveEditMode && effectiveId) {
+      this.fluxApi.update(effectiveId, payload).subscribe({
         next: (fluxResponse) => {
           this.isSubmitting = false;
           this.handleSaveSuccess(fluxResponse.warnings);
-          console.log('Flux mis à jour avec succès');
         },
         error: (error: HttpErrorResponse) => {
           this.isSubmitting = false;
           const apiError = error.error as ApiErrorResponse | undefined;
-
           if (apiError?.validationErrors) {
             this.handleSaveValidationError(apiError.validationErrors);
             return;
           }
-
           this.handleUnexpectedSubmitError();
-          console.error('Erreur lors de la mise à jour du flux', error);
         },
       });
-
       return;
     }
 
     this.fluxApi.create(payload).subscribe({
       next: (fluxResponse) => {
         this.isSubmitting = false;
-        this.handleSaveSuccess(fluxResponse.warnings);
-        console.log('Flux créé avec succès');
+        this.handleSaveSuccess(fluxResponse.warnings, fluxResponse.id);
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting = false;
         const apiError = error.error as ApiErrorResponse | undefined;
-
         if (apiError?.validationErrors) {
           this.handleSaveValidationError(apiError.validationErrors);
           return;
         }
-
         this.handleUnexpectedSubmitError();
-        console.error('Erreur lors de la création du flux', error);
       },
     });
   }
@@ -278,6 +286,7 @@ export class FluxForm implements OnInit {
       bienId: rawValue.bienId ? Number(rawValue.bienId) : null,
       exerciceId: rawValue.exerciceId ? Number(rawValue.exerciceId) : null,
       justificatifId: rawValue.justificatifId ? Number(rawValue.justificatifId) : null,
+      travauxId: rawValue.travauxId ? Number(rawValue.travauxId) : null,
     };
   }
 
@@ -311,13 +320,16 @@ export class FluxForm implements OnInit {
     this.serverValidationErrors = errors ?? {};
   }
 
-  private handleSaveSuccess(warnings: string[]): void {
+  private handleSaveSuccess(warnings: string[], createdId?: number): void {
     this.serverValidationErrors = {};
     this.submitErrorMessage = '';
     this.submitWarnings = [];
 
     if (warnings.length > 0) {
       this.submitWarnings = warnings;
+      if (!this.isEditMode() && createdId) {
+        this.fluxCreatedId = createdId;
+      }
       this.cdr.detectChanges();
       return;
     }
@@ -370,6 +382,7 @@ export class FluxForm implements OnInit {
 
   confirmAndRedirect(): void {
     this.submitWarnings = [];
+    this.fluxCreatedId = null;
     this.form.reset();
     this.router.navigateByUrl('/flux');
   }
@@ -407,5 +420,28 @@ export class FluxForm implements OnInit {
         },
       });
     });
+  }
+
+  ouvrirDialogTravaux(): void {
+    const dialogRef = this.dialog.open(TravauxForm, {
+      width: '720px',
+      disableClose: false,
+      data: {} as TravauxDialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((travaux: TravauxResponse | null) => {
+      if (!travaux) return;
+      this.travauxApi.getAll().subscribe({
+        next: (list) => {
+          this.travaux = list;
+          this.form.patchValue({ travauxId: travaux.id });
+          this.cdr.detectChanges();
+        },
+      });
+    });
+  }
+
+  formatTravauxLabel(t: TravauxResponse): string {
+    return `${t.libelleTravaux} — ${t.montantTotal.toLocaleString('fr-FR')} €`;
   }
 }
