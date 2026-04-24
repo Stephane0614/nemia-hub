@@ -25,4 +25,5 @@ export interface FluxRequest {
   bienId?: number | null;
   exerciceId?: number | null;
   justificatifId?: number | null;
+  travauxId: number | null;
 }

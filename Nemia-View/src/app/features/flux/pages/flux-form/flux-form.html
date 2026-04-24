@@ -273,6 +273,27 @@
       </button>
     </div>
 
+    <!-- Travaux rattachés -->
+    <div class="justificatif-block field-span-2">
+      <mat-form-field appearance="outline" class="justificatif-select">
+        <mat-label>Travaux rattachés</mat-label>
+        <mat-select formControlName="travauxId">
+          @if (travauxLoading) {
+          <mat-option disabled>Chargement...</mat-option>
+          } @else {
+          <mat-option [value]="null">— Aucun travaux sélectionné</mat-option>
+          @for (t of travaux; track t.id) {
+          <mat-option [value]="t.id">{{ formatTravauxLabel(t) }}</mat-option>
+          } }
+        </mat-select>
+        <mat-hint>Optionnel — associer des travaux existants</mat-hint>
+      </mat-form-field>
+
+      <button mat-stroked-button type="button" class="justificatif-create-link" (click)="ouvrirDialogTravaux()">
+        + Créer des travaux
+      </button>
+    </div>
+
     <!-- Zone upload réservée -->
     <div class="upload-reserved field-span-2">
       <span class="upload-reserved__icon">📎</span>

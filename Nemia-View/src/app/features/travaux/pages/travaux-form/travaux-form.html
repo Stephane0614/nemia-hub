@@ -1,0 +1,143 @@
+<div [class.page-container]="!isDialogMode">
+  @if (isDialogMode) {
+  <h2 mat-dialog-title>{{ isEditMode ? 'Modifier les travaux' : 'Nouveaux travaux' }}</h2>
+  } @if (!isDialogMode) {
+  <section class="page-header">
+    <div>
+      <h1 class="page-title">{{ isEditMode ? 'Modifier les travaux' : 'Nouveaux travaux' }}</h1>
+      <p class="page-subtitle">Renseigne les informations des travaux.</p>
+    </div>
+  </section>
+  }
+
+  <ng-container *ngTemplateOutlet="formContent"></ng-container>
+</div>
+
+<ng-template #formContent>
+  @if (isLoading) {
+  <div class="loading-container">
+    <mat-spinner diameter="40" />
+  </div>
+  } @if (!isLoading) { @if (isDialogMode) {
+  <mat-dialog-content>
+    <ng-container *ngTemplateOutlet="formInner"></ng-container>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button type="button" (click)="onCancel()">Annuler</button>
+    <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
+    </button>
+  </mat-dialog-actions>
+  } @if (!isDialogMode) {
+  <mat-card class="form-card">
+    <mat-card-content>
+      <ng-container *ngTemplateOutlet="formInner"></ng-container>
+      @if (errorMessage) {
+      <p class="error-message">{{ errorMessage }}</p>
+      }
+      <div class="form-actions">
+        <button mat-stroked-button type="button" (click)="onCancel()">Annuler</button>
+        <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  } }
+</ng-template>
+
+<ng-template #formInner>
+  <form [formGroup]="form">
+    <div class="form-grid">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Libellé *</mat-label>
+        <input matInput formControlName="libelleTravaux" maxlength="200" />
+        @if (form.get('libelleTravaux')?.invalid && form.get('libelleTravaux')?.touched) {
+        <mat-error>Le libellé est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Bien rattaché *</mat-label>
+        <mat-select formControlName="bienId">
+          @for (bien of biens; track bien.id) {
+          <mat-option [value]="bien.id">{{ bien.nomUsuel }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('bienId')?.invalid && form.get('bienId')?.touched) {
+        <mat-error>Le bien est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Montant total *</mat-label>
+        <input matInput type="number" step="0.01" formControlName="montantTotal" />
+        @if (form.get('montantTotal')?.invalid && form.get('montantTotal')?.touched) {
+        <mat-error>Le montant est obligatoire et doit être positif</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Finalité pressentie *</mat-label>
+        <mat-select formControlName="finalitePressentie">
+          @for (item of finalitesPressenties; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('finalitePressentie')?.invalid && form.get('finalitePressentie')?.touched) {
+        <mat-error>La finalité est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Qualification pressentie *</mat-label>
+        <mat-select formControlName="qualificationPressentie">
+          @for (item of qualificationsPressenties; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('qualificationPressentie')?.invalid && form.get('qualificationPressentie')?.touched) {
+        <mat-error>La qualification est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut *</mat-label>
+        <mat-select formControlName="statutTravaux">
+          @for (item of statutsTravaux; track item.code) {
+          <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('statutTravaux')?.invalid && form.get('statutTravaux')?.touched) {
+        <mat-error>Le statut est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date début</mat-label>
+        <input matInput [matDatepicker]="pickerDebut" formControlName="dateDebut" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerDebut" />
+        <mat-datepicker #pickerDebut />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date fin</mat-label>
+        <input matInput [matDatepicker]="pickerFin" formControlName="dateFin" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerFin" />
+        <mat-datepicker #pickerFin />
+        @if (form.errors?.['dateFinInvalide'] && form.get('dateFin')?.touched) {
+        <mat-error>La date de fin doit être après la date de début</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput formControlName="commentaire" rows="3" maxlength="500"></textarea>
+      </mat-form-field>
+    </div>
+
+    @if (errorMessage && isDialogMode) {
+    <p class="error-message">{{ errorMessage }}</p>
+    }
+  </form>
+</ng-template>

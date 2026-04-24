@@ -29,4 +29,5 @@ export interface FluxResponse {
   exerciceId: number | null;
   warnings: string[];
   justificatifId?: number | null;
+  travauxId: number | null;
 }
