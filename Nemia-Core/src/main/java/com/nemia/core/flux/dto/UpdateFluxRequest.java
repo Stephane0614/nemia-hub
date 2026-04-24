@@ -50,6 +50,8 @@ public class UpdateFluxRequest {
 
   private StatutTraitement statutTraitement;
 
+  private Long travauxId;
+
   @Size(max = 500)
   private String commentaire;
 
@@ -165,5 +167,13 @@ public class UpdateFluxRequest {
 
   public void setStatutTraitement(StatutTraitement statutTraitement) {
     this.statutTraitement = statutTraitement;
+  }
+
+  public Long getTravauxId() {
+    return travauxId;
+  }
+
+  public void setTravauxId(Long travauxId) {
+    this.travauxId = travauxId;
   }
 }
