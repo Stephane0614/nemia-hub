@@ -43,6 +43,8 @@ public class FluxResponse {
 
   private Long travauxId;
 
+  private Long mobilierId;
+
   public FluxResponse() {}
 
   public Long getId() {
@@ -195,5 +197,13 @@ public class FluxResponse {
 
   public void setTravauxId(Long travauxId) {
     this.travauxId = travauxId;
+  }
+
+  public Long getMobilierId() {
+    return mobilierId;
+  }
+
+  public void setMobilierId(Long mobilierId) {
+    this.mobilierId = mobilierId;
   }
 }
