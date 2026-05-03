@@ -13,6 +13,7 @@ import com.nemia.core.flux.model.StatutJustificatif;
 import com.nemia.core.flux.model.StatutTraitement;
 import com.nemia.core.flux.repository.FluxRepository;
 import com.nemia.core.justificatif.repository.JustificatifRepository;
+import com.nemia.core.mobilier.repository.MobilierRepository;
 import com.nemia.core.travaux.repository.TravauxRepository;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -34,17 +35,20 @@ public class FluxService {
   private final FluxValidationService fluxValidationService;
   private final JustificatifRepository justificatifRepository;
   private final TravauxRepository travauxRepository;
+  private final MobilierRepository mobilierRepository;
 
   public FluxService(
     FluxRepository fluxRepository,
     FluxValidationService fluxValidationService,
     JustificatifRepository justificatifRepository,
-    TravauxRepository travauxRepository
+    TravauxRepository travauxRepository,
+    MobilierRepository mobilierRepository
   ) {
     this.fluxRepository = fluxRepository;
     this.fluxValidationService = fluxValidationService;
     this.justificatifRepository = justificatifRepository;
     this.travauxRepository = travauxRepository;
+    this.mobilierRepository = mobilierRepository;
   }
 
   private List<String> validateFlux(Flux flux) {
@@ -64,6 +68,7 @@ public class FluxService {
     mapCreateRequestToEntity(request, flux);
     validateJustificatifId(flux.getJustificatifId());
     validateTravauxId(flux.getTravauxId());
+    validateMobilierId(flux.getMobilierId());
     List<String> warnings = validateFlux(flux);
     Flux savedFlux = fluxRepository.save(flux);
     FluxResponse response = mapToResponse(savedFlux);
@@ -99,6 +104,7 @@ public class FluxService {
     mapUpdateRequestToEntity(request, flux);
     validateJustificatifId(flux.getJustificatifId());
     validateTravauxId(flux.getTravauxId());
+    validateMobilierId(flux.getMobilierId());
     List<String> warnings = validateFlux(flux);
     Flux updatedFlux = fluxRepository.save(flux);
     FluxResponse response = mapToResponse(updatedFlux);
@@ -137,6 +143,7 @@ public class FluxService {
     flux.setQualificationPressentie(request.getQualificationPressentie());
     flux.setStatutTraitement(request.getStatutTraitement());
     flux.setTravauxId(request.getTravauxId());
+    flux.setMobilierId(request.getMobilierId());
   }
 
   private void mapUpdateRequestToEntity(UpdateFluxRequest request, Flux flux) {
@@ -155,6 +162,7 @@ public class FluxService {
     flux.setQualificationPressentie(request.getQualificationPressentie());
     flux.setStatutTraitement(request.getStatutTraitement());
     flux.setTravauxId(request.getTravauxId());
+    flux.setMobilierId(request.getMobilierId());
   }
 
   private FluxResponse mapToResponse(Flux flux) {
@@ -177,6 +185,7 @@ public class FluxService {
     response.setQualificationPressentie(flux.getQualificationPressentie());
     response.setStatutTraitement(flux.getStatutTraitement());
     response.setTravauxId(flux.getTravauxId());
+    response.setMobilierId(flux.getMobilierId());
 
     return response;
   }
@@ -281,6 +290,12 @@ public class FluxService {
   private void validateTravauxId(Long travauxId) {
     if (travauxId != null && !travauxRepository.existsById(travauxId)) {
       throw new IllegalArgumentException("Travaux introuvable avec l'id : " + travauxId);
+    }
+  }
+
+  private void validateMobilierId(Long mobilierId) {
+    if (mobilierId != null && !mobilierRepository.existsById(mobilierId)) {
+      throw new IllegalArgumentException("Mobilier introuvable avec l'id : " + mobilierId);
     }
   }
 }

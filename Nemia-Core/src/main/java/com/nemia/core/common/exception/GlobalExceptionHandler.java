@@ -152,4 +152,16 @@ public class GlobalExceptionHandler {
     );
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
   }
+
+  @ExceptionHandler(MobilierNotFoundException.class)
+  public ResponseEntity<ApiErrorResponse> handleMobilierNotFound(MobilierNotFoundException ex, HttpServletRequest request) {
+    ApiErrorResponse errorResponse = new ApiErrorResponse(
+      LocalDateTime.now(),
+      HttpStatus.NOT_FOUND.value(),
+      HttpStatus.NOT_FOUND.name(),
+      ex.getMessage(),
+      request.getRequestURI()
+    );
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+  }
 }
