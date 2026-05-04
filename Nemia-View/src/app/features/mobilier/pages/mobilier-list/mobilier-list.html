@@ -13,100 +13,106 @@
     <mat-select [(ngModel)]="selectedBienId" (ngModelChange)="onBienChange()">
       <mat-option [value]="null">Tous les biens</mat-option>
       @for (bien of biens; track bien.id) {
-        <mat-option [value]="bien.id">{{ bien.nomUsuel }}</mat-option>
+      <mat-option [value]="bien.id">{{ bien.nomUsuel }}</mat-option>
       }
     </mat-select>
   </mat-form-field>
 </div>
 
 @if (isLoading) {
-  <mat-card class="state-card">
-    <div class="state-content">
-      <mat-spinner diameter="36"></mat-spinner>
-      <p>Chargement du mobilier...</p>
-    </div>
-  </mat-card>
+<mat-card class="state-card">
+  <div class="state-content">
+    <mat-spinner diameter="36"></mat-spinner>
+    <p>Chargement du mobilier...</p>
+  </div>
+</mat-card>
 } @else if (loadErrorMessage) {
-  <mat-card class="state-card state-card--error">
-    <p>{{ loadErrorMessage }}</p>
-  </mat-card>
+<mat-card class="state-card state-card--error">
+  <p>{{ loadErrorMessage }}</p>
+</mat-card>
 } @else if (mobiliers.length === 0) {
-  <mat-card class="state-card">
-    <p>Aucun élément de mobilier enregistré.</p>
-    <a mat-flat-button routerLink="/mobilier/nouveau">Ajouter le premier élément</a>
-  </mat-card>
+<mat-card class="state-card">
+  <p>Aucun élément de mobilier enregistré.</p>
+  <a mat-flat-button routerLink="/mobilier/nouveau">Ajouter le premier élément</a>
+</mat-card>
 } @else {
-  <mat-card class="table-card">
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Désignation</th>
-            <th>Bien</th>
-            <th>Date acquisition</th>
-            <th>Montant</th>
-            <th>Qté</th>
-            <th>Catégorie</th>
-            <th>État</th>
-            <th>Qualification</th>
-            <th>Statut</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (m of mobiliers; track m.id) {
-            <tr>
-              <td class="cell-libelle">{{ m.designation }}</td>
-              <td>{{ getBienNom(m.bienId) }}</td>
-              <td>{{ formatDate(m.dateAcquisition) }}</td>
-              <td>{{ m.montant | number:'1.2-2' }} €</td>
-              <td>{{ m.quantite ?? 1 }}</td>
-              <td>
-                <span class="badge"
-                  [class.badge--info]="m.categorieMobilier === 'MEUBLE' || m.categorieMobilier === 'EQUIPEMENT'"
-                  [class.badge--ok]="m.categorieMobilier === 'LITERIE'"
-                  [class.badge--warn]="m.categorieMobilier === 'ELECTROMENAGER'"
-                  [class.badge--muted]="m.categorieMobilier === 'DECORATION' || m.categorieMobilier === 'AUTRE'">
-                  {{ m.categorieMobilier }}
-                </span>
-              </td>
-              <td>
-                <span class="badge"
-                  [class.badge--ok]="m.etatUsage === 'NEUF'"
-                  [class.badge--info]="m.etatUsage === 'REMPLACEMENT'"
-                  [class.badge--warn]="m.etatUsage === 'OCCASION'"
-                  [class.badge--muted]="m.etatUsage === 'INDETERMINE' || !m.etatUsage">
-                  {{ m.etatUsage ?? '—' }}
-                </span>
-              </td>
-              <td>
-                <span class="badge"
-                  [class.badge--ok]="m.qualificationPressentie === 'CHARGE_COURANTE'"
-                  [class.badge--info]="m.qualificationPressentie === 'IMMOBILISATION'"
-                  [class.badge--warn]="m.qualificationPressentie === 'A_ARBITRER' || m.qualificationPressentie === 'MIXTE_OU_A_VENTILER'"
-                  [class.badge--muted]="m.qualificationPressentie === 'HORS_RESULTAT' || m.qualificationPressentie === 'NON_APPLICABLE'">
-                  {{ m.qualificationPressentie }}
-                </span>
-              </td>
-              <td>
-                <span class="badge"
-                  [class.badge--ok]="m.statutMobilier === 'VALIDE'"
-                  [class.badge--info]="m.statutMobilier === 'QUALIFIE'"
-                  [class.badge--warn]="m.statutMobilier === 'A_REVOIR'"
-                  [class.badge--muted]="m.statutMobilier === 'BRUT'">
-                  {{ m.statutMobilier }}
-                </span>
-              </td>
-              <td class="actions-cell">
-                <a mat-button [routerLink]="['/mobilier', m.id, 'modifier']">Modifier</a>
-                <button mat-stroked-button type="button" (click)="deleteMobilier(m.id)">
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  </mat-card>
+<mat-card class="table-card">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Désignation</th>
+          <th>Bien</th>
+          <th>Date acquisition</th>
+          <th>Montant</th>
+          <th>Qté</th>
+          <th>Catégorie</th>
+          <th>État</th>
+          <th>Qualification</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of mobiliers; track m.id) {
+        <tr>
+          <td class="cell-libelle">{{ m.designation }}</td>
+          <td>{{ getBienNom(m.bienId) }}</td>
+          <td>{{ formatDate(m.dateAcquisition) }}</td>
+          <td>{{ m.montant | number:'1.2-2' }} €</td>
+          <td>{{ m.quantite ?? 1 }}</td>
+          <td>
+            <span
+              class="badge"
+              [class.badge--info]="m.categorieMobilier === 'MEUBLE' || m.categorieMobilier === 'EQUIPEMENT'"
+              [class.badge--ok]="m.categorieMobilier === 'LITERIE'"
+              [class.badge--warn]="m.categorieMobilier === 'ELECTROMENAGER'"
+              [class.badge--muted]="m.categorieMobilier === 'DECORATION' || m.categorieMobilier === 'AUTRE'"
+            >
+              {{ m.categorieMobilier }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="badge"
+              [class.badge--ok]="m.etatUsage === 'NEUF'"
+              [class.badge--info]="m.etatUsage === 'REMPLACEMENT'"
+              [class.badge--warn]="m.etatUsage === 'OCCASION'"
+              [class.badge--muted]="m.etatUsage === 'INDETERMINE' || !m.etatUsage"
+            >
+              {{ m.etatUsage ?? '—' }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="badge"
+              [class.badge--ok]="m.qualificationPressentie === 'CHARGE_COURANTE'"
+              [class.badge--info]="m.qualificationPressentie === 'IMMOBILISATION'"
+              [class.badge--warn]="m.qualificationPressentie === 'A_ARBITRER' || m.qualificationPressentie === 'MIXTE_OU_A_VENTILER'"
+              [class.badge--muted]="m.qualificationPressentie === 'HORS_RESULTAT' || m.qualificationPressentie === 'NON_APPLICABLE'"
+            >
+              {{ m.qualificationPressentie }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="badge"
+              [class.badge--ok]="m.statutMobilier === 'VALIDE'"
+              [class.badge--info]="m.statutMobilier === 'QUALIFIE'"
+              [class.badge--warn]="m.statutMobilier === 'A_REVOIR'"
+              [class.badge--muted]="m.statutMobilier === 'BRUT'"
+            >
+              {{ m.statutMobilier }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <a mat-button [routerLink]="['/mobilier', m.id, 'modifier']">Modifier</a>
+            <button mat-stroked-button type="button" (click)="deleteMobilier(m.id)">Supprimer</button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</mat-card>
 }

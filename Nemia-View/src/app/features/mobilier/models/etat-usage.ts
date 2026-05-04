@@ -1,5 +1,1 @@
-export type EtatUsage =
-  | 'NEUF'
-  | 'OCCASION'
-  | 'REMPLACEMENT'
-  | 'INDETERMINE';
+export type EtatUsage = 'NEUF' | 'OCCASION' | 'REMPLACEMENT' | 'INDETERMINE';

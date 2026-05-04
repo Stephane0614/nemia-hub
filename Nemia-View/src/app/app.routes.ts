@@ -38,9 +38,9 @@ export const routes: Routes = [
     children: travauxRoutes,
   },
   {
-  path: 'mobilier',
-  children: mobilierRoutes,
-},
+    path: 'mobilier',
+    children: mobilierRoutes,
+  },
   {
     path: '**',
     redirectTo: '',

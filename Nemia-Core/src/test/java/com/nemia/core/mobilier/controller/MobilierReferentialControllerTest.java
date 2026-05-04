@@ -26,7 +26,8 @@ class MobilierReferentialControllerTest {
 
   @Test
   void shouldReturnMobilierReferentials() throws Exception {
-    mockMvc.perform(get("/api/mobilier/referentials"))
+    mockMvc
+      .perform(get("/api/mobilier/referentials"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.categoriesMobilier").isArray())

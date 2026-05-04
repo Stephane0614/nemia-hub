@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MobilierReferentialController {
 
-    @GetMapping("/api/mobilier/referentials")
-    public MobilierReferentialsResponse getReferentials() {
-        List<ReferentialItemResponse> categories = Arrays.stream(CategorieMobilier.values())
-            .map(c -> new ReferentialItemResponse(c.name(), c.getLabel()))
-            .toList();
+  @GetMapping("/api/mobilier/referentials")
+  public MobilierReferentialsResponse getReferentials() {
+    List<ReferentialItemResponse> categories = Arrays.stream(CategorieMobilier.values())
+      .map(c -> new ReferentialItemResponse(c.name(), c.getLabel()))
+      .toList();
 
-        List<ReferentialItemResponse> etats = Arrays.stream(EtatUsage.values())
-            .map(e -> new ReferentialItemResponse(e.name(), e.getLabel()))
-            .toList();
+    List<ReferentialItemResponse> etats = Arrays.stream(EtatUsage.values())
+      .map(e -> new ReferentialItemResponse(e.name(), e.getLabel()))
+      .toList();
 
-        List<ReferentialItemResponse> statuts = Arrays.stream(StatutMobilier.values())
-            .map(s -> new ReferentialItemResponse(s.name(), s.getLabel()))
-            .toList();
+    List<ReferentialItemResponse> statuts = Arrays.stream(StatutMobilier.values())
+      .map(s -> new ReferentialItemResponse(s.name(), s.getLabel()))
+      .toList();
 
-        return new MobilierReferentialsResponse(categories, etats, statuts);
-    }
+    return new MobilierReferentialsResponse(categories, etats, statuts);
+  }
 }

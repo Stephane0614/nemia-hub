@@ -62,7 +62,8 @@ table {
   min-width: max-content;
 }
 
-th, td {
+th,
+td {
   padding: 14px 16px;
   text-align: left;
   vertical-align: middle;
@@ -111,9 +112,24 @@ tbody tr:hover td {
   background: #e2e8f0;
   color: #334155;
 
-  &--ok { background: #dcfce7; color: #15803d; }
-  &--info { background: #dbeafe; color: #1d4ed8; }
-  &--warn { background: #fef9c3; color: #854d0e; }
-  &--muted { background: #f1f5f9; color: #64748b; }
-  &--error { background: #fee2e2; color: #b91c1c; }
+  &--ok {
+    background: #dcfce7;
+    color: #15803d;
+  }
+  &--info {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  &--warn {
+    background: #fef9c3;
+    color: #854d0e;
+  }
+  &--muted {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  &--error {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
 }

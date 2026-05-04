@@ -76,32 +76,32 @@ class MobilierControllerTest {
 
   private String requestBodyComplet() {
     return """
-      {
-        "designation": "Canapé convertible",
-        "bienId": 1,
-        "dateAcquisition": "2026-03-15",
-        "montant": 850.00,
-        "quantite": 1,
-        "categorieMobilier": "MEUBLE",
-        "etatUsage": "NEUF",
-        "qualificationPressentie": "IMMOBILISATION",
-        "statutMobilier": "BRUT",
-        "commentaire": "Salon principal"
-      }
-      """;
+    {
+      "designation": "Canapé convertible",
+      "bienId": 1,
+      "dateAcquisition": "2026-03-15",
+      "montant": 850.00,
+      "quantite": 1,
+      "categorieMobilier": "MEUBLE",
+      "etatUsage": "NEUF",
+      "qualificationPressentie": "IMMOBILISATION",
+      "statutMobilier": "BRUT",
+      "commentaire": "Salon principal"
+    }
+    """;
   }
 
   private String requestBodyMinimal() {
     return """
-      {
-        "designation": "Table de nuit",
-        "bienId": 1,
-        "montant": 120.00,
-        "categorieMobilier": "MEUBLE",
-        "qualificationPressentie": "CHARGE_COURANTE",
-        "statutMobilier": "BRUT"
-      }
-      """;
+    {
+      "designation": "Table de nuit",
+      "bienId": 1,
+      "montant": 120.00,
+      "categorieMobilier": "MEUBLE",
+      "qualificationPressentie": "CHARGE_COURANTE",
+      "statutMobilier": "BRUT"
+    }
+    """;
   }
 
   // ── CRUD ──
@@ -110,9 +110,8 @@ class MobilierControllerTest {
   void shouldCreateMobilierComplet() throws Exception {
     when(mobilierService.create(any())).thenReturn(buildResponse(1L));
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(requestBodyComplet()))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(requestBodyComplet()))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(1))
@@ -135,9 +134,8 @@ class MobilierControllerTest {
     r.setJustificatifId(null);
     when(mobilierService.create(any())).thenReturn(r);
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(requestBodyMinimal()))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(requestBodyMinimal()))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.id").value(2));
@@ -149,7 +147,8 @@ class MobilierControllerTest {
   void shouldReturnAllMobilier() throws Exception {
     when(mobilierService.findAll(null)).thenReturn(List.of(buildResponse(1L), buildResponse(2L)));
 
-    mockMvc.perform(get("/api/mobilier"))
+    mockMvc
+      .perform(get("/api/mobilier"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$").isArray())
@@ -162,7 +161,8 @@ class MobilierControllerTest {
   void shouldReturnMobilierFilteredByBienId() throws Exception {
     when(mobilierService.findAll(1L)).thenReturn(List.of(buildResponse(1L)));
 
-    mockMvc.perform(get("/api/mobilier").param("bienId", "1"))
+    mockMvc
+      .perform(get("/api/mobilier").param("bienId", "1"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.length()").value(1));
@@ -174,7 +174,8 @@ class MobilierControllerTest {
   void shouldReturnEmptyListWhenNoBienId() throws Exception {
     when(mobilierService.findAll(99L)).thenReturn(List.of());
 
-    mockMvc.perform(get("/api/mobilier").param("bienId", "99"))
+    mockMvc
+      .perform(get("/api/mobilier").param("bienId", "99"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.length()").value(0));
@@ -184,7 +185,8 @@ class MobilierControllerTest {
   void shouldReturnMobilierById() throws Exception {
     when(mobilierService.findById(1L)).thenReturn(buildResponse(1L));
 
-    mockMvc.perform(get("/api/mobilier/{id}", 1L))
+    mockMvc
+      .perform(get("/api/mobilier/{id}", 1L))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.id").value(1))
@@ -197,7 +199,8 @@ class MobilierControllerTest {
   void shouldReturn404WhenMobilierNotFound() throws Exception {
     when(mobilierService.findById(99L)).thenThrow(new MobilierNotFoundException(99L));
 
-    mockMvc.perform(get("/api/mobilier/{id}", 99L))
+    mockMvc
+      .perform(get("/api/mobilier/{id}", 99L))
       .andDo(print())
       .andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message").value("Mobilier introuvable : 99"));
@@ -223,9 +226,8 @@ class MobilierControllerTest {
       }
       """;
 
-    mockMvc.perform(put("/api/mobilier/{id}", 1L)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(body))
+    mockMvc
+      .perform(put("/api/mobilier/{id}", 1L).contentType(MediaType.APPLICATION_JSON).content(body))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.designation").value("Lit double"))
@@ -238,9 +240,8 @@ class MobilierControllerTest {
   void shouldReturn404WhenUpdatingNonExistentMobilier() throws Exception {
     when(mobilierService.update(eq(99L), any())).thenThrow(new MobilierNotFoundException(99L));
 
-    mockMvc.perform(put("/api/mobilier/{id}", 99L)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(requestBodyComplet()))
+    mockMvc
+      .perform(put("/api/mobilier/{id}", 99L).contentType(MediaType.APPLICATION_JSON).content(requestBodyComplet()))
       .andDo(print())
       .andExpect(status().isNotFound());
   }
@@ -249,9 +250,7 @@ class MobilierControllerTest {
   void shouldDeleteMobilier() throws Exception {
     doNothing().when(mobilierService).delete(1L);
 
-    mockMvc.perform(delete("/api/mobilier/{id}", 1L))
-      .andDo(print())
-      .andExpect(status().isNoContent());
+    mockMvc.perform(delete("/api/mobilier/{id}", 1L)).andDo(print()).andExpect(status().isNoContent());
 
     verify(mobilierService).delete(1L);
   }
@@ -260,9 +259,7 @@ class MobilierControllerTest {
   void shouldReturn404WhenDeletingNonExistentMobilier() throws Exception {
     doThrow(new MobilierNotFoundException(99L)).when(mobilierService).delete(99L);
 
-    mockMvc.perform(delete("/api/mobilier/{id}", 99L))
-      .andDo(print())
-      .andExpect(status().isNotFound());
+    mockMvc.perform(delete("/api/mobilier/{id}", 99L)).andDo(print()).andExpect(status().isNotFound());
   }
 
   // ── Validations ──
@@ -280,9 +277,8 @@ class MobilierControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(body))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(body))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.designation").exists());
@@ -302,9 +298,8 @@ class MobilierControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(body))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(body))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.bienId").exists());
@@ -325,9 +320,8 @@ class MobilierControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(body))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(body))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.montant").exists());
@@ -349,9 +343,8 @@ class MobilierControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(body))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(body))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.quantite").exists());
@@ -371,9 +364,8 @@ class MobilierControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(body))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(body))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.categorieMobilier").exists());
@@ -393,9 +385,8 @@ class MobilierControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(body))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(body))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.qualificationPressentie").exists());
@@ -415,9 +406,8 @@ class MobilierControllerTest {
       }
       """;
 
-    mockMvc.perform(post("/api/mobilier")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(body))
+    mockMvc
+      .perform(post("/api/mobilier").contentType(MediaType.APPLICATION_JSON).content(body))
       .andDo(print())
       .andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.validationErrors.statutMobilier").exists());
