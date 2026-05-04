@@ -294,6 +294,32 @@
       </button>
     </div>
 
+    <!-- Mobilier rattaché -->
+<div class="justificatif-block field-span-2">
+
+  <mat-form-field appearance="outline" class="justificatif-select">
+    <mat-label>Mobilier rattaché</mat-label>
+    <mat-select formControlName="mobilierId">
+      @if (mobiliersLoading) {
+        <mat-option disabled>Chargement...</mat-option>
+      } @else {
+        <mat-option [value]="null">— Aucun mobilier sélectionné</mat-option>
+        @for (m of mobiliers; track m.id) {
+          <mat-option [value]="m.id">{{ formatMobilierLabel(m) }}</mat-option>
+        }
+      }
+    </mat-select>
+    <mat-hint>Optionnel — associer un élément de mobilier</mat-hint>
+  </mat-form-field>
+
+  <button mat-stroked-button type="button"
+    class="justificatif-create-link"
+    (click)="ouvrirDialogMobilier()">
+    + Créer un mobilier
+  </button>
+
+</div>
+
     <!-- Zone upload réservée -->
     <div class="upload-reserved field-span-2">
       <span class="upload-reserved__icon">📎</span>

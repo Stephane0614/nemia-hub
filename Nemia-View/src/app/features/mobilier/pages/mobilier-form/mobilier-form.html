@@ -1,0 +1,171 @@
+<div [class.page-container]="!isDialogMode">
+
+  @if (isDialogMode) {
+    <h2 mat-dialog-title>
+      {{ isEditMode ? 'Modifier le mobilier' : 'Nouveau mobilier' }}
+    </h2>
+  }
+
+  @if (!isDialogMode) {
+    <section class="page-header">
+      <div>
+        <h1 class="page-title">{{ isEditMode ? 'Modifier le mobilier' : 'Nouveau mobilier' }}</h1>
+        <p class="page-subtitle">Renseigne les informations de l'élément.</p>
+      </div>
+    </section>
+  }
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40" />
+    </div>
+  }
+
+  @if (!isLoading) {
+
+    @if (isDialogMode) {
+      <mat-dialog-content>
+        <ng-container *ngTemplateOutlet="formInner"></ng-container>
+      </mat-dialog-content>
+      <mat-dialog-actions align="end">
+        <button mat-stroked-button type="button" (click)="onCancel()">Annuler</button>
+        <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
+        </button>
+      </mat-dialog-actions>
+    }
+
+    @if (!isDialogMode) {
+      <mat-card class="form-card">
+        <mat-card-content>
+          <ng-container *ngTemplateOutlet="formInner"></ng-container>
+          @if (errorMessage) {
+            <p class="error-message">{{ errorMessage }}</p>
+          }
+          <div class="form-actions">
+            <button mat-stroked-button type="button" (click)="onCancel()">Annuler</button>
+            <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="isSubmitting">
+              {{ isSubmitting ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+
+  }
+
+</div>
+
+<ng-template #formInner>
+  <form [formGroup]="form">
+    <div class="form-grid">
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Désignation *</mat-label>
+        <input matInput formControlName="designation" maxlength="200" />
+        @if (form.get('designation')?.invalid && form.get('designation')?.touched) {
+          <mat-error>La désignation est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Bien rattaché *</mat-label>
+        <mat-select formControlName="bienId">
+          @for (bien of biens; track bien.id) {
+            <mat-option [value]="bien.id">{{ bien.nomUsuel }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('bienId')?.invalid && form.get('bienId')?.touched) {
+          <mat-error>Le bien est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Montant *</mat-label>
+        <input matInput type="number" step="0.01" formControlName="montant" />
+        @if (form.get('montant')?.invalid && form.get('montant')?.touched) {
+          <mat-error>Le montant est obligatoire et doit être positif</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Catégorie *</mat-label>
+        <mat-select formControlName="categorieMobilier">
+          @for (item of categoriesMobilier; track item.code) {
+            <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('categorieMobilier')?.invalid && form.get('categorieMobilier')?.touched) {
+          <mat-error>La catégorie est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Qualification pressentie *</mat-label>
+        <mat-select formControlName="qualificationPressentie">
+          @for (item of qualificationsPressenties; track item.code) {
+            <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('qualificationPressentie')?.invalid && form.get('qualificationPressentie')?.touched) {
+          <mat-error>La qualification est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut *</mat-label>
+        <mat-select formControlName="statutMobilier">
+          @for (item of statutsMobilier; track item.code) {
+            <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('statutMobilier')?.invalid && form.get('statutMobilier')?.touched) {
+          <mat-error>Le statut est obligatoire</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Date d'acquisition</mat-label>
+        <input matInput [matDatepicker]="pickerAcq" formControlName="dateAcquisition" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerAcq" />
+        <mat-datepicker #pickerAcq />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Quantité</mat-label>
+        <input matInput type="number" step="1" min="1" formControlName="quantite" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>État d'usage</mat-label>
+        <mat-select formControlName="etatUsage">
+          <mat-option [value]="null">— Non renseigné</mat-option>
+          @for (item of etatsUsage; track item.code) {
+            <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Justificatif associé</mat-label>
+        <mat-select formControlName="justificatifId">
+          <mat-option [value]="null">— Aucun</mat-option>
+          @for (j of justificatifs; track j.id) {
+            <mat-option [value]="j.id">{{ formatJustificatifLabel(j) }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Commentaire</mat-label>
+        <textarea matInput formControlName="commentaire" rows="3" maxlength="500"></textarea>
+      </mat-form-field>
+
+    </div>
+
+    @if (errorMessage && isDialogMode) {
+      <p class="error-message">{{ errorMessage }}</p>
+    }
+
+  </form>
+</ng-template>
