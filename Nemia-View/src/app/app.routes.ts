@@ -6,6 +6,7 @@ import { exerciceRoutes } from './features/exercice/exercice.routes';
 import { justificatifRoutes } from './features/justificatif/justificatif.routes';
 import { ExerciceSynthese } from './features/exercice/pages/exercice-synthese/exercice-synthese';
 import { travauxRoutes } from './features/travaux/travaux.routes';
+import { mobilierRoutes } from './features/mobilier/mobilier.routes';
 
 export const routes: Routes = [
   {
@@ -36,6 +37,10 @@ export const routes: Routes = [
     path: 'travaux',
     children: travauxRoutes,
   },
+  {
+  path: 'mobilier',
+  children: mobilierRoutes,
+},
   {
     path: '**',
     redirectTo: '',

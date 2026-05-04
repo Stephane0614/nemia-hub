@@ -30,4 +30,5 @@ export interface FluxResponse {
   warnings: string[];
   justificatifId?: number | null;
   travauxId: number | null;
+    mobilierId: number | null;
 }

@@ -30,6 +30,12 @@ import {
   JustificatifForm,
   JustificatifDialogData,
 } from '../../../justificatif/pages/justificatif-form/justificatif-form';
+import { MobilierApi } from '../../../mobilier/services/mobilier-api';
+import { MobilierResponse } from '../../../mobilier/models/mobilier-response';
+import {
+  MobilierForm,
+  MobilierDialogData,
+} from '../../../mobilier/pages/mobilier-form/mobilier-form';
 
 import {
   Occurrence,
@@ -67,6 +73,7 @@ export class FluxForm implements OnInit {
   private readonly exerciceApi = inject(ExerciceApi);
   private readonly justificatifApi = inject(JustificatifApi);
   private readonly travauxApi = inject(TravauxApi);
+  private readonly mobilierApi = inject(MobilierApi);
 
   serverValidationErrors: Record<string, string> = {};
   loadErrorMessage = '';
@@ -76,6 +83,8 @@ export class FluxForm implements OnInit {
   submitWarnings: string[] = [];
   travaux: TravauxResponse[] = [];
   travauxLoading = false;
+  mobiliers: MobilierResponse[] = [];
+  mobiliersLoading = false;
 
   fluxTypes: { code: string; label: string }[] = [];
   fluxCategories: { code: string; label: string }[] = [];
@@ -114,6 +123,7 @@ export class FluxForm implements OnInit {
     commentaire: ['', Validators.maxLength(500)],
     justificatifId: [null as number | null],
     travauxId: [null as number | null],
+    mobilierId: [null as number | null],
   });
 
   ngOnInit(): void {
@@ -174,6 +184,18 @@ export class FluxForm implements OnInit {
           },
           error: () => {
             this.travauxLoading = false;
+            this.cdr.detectChanges();
+          },
+        });
+        this.mobiliersLoading = true;
+        this.mobilierApi.getAll().subscribe({
+          next: (mobiliers) => {
+            this.mobiliers = mobiliers;
+            this.mobiliersLoading = false;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.mobiliersLoading = false;
             this.cdr.detectChanges();
           },
         });
@@ -287,6 +309,7 @@ export class FluxForm implements OnInit {
       exerciceId: rawValue.exerciceId ? Number(rawValue.exerciceId) : null,
       justificatifId: rawValue.justificatifId ? Number(rawValue.justificatifId) : null,
       travauxId: rawValue.travauxId ? Number(rawValue.travauxId) : null,
+      mobilierId: rawValue.mobilierId ? Number(rawValue.mobilierId) : null,
     };
   }
 
@@ -366,6 +389,7 @@ export class FluxForm implements OnInit {
           bienId: flux.bienId,
           exerciceId: flux.exerciceId,
           justificatifId: flux.justificatifId ?? null,
+          mobilierId: flux.mobilierId ?? null,
         });
 
         this.isLoading = false;
@@ -444,4 +468,27 @@ export class FluxForm implements OnInit {
   formatTravauxLabel(t: TravauxResponse): string {
     return `${t.libelleTravaux} — ${t.montantTotal.toLocaleString('fr-FR')} €`;
   }
+
+  ouvrirDialogMobilier(): void {
+  const dialogRef = this.dialog.open(MobilierForm, {
+    width: '720px',
+    disableClose: false,
+    data: {} as MobilierDialogData,
+  });
+
+  dialogRef.afterClosed().subscribe((mobilier: MobilierResponse | null) => {
+    if (!mobilier) return;
+    this.mobilierApi.getAll().subscribe({
+      next: (list) => {
+        this.mobiliers = list;
+        this.form.patchValue({ mobilierId: mobilier.id });
+        this.cdr.detectChanges();
+      },
+    });
+  });
+}
+
+formatMobilierLabel(m: MobilierResponse): string {
+  return `${m.designation} — ${m.montant.toLocaleString('fr-FR')} €`;
+}
 }
