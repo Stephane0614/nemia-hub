@@ -24,11 +24,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class FluxServiceMobilierValidationTest {
 
-  @Mock private FluxRepository fluxRepository;
-  @Mock private FluxValidationService fluxValidationService;
-  @Mock private JustificatifRepository justificatifRepository;
-  @Mock private TravauxRepository travauxRepository;
-  @Mock private MobilierRepository mobilierRepository;
+  @Mock
+  private FluxRepository fluxRepository;
+
+  @Mock
+  private FluxValidationService fluxValidationService;
+
+  @Mock
+  private JustificatifRepository justificatifRepository;
+
+  @Mock
+  private TravauxRepository travauxRepository;
+
+  @Mock
+  private MobilierRepository mobilierRepository;
 
   @InjectMocks
   private FluxService fluxService;
@@ -57,8 +66,7 @@ class FluxServiceMobilierValidationTest {
   @Test
   void shouldNotThrowWhenMobilierIdIsNull() {
     when(fluxRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-    when(fluxValidationService.computeWarnings(any(), any(), any(), any(), any(), any()))
-      .thenReturn(List.of());
+    when(fluxValidationService.computeWarnings(any(), any(), any(), any(), any(), any())).thenReturn(List.of());
 
     fluxService.create(buildRequest(null));
   }
@@ -67,8 +75,7 @@ class FluxServiceMobilierValidationTest {
   void shouldNotThrowWhenMobilierIdIsValid() {
     when(mobilierRepository.existsById(1L)).thenReturn(true);
     when(fluxRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-    when(fluxValidationService.computeWarnings(any(), any(), any(), any(), any(), any()))
-      .thenReturn(List.of());
+    when(fluxValidationService.computeWarnings(any(), any(), any(), any(), any(), any())).thenReturn(List.of());
 
     fluxService.create(buildRequest(1L));
   }

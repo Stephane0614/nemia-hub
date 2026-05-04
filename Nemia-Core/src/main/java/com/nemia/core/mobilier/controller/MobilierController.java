@@ -12,36 +12,36 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/mobilier")
 public class MobilierController {
 
-    private final MobilierService mobilierService;
+  private final MobilierService mobilierService;
 
-    public MobilierController(MobilierService mobilierService) {
-        this.mobilierService = mobilierService;
-    }
+  public MobilierController(MobilierService mobilierService) {
+    this.mobilierService = mobilierService;
+  }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public MobilierResponse create(@Valid @RequestBody MobilierRequest request) {
-        return mobilierService.create(request);
-    }
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public MobilierResponse create(@Valid @RequestBody MobilierRequest request) {
+    return mobilierService.create(request);
+  }
 
-    @GetMapping
-    public List<MobilierResponse> findAll(@RequestParam(required = false) Long bienId) {
-        return mobilierService.findAll(bienId);
-    }
+  @GetMapping
+  public List<MobilierResponse> findAll(@RequestParam(required = false) Long bienId) {
+    return mobilierService.findAll(bienId);
+  }
 
-    @GetMapping("/{id}")
-    public MobilierResponse findById(@PathVariable Long id) {
-        return mobilierService.findById(id);
-    }
+  @GetMapping("/{id}")
+  public MobilierResponse findById(@PathVariable Long id) {
+    return mobilierService.findById(id);
+  }
 
-    @PutMapping("/{id}")
-    public MobilierResponse update(@PathVariable Long id, @Valid @RequestBody MobilierRequest request) {
-        return mobilierService.update(id, request);
-    }
+  @PutMapping("/{id}")
+  public MobilierResponse update(@PathVariable Long id, @Valid @RequestBody MobilierRequest request) {
+    return mobilierService.update(id, request);
+  }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        mobilierService.delete(id);
-    }
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable Long id) {
+    mobilierService.delete(id);
+  }
 }

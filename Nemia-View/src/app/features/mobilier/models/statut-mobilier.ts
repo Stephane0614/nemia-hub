@@ -1,5 +1,1 @@
-export type StatutMobilier =
-  | 'BRUT'
-  | 'QUALIFIE'
-  | 'A_REVOIR'
-  | 'VALIDE';
+export type StatutMobilier = 'BRUT' | 'QUALIFIE' | 'A_REVOIR' | 'VALIDE';

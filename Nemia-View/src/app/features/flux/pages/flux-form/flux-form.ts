@@ -470,25 +470,25 @@ export class FluxForm implements OnInit {
   }
 
   ouvrirDialogMobilier(): void {
-  const dialogRef = this.dialog.open(MobilierForm, {
-    width: '720px',
-    disableClose: false,
-    data: {} as MobilierDialogData,
-  });
-
-  dialogRef.afterClosed().subscribe((mobilier: MobilierResponse | null) => {
-    if (!mobilier) return;
-    this.mobilierApi.getAll().subscribe({
-      next: (list) => {
-        this.mobiliers = list;
-        this.form.patchValue({ mobilierId: mobilier.id });
-        this.cdr.detectChanges();
-      },
+    const dialogRef = this.dialog.open(MobilierForm, {
+      width: '720px',
+      disableClose: false,
+      data: {} as MobilierDialogData,
     });
-  });
-}
 
-formatMobilierLabel(m: MobilierResponse): string {
-  return `${m.designation} — ${m.montant.toLocaleString('fr-FR')} €`;
-}
+    dialogRef.afterClosed().subscribe((mobilier: MobilierResponse | null) => {
+      if (!mobilier) return;
+      this.mobilierApi.getAll().subscribe({
+        next: (list) => {
+          this.mobiliers = list;
+          this.form.patchValue({ mobilierId: mobilier.id });
+          this.cdr.detectChanges();
+        },
+      });
+    });
+  }
+
+  formatMobilierLabel(m: MobilierResponse): string {
+    return `${m.designation} — ${m.montant.toLocaleString('fr-FR')} €`;
+  }
 }

@@ -7,6 +7,7 @@ PROJECT_ROOT="/c/Perso/projet_dev_perso/nemia-hub"
 SRC_DIR="$PROJECT_ROOT"
 CONFIG_FILE="$PROJECT_ROOT/.prettierrc"
 PRETTIER_BIN="$PROJECT_ROOT/node_modules/.bin/prettier"
+CACHE_FILE="$PROJECT_ROOT/.prettier-cache"
 HEARTBEAT_INTERVAL=12
 
 # Fichier de log des erreurs
@@ -85,79 +86,74 @@ collect_files() {
 }
 
 check_files() {
-  local file
-  local check_exit
-  local err_out
+  local check_out
 
+  # Compte total connu dès le départ, plus besoin de boucle pour l'incrémenter
+  CHECKED_COUNT=$(wc -l < "$TMP_FILES" | tr -d '[:space:]')
   BAD_COUNT=0
   CHECK_ERROR_COUNT=0
 
-  while IFS= read -r file; do
-    [ -z "$file" ] && continue
-    CHECKED_COUNT=$((CHECKED_COUNT + 1))
-
-    # --- CORRECTION ICI : Pas de --write pendant le --check ---
-    err_out=$( \
-      "$PRETTIER_BIN" "$file" \
+  # xargs passe tous les fichiers en un seul appel Prettier (batch) :
+  # un seul démarrage Node.js au lieu de N.
+  # 2>&1 >/dev/null : on capture stderr ([warn]/[error]) et on jette stdout.
+  check_out=$(
+    xargs -d '\n' < "$TMP_FILES" \
+      "$PRETTIER_BIN" \
         --config "$CONFIG_FILE" \
         --plugin prettier-plugin-java \
         --plugin @prettier/plugin-xml \
-        --check 2>&1 >/dev/null \
-    )
-    check_exit=$?
+        --cache \
+        --cache-location "$CACHE_FILE" \
+        --check 2>&1 >/dev/null
+  )
 
-    case "$check_exit" in
-      0) ;;
-      1)
-        BAD_COUNT=$((BAD_COUNT + 1))
-        printf '%s\n' "$file" >> "$TMP_BAD"
-        ;;
-      *)
-        CHECK_ERROR_COUNT=$((CHECK_ERROR_COUNT + 1))
-        printf '%s\n' "$file" >> "$TMP_BAD"
-        log_detail "check (exit=$check_exit) : $file"
-        if [ -n "$err_out" ]; then
-          printf '%s\n' "$err_out" | while IFS= read -r line; do
-            log_detail "  >> $line"
-          done
-        fi
-        ;;
-    esac
-  done < "$TMP_FILES"
+  # Prettier émet une ligne "[warn] <chemin>" pour chaque fichier mal formaté.
+  # On exclut la ligne de résumé finale "Code style issues found in X files."
+  printf '%s\n' "$check_out" \
+    | grep '^\[warn\] ' \
+    | sed 's/^\[warn\] //' \
+    | grep -v '^Code style issues found' \
+    > "$TMP_BAD"
+
+  BAD_COUNT=$(wc -l < "$TMP_BAD" | tr -d '[:space:]')
+
+  # Les lignes [error] signalent de vrais problèmes (fichier non parseable, etc.)
+  if printf '%s\n' "$check_out" | grep -q '^\[error\]'; then
+    CHECK_ERROR_COUNT=1
+    printf '%s\n' "$check_out" | grep '^\[error\]' | while IFS= read -r line; do
+      log_detail "  >> $line"
+    done
+  fi
 }
 
 format_files() {
-  local file
-  local write_exit
-  local fmt_err
+  local fmt_out fmt_exit
 
   FORMATTED_COUNT=0
   FORMAT_ERROR_COUNT=0
 
-  while IFS= read -r file; do
-    [ -z "$file" ] && continue
-
-    fmt_err=$( \
-      "$PRETTIER_BIN" "$file" \
+  # Même approche batch : tous les fichiers à corriger en un seul appel --write.
+  fmt_out=$(
+    xargs -d '\n' < "$TMP_BAD" \
+      "$PRETTIER_BIN" \
         --config "$CONFIG_FILE" \
         --plugin prettier-plugin-java \
         --plugin @prettier/plugin-xml \
-        --write 2>&1 >/dev/null \
-    )
-    write_exit=$?
+        --cache \
+        --cache-location "$CACHE_FILE" \
+        --write 2>&1 >/dev/null
+  )
+  fmt_exit=$?
 
-    if [ "$write_exit" -eq 0 ]; then
-      FORMATTED_COUNT=$((FORMATTED_COUNT + 1))
-    else
-      FORMAT_ERROR_COUNT=$((FORMAT_ERROR_COUNT + 1))
-      log_detail "format (exit=$write_exit) : $file"
-      if [ -n "$fmt_err" ]; then
-        printf '%s\n' "$fmt_err" | while IFS= read -r line; do
-          log_detail "  >> $line"
-        done
-      fi
-    fi
-  done < "$TMP_BAD"
+  if [ "$fmt_exit" -eq 0 ]; then
+    FORMATTED_COUNT=$BAD_COUNT
+  else
+    FORMAT_ERROR_COUNT=1
+    log_err "Prettier --write a rencontré des erreurs (exit=$fmt_exit)"
+    printf '%s\n' "$fmt_out" | while IFS= read -r line; do
+      log_detail "  >> $line"
+    done
+  fi
 }
 
 # ── Vérifications préalables ───────────────────────────────────────────────────
@@ -230,7 +226,6 @@ log_ok "@prettier/plugin-xml OK"
 
 # ── Check ──────────────────────────────────────────────────────────────────────
 
-CHECKED_COUNT=0
 start_heartbeat "Check"
 check_files
 stop_heartbeat

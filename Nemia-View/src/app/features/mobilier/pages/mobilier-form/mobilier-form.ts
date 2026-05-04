@@ -217,9 +217,10 @@ export class MobilierForm implements OnInit {
       commentaire: raw.commentaire || null,
     };
 
-    const request$ = this.isEditMode && this.mobilierId
-      ? this.mobilierApi.update(this.mobilierId, payload)
-      : this.mobilierApi.create(payload);
+    const request$ =
+      this.isEditMode && this.mobilierId
+        ? this.mobilierApi.update(this.mobilierId, payload)
+        : this.mobilierApi.create(payload);
 
     request$.subscribe({
       next: (mobilier: MobilierResponse) => {
