@@ -1,7 +1,7 @@
 package com.nemia.core.travaux.model;
 
 public enum FinalitePressentie {
-  ENTRETIEN("Entretien"),
+  ENTRETIEN_COURANT("Entretien courant"),
   REPARATION("Réparation"),
   AMELIORATION("Amélioration"),
   CREATION("Création"),

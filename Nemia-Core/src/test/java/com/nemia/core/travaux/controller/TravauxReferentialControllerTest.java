@@ -31,7 +31,7 @@ class TravauxReferentialControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(jsonPath("$.finalitesPressenties").isArray())
-      .andExpect(jsonPath("$.finalitesPressenties[?(@.code=='ENTRETIEN')]").exists())
+      .andExpect(jsonPath("$.finalitesPressenties[?(@.code=='ENTRETIEN_COURANT')]").exists())
       .andExpect(jsonPath("$.finalitesPressenties[?(@.code=='REPARATION')]").exists())
       .andExpect(jsonPath("$.finalitesPressenties[?(@.code=='AMELIORATION')]").exists())
       .andExpect(jsonPath("$.finalitesPressenties[?(@.code=='CREATION')]").exists())

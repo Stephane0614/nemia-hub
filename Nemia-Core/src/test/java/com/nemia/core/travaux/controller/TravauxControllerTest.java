@@ -94,7 +94,7 @@ class TravauxControllerTest {
       "libelleTravaux": "Peinture",
       "bienId": 1,
       "montantTotal": 800.00,
-      "finalitePressentie": "ENTRETIEN",
+      "finalitePressentie": "ENTRETIEN_COURANT",
       "qualificationPressentie": "CHARGE_COURANTE"
     }
     """;
@@ -267,7 +267,7 @@ class TravauxControllerTest {
         "libelleTravaux": "",
         "bienId": 1,
         "montantTotal": 1000.00,
-        "finalitePressentie": "ENTRETIEN",
+        "finalitePressentie": "ENTRETIEN_COURANT",
         "qualificationPressentie": "CHARGE_COURANTE"
       }
       """;
@@ -287,7 +287,7 @@ class TravauxControllerTest {
       {
         "libelleTravaux": "Travaux test",
         "montantTotal": 1000.00,
-        "finalitePressentie": "ENTRETIEN",
+        "finalitePressentie": "ENTRETIEN_COURANT",
         "qualificationPressentie": "CHARGE_COURANTE"
       }
       """;
@@ -308,7 +308,7 @@ class TravauxControllerTest {
         "libelleTravaux": "Travaux test",
         "bienId": 1,
         "montantTotal": -500.00,
-        "finalitePressentie": "ENTRETIEN",
+        "finalitePressentie": "ENTRETIEN_COURANT",
         "qualificationPressentie": "CHARGE_COURANTE"
       }
       """;
@@ -349,7 +349,7 @@ class TravauxControllerTest {
         "libelleTravaux": "Travaux test",
         "bienId": 1,
         "montantTotal": 1000.00,
-        "finalitePressentie": "ENTRETIEN"
+        "finalitePressentie": "ENTRETIEN_COURANT"
       }
       """;
 
@@ -375,7 +375,7 @@ class TravauxControllerTest {
         "dateDebut": "2026-03-31",
         "dateFin": "2026-03-01",
         "montantTotal": 1000.00,
-        "finalitePressentie": "ENTRETIEN",
+        "finalitePressentie": "ENTRETIEN_COURANT",
         "qualificationPressentie": "CHARGE_COURANTE"
       }
       """;

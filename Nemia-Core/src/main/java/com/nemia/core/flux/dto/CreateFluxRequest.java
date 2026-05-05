@@ -54,6 +54,8 @@ public class CreateFluxRequest {
 
   private Long mobilierId;
 
+  private Long empruntId;
+
   @Size(max = 500)
   private String commentaire;
 
@@ -185,5 +187,13 @@ public class CreateFluxRequest {
 
   public void setMobilierId(Long mobilierId) {
     this.mobilierId = mobilierId;
+  }
+
+  public Long getEmpruntId() {
+    return empruntId;
+  }
+
+  public void setEmpruntId(Long empruntId) {
+    this.empruntId = empruntId;
   }
 }
