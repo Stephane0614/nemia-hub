@@ -36,6 +36,9 @@ import {
   MobilierForm,
   MobilierDialogData,
 } from '../../../mobilier/pages/mobilier-form/mobilier-form';
+import { EmpruntApi } from '../../../emprunt/services/emprunt-api';
+import { EmpruntResponse } from '../../../emprunt/models/emprunt-response';
+import { EmpruntFormComponent, EmpruntFormDialogData } from '../../../emprunt/pages/emprunt-form/emprunt-form';
 
 import {
   Occurrence,
@@ -57,6 +60,7 @@ import {
     MatButtonModule,
     MatProgressSpinnerModule,
     MatDatepickerModule,
+    MatDialogModule,
   ],
   templateUrl: './flux-form.html',
   styleUrl: './flux-form.scss',
@@ -74,6 +78,7 @@ export class FluxForm implements OnInit {
   private readonly justificatifApi = inject(JustificatifApi);
   private readonly travauxApi = inject(TravauxApi);
   private readonly mobilierApi = inject(MobilierApi);
+  private readonly empruntApi = inject(EmpruntApi);
 
   serverValidationErrors: Record<string, string> = {};
   loadErrorMessage = '';
@@ -85,6 +90,7 @@ export class FluxForm implements OnInit {
   travauxLoading = false;
   mobiliers: MobilierResponse[] = [];
   mobiliersLoading = false;
+  emprunts: EmpruntResponse[] = [];
 
   fluxTypes: { code: string; label: string }[] = [];
   fluxCategories: { code: string; label: string }[] = [];
@@ -124,6 +130,7 @@ export class FluxForm implements OnInit {
     justificatifId: [null as number | null],
     travauxId: [null as number | null],
     mobilierId: [null as number | null],
+    empruntId: [null as number | null],
   });
 
   ngOnInit(): void {
@@ -199,6 +206,7 @@ export class FluxForm implements OnInit {
             this.cdr.detectChanges();
           },
         });
+        this.loadEmprunts();
 
         const fluxId = this.fluxId();
 
@@ -310,6 +318,7 @@ export class FluxForm implements OnInit {
       justificatifId: rawValue.justificatifId ? Number(rawValue.justificatifId) : null,
       travauxId: rawValue.travauxId ? Number(rawValue.travauxId) : null,
       mobilierId: rawValue.mobilierId ? Number(rawValue.mobilierId) : null,
+      empruntId: rawValue.empruntId ?? undefined,
     };
   }
 
@@ -390,6 +399,8 @@ export class FluxForm implements OnInit {
           exerciceId: flux.exerciceId,
           justificatifId: flux.justificatifId ?? null,
           mobilierId: flux.mobilierId ?? null,
+          empruntId: flux.empruntId ?? null,
+          travauxId: flux.travauxId ?? null,
         });
 
         this.isLoading = false;
@@ -490,5 +501,36 @@ export class FluxForm implements OnInit {
 
   formatMobilierLabel(m: MobilierResponse): string {
     return `${m.designation} — ${m.montant.toLocaleString('fr-FR')} €`;
+  }
+
+  loadEmprunts(): void {
+    this.empruntApi.getAll().subscribe({
+      next: (emprunts) => {
+        this.emprunts = emprunts;
+        this.cdr.detectChanges();
+      },
+      error: () => {},
+    });
+  }
+
+  getEmpruntLabel(emprunt: EmpruntResponse): string {
+    return emprunt.organismePreteur
+      ? `${emprunt.referencePret} — ${emprunt.organismePreteur}`
+      : emprunt.referencePret;
+  }
+
+  ouvrirDialogEmprunt(): void {
+    const ref = this.dialog.open(EmpruntFormComponent, {
+      width: '600px',
+      disableClose: true,
+      data: { bienId: this.form.get('bienId')?.value } as EmpruntFormDialogData,
+    });
+
+    ref.afterClosed().subscribe((emprunt: EmpruntResponse | null) => {
+      if (emprunt) {
+        this.loadEmprunts();
+        this.form.patchValue({ empruntId: emprunt.id });
+      }
+    });
   }
 }
