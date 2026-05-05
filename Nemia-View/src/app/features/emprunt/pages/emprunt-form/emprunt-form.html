@@ -1,0 +1,140 @@
+<div [class.page-container]="!isDialog">
+
+  <!-- En-tête page -->
+  <div class="form-header" *ngIf="!isDialog">
+    <button mat-icon-button (click)="annuler()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ isEditMode ? 'Modifier l\'emprunt' : 'Nouvel emprunt' }}</h1>
+  </div>
+
+  <!-- En-tête dialog -->
+  <h2 mat-dialog-title *ngIf="isDialog">
+    {{ isEditMode ? 'Modifier l\'emprunt' : 'Nouvel emprunt' }}
+  </h2>
+
+  <!-- Chargement -->
+  <div class="state-card" *ngIf="isLoading">
+    <mat-spinner diameter="32"></mat-spinner>
+    <p>Chargement…</p>
+  </div>
+
+  <!-- Formulaire -->
+  <div [class.mat-dialog-content-wrapper]="isDialog" *ngIf="!isLoading">
+    <mat-dialog-content *ngIf="isDialog">
+      <ng-container *ngTemplateOutlet="formContent"></ng-container>
+    </mat-dialog-content>
+
+    <ng-container *ngIf="!isDialog">
+      <ng-container *ngTemplateOutlet="formContent"></ng-container>
+    </ng-container>
+  </div>
+
+  <!-- Actions -->
+  <mat-dialog-actions align="end" *ngIf="isDialog && !isLoading">
+    <button mat-button (click)="annuler()" [disabled]="isSubmitting">Annuler</button>
+    <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Enregistrement…' : (isEditMode ? 'Modifier' : 'Créer') }}
+    </button>
+  </mat-dialog-actions>
+
+  <div class="form-actions" *ngIf="!isDialog && !isLoading">
+    <button mat-stroked-button (click)="annuler()" [disabled]="isSubmitting">Annuler</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Enregistrement…' : (isEditMode ? 'Modifier' : 'Créer') }}
+    </button>
+  </div>
+
+</div>
+
+<!-- Template du formulaire — partagé page et dialog -->
+<ng-template #formContent>
+  <form [formGroup]="form" class="form-card" (ngSubmit)="onSubmit()">
+
+    <!-- Erreur globale -->
+    <div class="form-error" *ngIf="errorMessage">
+      <mat-icon>error_outline</mat-icon>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Référence prêt -->
+    <mat-form-field appearance="outline" class="field-full">
+      <mat-label>Référence prêt *</mat-label>
+      <input matInput formControlName="referencePret" placeholder="Ex : CIC-2024-001" />
+      <mat-error *ngIf="form.get('referencePret')?.hasError('required')">
+        La référence est obligatoire.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Bien rattaché -->
+    <mat-form-field appearance="outline" class="field-full">
+      <mat-label>Bien rattaché *</mat-label>
+      <mat-select formControlName="bienId">
+        <mat-option *ngFor="let bien of biens" [value]="bien.id">
+          {{ bien.nomUsuel }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('bienId')?.hasError('required')">
+        Le bien est obligatoire.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Statut -->
+    <mat-form-field appearance="outline" class="field-full">
+      <mat-label>Statut *</mat-label>
+      <mat-select formControlName="statutEmprunt">
+        <mat-option *ngFor="let s of statutEmprunt" [value]="s.code">
+          {{ s.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('statutEmprunt')?.hasError('required')">
+        Le statut est obligatoire.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Organisme prêteur -->
+    <mat-form-field appearance="outline" class="field-full">
+      <mat-label>Organisme prêteur</mat-label>
+      <input matInput formControlName="organismePreteur" placeholder="Ex : Crédit Agricole" />
+    </mat-form-field>
+
+    <!-- Mensualité -->
+    <mat-form-field appearance="outline" class="field-half">
+      <mat-label>Mensualité totale (€)</mat-label>
+      <input matInput type="number" min="0" step="0.01" formControlName="mensualiteTotale" />
+      <mat-error *ngIf="form.get('mensualiteTotale')?.hasError('min')">
+        La mensualité doit être positive.
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Dates échéances -->
+    <div class="field-row">
+      <mat-form-field appearance="outline" class="field-half">
+        <mat-label>1ère échéance</mat-label>
+        <input matInput [matDatepicker]="pickerPremiere" formControlName="datePremiereEcheance" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerPremiere"></mat-datepicker-toggle>
+        <mat-datepicker #pickerPremiere></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="field-half">
+        <mat-label>Dernière échéance</mat-label>
+        <input matInput [matDatepicker]="pickerDerniere" formControlName="dateDerniereEcheance" />
+        <mat-datepicker-toggle matIconSuffix [for]="pickerDerniere"></mat-datepicker-toggle>
+        <mat-datepicker #pickerDerniere></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Erreur dates -->
+    <div class="field-error" *ngIf="hasDateEcheanceError()">
+      <mat-icon>warning</mat-icon>
+      La dernière échéance doit être postérieure ou égale à la première.
+    </div>
+
+    <!-- Commentaire -->
+    <mat-form-field appearance="outline" class="field-full">
+      <mat-label>Commentaire</mat-label>
+      <textarea matInput formControlName="commentaire" rows="3"></textarea>
+    </mat-form-field>
+
+  </form>
+</ng-template>

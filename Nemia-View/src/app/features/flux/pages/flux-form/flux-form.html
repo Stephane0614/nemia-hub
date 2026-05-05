@@ -315,6 +315,24 @@
       </button>
     </div>
 
+    <!-- Emprunt rattaché -->
+    <div class="justificatif-block field-span-2">
+      <mat-form-field appearance="outline" class="justificatif-select">
+        <mat-label>Emprunt rattaché</mat-label>
+        <mat-select formControlName="empruntId">
+          <mat-option [value]="null">— Aucun —</mat-option>
+          @for (e of emprunts; track e.id) {
+          <mat-option [value]="e.id">{{ getEmpruntLabel(e) }}</mat-option>
+          }
+        </mat-select>
+        <mat-hint>Optionnel — associer un emprunt existant</mat-hint>
+      </mat-form-field>
+
+      <button mat-stroked-button type="button" class="justificatif-create-link" (click)="ouvrirDialogEmprunt()">
+        + Créer un emprunt
+      </button>
+    </div>
+
     <!-- Zone upload réservée -->
     <div class="upload-reserved field-span-2">
       <span class="upload-reserved__icon">📎</span>

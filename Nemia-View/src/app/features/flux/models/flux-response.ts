@@ -31,4 +31,5 @@ export interface FluxResponse {
   justificatifId?: number | null;
   travauxId: number | null;
   mobilierId: number | null;
+  empruntId?: number;
 }

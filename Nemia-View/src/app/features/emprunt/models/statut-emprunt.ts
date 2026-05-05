@@ -1,0 +1,1 @@
+export type StatutEmprunt = 'EN_COURS' | 'TERMINE' | 'SUSPENDU' | 'A_VERIFIER';
