@@ -45,6 +45,8 @@ public class FluxResponse {
 
   private Long mobilierId;
 
+  private Long empruntId;
+
   public FluxResponse() {}
 
   public Long getId() {
@@ -205,5 +207,13 @@ public class FluxResponse {
 
   public void setMobilierId(Long mobilierId) {
     this.mobilierId = mobilierId;
+  }
+
+  public Long getEmpruntId() {
+    return empruntId;
+  }
+
+  public void setEmpruntId(Long empruntId) {
+    this.empruntId = empruntId;
   }
 }

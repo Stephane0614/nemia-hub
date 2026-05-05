@@ -70,6 +70,8 @@ public class Flux {
 
   private Long mobilierId;
 
+  private Long empruntId;
+
   public Flux() {}
 
   @PrePersist
@@ -230,5 +232,13 @@ public class Flux {
 
   public void setMobilierId(Long mobilierId) {
     this.mobilierId = mobilierId;
+  }
+
+  public Long getEmpruntId() {
+    return empruntId;
+  }
+
+  public void setEmpruntId(Long empruntId) {
+    this.empruntId = empruntId;
   }
 }

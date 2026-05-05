@@ -164,4 +164,16 @@ public class GlobalExceptionHandler {
     );
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
   }
+
+  @ExceptionHandler(EmpruntNotFoundException.class)
+  public ResponseEntity<ApiErrorResponse> handleEmpruntNotFound(EmpruntNotFoundException ex, HttpServletRequest request) {
+    ApiErrorResponse errorResponse = new ApiErrorResponse(
+      LocalDateTime.now(),
+      HttpStatus.NOT_FOUND.value(),
+      HttpStatus.NOT_FOUND.name(),
+      ex.getMessage(),
+      request.getRequestURI()
+    );
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+  }
 }
