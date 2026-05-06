@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CommonModule, DecimalPipe, DatePipe, registerLocaleData } from '@angular/common';
+import { CommonModule, DecimalPipe, registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 
 import { MatCardModule } from '@angular/material/card';
@@ -26,7 +26,6 @@ import { ConfirmDialog } from '../../../../shared/ui/confirm-dialog/confirm-dial
     RouterLink,
     FormsModule,
     DecimalPipe,
-    DatePipe,
     MatCardModule,
     MatButtonModule,
     MatProgressSpinnerModule,

@@ -19,7 +19,6 @@ import { BienApi } from '../.././../bien/services/bien-api';
 import { BienResponse } from '../../../bien/models/bien-response';
 import { ExerciceApi } from '../../../exercice/services/exercice-api';
 import { ExerciceResponse } from '../../../exercice/models/exercice-response';
-import { DatePipe } from '@angular/common';
 import { JustificatifApi } from '../../../justificatif/services/justificatif-api';
 import { JustificatifResponse } from '../../../justificatif/models/justificatif-response';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -50,7 +49,6 @@ import {
 @Component({
   selector: 'app-flux-form',
   imports: [
-    DatePipe,
     ReactiveFormsModule,
     RouterLink,
     MatCardModule,

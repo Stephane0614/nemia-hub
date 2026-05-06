@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, registerLocaleData, DatePipe } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import localeFr from '@angular/common/locales/fr';
 import { MatCardModule } from '@angular/material/card';
@@ -25,7 +25,6 @@ import {
   selector: 'app-home',
   imports: [
     CommonModule,
-    RouterLink,
     FormsModule,
     MatCardModule,
     MatDividerModule,
