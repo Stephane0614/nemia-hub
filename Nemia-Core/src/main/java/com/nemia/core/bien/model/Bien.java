@@ -1,6 +1,5 @@
 package com.nemia.core.bien.model;
 
-import com.nemia.core.flux.persistence.LocalDateStringConverter;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +25,6 @@ public class Bien {
   @Enumerated(EnumType.STRING)
   private TypeLocation typeLocation;
 
-  @Convert(converter = LocalDateStringConverter.class)
   private LocalDate dateMiseEnLocation;
 
   @Enumerated(EnumType.STRING)

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -176,4 +177,39 @@ public class GlobalExceptionHandler {
     );
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
   }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolation(
+        DataIntegrityViolationException ex,
+        HttpServletRequest request) {
+
+    String message = "Impossible de supprimer cet élément : il est encore référencé par d'autres données.";
+
+    String cause = ex.getMessage() != null ? ex.getMessage().toLowerCase() : "";
+
+    if (cause.contains("fk_flux_bien") || cause.contains("fk_travaux_bien")
+            || cause.contains("fk_mobilier_bien") || cause.contains("fk_emprunt_bien")) {
+        message = "Impossible de supprimer ce bien : des opérations y sont encore rattachées.";
+    } else if (cause.contains("fk_flux_exercice")) {
+        message = "Impossible de supprimer cet exercice : des flux y sont encore rattachés.";
+    } else if (cause.contains("fk_flux_justificatif")) {
+        message = "Impossible de supprimer ce justificatif : des flux y sont encore rattachés.";
+    } else if (cause.contains("fk_flux_travaux")) {
+        message = "Impossible de supprimer ces travaux : des flux y sont encore rattachés.";
+    } else if (cause.contains("fk_flux_mobilier")) {
+        message = "Impossible de supprimer ce mobilier : des flux y sont encore rattachés.";
+    } else if (cause.contains("fk_flux_emprunt")) {
+        message = "Impossible de supprimer cet emprunt : des flux y sont encore rattachés.";
+    }
+
+    ApiErrorResponse error = new ApiErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.CONFLICT.value(),
+            HttpStatus.CONFLICT.name(),
+            message,
+            request.getRequestURI()
+    );
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+}
 }

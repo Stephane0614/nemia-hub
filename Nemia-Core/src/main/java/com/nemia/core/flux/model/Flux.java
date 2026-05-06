@@ -1,6 +1,5 @@
 package com.nemia.core.flux.model;
 
-import com.nemia.core.flux.persistence.LocalDateStringConverter;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +13,6 @@ public class Flux {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Convert(converter = LocalDateStringConverter.class)
   @Column(nullable = false)
   private LocalDate date;
 
@@ -49,7 +47,6 @@ public class Flux {
 
   private Long exerciceId;
 
-  @Convert(converter = LocalDateStringConverter.class)
   private LocalDate dateValeur;
 
   @Enumerated(EnumType.STRING)

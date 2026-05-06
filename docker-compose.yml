@@ -1,0 +1,49 @@
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: nemia-db
+    environment:
+      POSTGRES_DB: nemia_hub
+      POSTGRES_USER: ${DB_USER:-nemia}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-nemia2026}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - nemia-network
+
+  # backend:
+  #   build: ./Nemia-Core
+  #   container_name: nemia-api
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #     DB_NAME: nemia_hub
+  #     DB_USER: ${DB_USER:-nemia}
+  #     DB_PASSWORD: ${DB_PASSWORD:-nemia2026}
+  #   restart: always
+  #   networks:
+  #     - nemia-network
+
+  # frontend:
+  #   build: ./Nemia-View
+  #   container_name: nemia-web
+  #   ports:
+  #     - "80:80"
+  #   depends_on:
+  #     - backend
+  #   restart: always
+  #   networks:
+  #     - nemia-network
+
+networks:
+  nemia-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
