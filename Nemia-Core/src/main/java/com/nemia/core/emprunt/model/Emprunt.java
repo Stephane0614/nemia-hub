@@ -1,6 +1,5 @@
 package com.nemia.core.emprunt.model;
 
-import com.nemia.core.flux.persistence.LocalDateStringConverter;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,11 +25,9 @@ public class Emprunt {
   @Column(name = "mensualite_totale", precision = 12, scale = 2)
   private BigDecimal mensualiteTotale;
 
-  @Convert(converter = LocalDateStringConverter.class)
   @Column(name = "date_premiere_echeance")
   private LocalDate datePremiereEcheance;
 
-  @Convert(converter = LocalDateStringConverter.class)
   @Column(name = "date_derniere_echeance")
   private LocalDate dateDerniereEcheance;
 

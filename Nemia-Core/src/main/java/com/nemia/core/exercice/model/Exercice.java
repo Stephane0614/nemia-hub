@@ -1,6 +1,5 @@
 package com.nemia.core.exercice.model;
 
-import com.nemia.core.flux.persistence.LocalDateStringConverter;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,11 +15,9 @@ public class Exercice {
   @Column(name = "libelle_exercice", nullable = false, length = 50)
   private String libelleExercice;
 
-  @Convert(converter = LocalDateStringConverter.class)
   @Column(nullable = false)
   private LocalDate dateDebut;
 
-  @Convert(converter = LocalDateStringConverter.class)
   @Column(nullable = false)
   private LocalDate dateFin;
 

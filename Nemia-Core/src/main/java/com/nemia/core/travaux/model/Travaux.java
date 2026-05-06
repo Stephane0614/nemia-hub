@@ -1,7 +1,6 @@
 package com.nemia.core.travaux.model;
 
 import com.nemia.core.flux.model.QualificationPressentie;
-import com.nemia.core.flux.persistence.LocalDateStringConverter;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,11 +20,9 @@ public class Travaux {
   @Column(name = "bien_id")
   private Long bienId;
 
-  @Convert(converter = LocalDateStringConverter.class)
   @Column(name = "date_debut")
   private LocalDate dateDebut;
 
-  @Convert(converter = LocalDateStringConverter.class)
   @Column(name = "date_fin")
   private LocalDate dateFin;
 

@@ -1,7 +1,6 @@
 package com.nemia.core.mobilier.model;
 
 import com.nemia.core.flux.model.QualificationPressentie;
-import com.nemia.core.flux.persistence.LocalDateStringConverter;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,7 +20,6 @@ public class Mobilier {
   @Column(name = "bien_id", nullable = false)
   private Long bienId;
 
-  @Convert(converter = LocalDateStringConverter.class)
   @Column(name = "date_acquisition")
   private LocalDate dateAcquisition;
 

@@ -1,6 +1,5 @@
 package com.nemia.core.justificatif.model;
 
-import com.nemia.core.flux.persistence.LocalDateStringConverter;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +20,6 @@ public class Justificatif {
   @Column(nullable = false)
   private StatutDocumentaire statutDocumentaire;
 
-  @Convert(converter = LocalDateStringConverter.class)
   private LocalDate datePiece;
 
   @Column(length = 100)
