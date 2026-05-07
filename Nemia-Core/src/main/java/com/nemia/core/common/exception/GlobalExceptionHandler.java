@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -211,5 +213,23 @@ public ResponseEntity<ApiErrorResponse> handleDataIntegrityViolation(
     );
 
     return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+}
+
+@ExceptionHandler(ResponseStatusException.class)
+public ResponseEntity<ApiErrorResponse> handleResponseStatus(
+        ResponseStatusException ex,
+        HttpServletRequest request) {
+
+    HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
+
+    ApiErrorResponse error = new ApiErrorResponse(
+            LocalDateTime.now(),
+            ex.getStatusCode().value(),
+            status != null ? status.name() : "ERROR",
+            ex.getReason(),
+            request.getRequestURI()
+    );
+
+    return ResponseEntity.status(ex.getStatusCode()).body(error);
 }
 }
