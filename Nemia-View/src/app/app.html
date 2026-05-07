@@ -1,7 +1,8 @@
+
 <mat-toolbar class="app-toolbar" color="primary">
   <div class="app-toolbar__inner">
     <a routerLink="/" class="app-brand">Nemia Hub</a>
-
+@if (isAuthenticated) {
     <nav class="app-nav">
       <!-- <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Accueil</a> -->
       <a routerLink="/biens" routerLinkActive="active">Biens</a>
@@ -10,9 +11,20 @@
       <a routerLink="/exercice" routerLinkActive="active">Synthèse</a>
       <a routerLink="/flux" routerLinkActive="active">Opérations</a>
       <a routerLink="/mobilier" routerLinkActive="active">Mobilier</a>
-      <a mat-button routerLink="/emprunts" routerLinkActive="nav-active"><mat-icon>account_balance</mat-icon></a>
+      <a mat-button routerLink="/emprunts" routerLinkActive="nav-active"><mat-icon>account_balance</mat-icon>Emprunts</a> 
     </nav>
+    }
   </div>
+  <span class="toolbar-spacer"></span>
+
+<span class="toolbar-username" *ngIf="username">
+  <mat-icon>person</mat-icon>
+  {{ username }}
+</span>
+
+<button mat-icon-button (click)="logout()" matTooltip="Se déconnecter">
+  <mat-icon>logout</mat-icon>
+</button>
 </mat-toolbar>
 
 <main class="app-shell">
