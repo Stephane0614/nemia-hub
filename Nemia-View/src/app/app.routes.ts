@@ -9,43 +9,82 @@ import { travauxRoutes } from './features/travaux/travaux.routes';
 import { mobilierRoutes } from './features/mobilier/mobilier.routes';
 import { empruntRoutes } from './features/emprunt/emprunt.routes';
 
+import { authGuard } from './core/auth/auth.guard';
+
 export const routes: Routes = [
   {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/pages/login/login').then(
+        (m) => m.LoginComponent
+      ),
+  },
+  {
     path: '',
-    component: Home,
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/home/pages/home/home').then((m) => m.Home),
   },
   {
     path: 'flux',
-    children: fluxRoutes,
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/flux/flux.routes').then((m) => m.fluxRoutes),
   },
   {
     path: 'biens',
-    children: bienRoutes,
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/bien/bien.routes').then((m) => m.bienRoutes),
   },
   {
     path: 'exercices',
-    children: exerciceRoutes,
-  },
-  {
-    path: 'justificatifs',
-    children: justificatifRoutes,
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/exercice/exercice.routes').then(
+        (m) => m.exerciceRoutes
+      ),
   },
   {
     path: 'exercice',
-    component: ExerciceSynthese,
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/exercice/pages/exercice-synthese/exercice-synthese').then(
+        (m) => m.ExerciceSynthese
+      ),
+  },
+  {
+    path: 'justificatifs',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/justificatif/justificatif.routes').then(
+        (m) => m.justificatifRoutes
+      ),
   },
   {
     path: 'travaux',
-    children: travauxRoutes,
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/travaux/travaux.routes').then(
+        (m) => m.travauxRoutes
+      ),
   },
   {
     path: 'mobilier',
-    children: mobilierRoutes,
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/mobilier/mobilier.routes').then(
+        (m) => m.mobilierRoutes
+      ),
   },
   {
-  path: 'emprunts',
-  children: empruntRoutes
-},
+    path: 'emprunts',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/emprunt/emprunt.routes').then(
+        (m) => m.empruntRoutes
+      ),
+  },
   {
     path: '**',
     redirectTo: '',
