@@ -17,9 +17,10 @@ public class JwtUtil {
     private final long expirationMs = 24 * 60 * 60 * 1000L; // 24h
 
     public JwtUtil(@Value("${jwt.secret}") String secret) {
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-    }
-
+    System.out.println("=== JwtUtil: secret reçu = " + (secret != null ? secret.substring(0, 3) + "***" : "NULL") + " ===");
+    this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    System.out.println("=== JwtUtil: bean créé avec succès ===");
+}
     public String generateToken(String username) {
         return Jwts.builder()
                 .subject(username)
