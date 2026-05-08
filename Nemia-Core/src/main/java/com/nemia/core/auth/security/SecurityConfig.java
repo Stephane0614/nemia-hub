@@ -22,8 +22,9 @@ public class SecurityConfig {
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
   public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    System.out.println("=== SecurityConfig: chargée ===");
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-  }
+}
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
