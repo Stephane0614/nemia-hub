@@ -64,7 +64,8 @@
               "buildTarget": "nemia-view:build:production"
             },
             "development": {
-              "buildTarget": "nemia-view:build:development"
+              "buildTarget": "nemia-view:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
