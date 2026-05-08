@@ -1,0 +1,29 @@
+name: CI nemia-hub
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  backend:
+    name: Backend — Build & Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Nemia-Core
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Build + Tests
+        run: mvn clean verify

@@ -2,3 +2,4 @@ target/
 nemia.db
 .vscode
 node_modules
+application-dev.properties
