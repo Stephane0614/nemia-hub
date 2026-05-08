@@ -3,7 +3,7 @@
 set -u
 
 # Chemins mis à jour pour la racine
-PROJECT_ROOT="/c/Perso/projet_dev_perso/nemia-hub"
+PROJECT_ROOT="D:/Dev-perso/nemia-hub"
 SRC_DIR="$PROJECT_ROOT"
 CONFIG_FILE="$PROJECT_ROOT/.prettierrc"
 PRETTIER_BIN="$PROJECT_ROOT/node_modules/.bin/prettier"

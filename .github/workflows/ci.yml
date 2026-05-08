@@ -54,3 +54,17 @@ jobs:
 
       - name: Audit sécurité dépendances
         run: npm audit --audit-level=high
+    docker:
+      -name: Docker — Build images
+          runs-on: ubuntu-latest
+          needs: [ backend, frontend ]
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Build image backend
+        run: docker build -t nemia-core:ci ./Nemia-Core
+
+      - name: Build image frontend
+        run: docker build -t nemia-view:ci ./Nemia-View
