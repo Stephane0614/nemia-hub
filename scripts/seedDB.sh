@@ -4,7 +4,45 @@
 
 set -u
 
-BASE_URL="http://localhost:8080/api"
+# ── Mode (dev | prod) ─────────────────────────────────────────────────
+
+if [[ $# -ne 1 || ( "$1" != "dev" && "$1" != "prod" ) ]]; then
+  echo "Usage: ./seedDB.sh [dev|prod]"
+  exit 1
+fi
+
+MODE="$1"
+TOKEN=""
+
+if [[ "$MODE" == "dev" ]]; then
+  BASE_URL="http://localhost:8080/api"
+else
+  BASE_URL="https://nemiahub.eu/api"
+  echo -n "Mot de passe admin : "
+  read -rs ADMIN_PASSWORD
+  echo
+
+  LOGIN_RESPONSE=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" \
+    -X POST "$BASE_URL/auth/login" \
+    -H "Content-Type: application/json; charset=UTF-8" \
+    -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PASSWORD\"}")
+
+  LOGIN_BODY=$(echo "$LOGIN_RESPONSE" | sed '$d')
+  LOGIN_STATUS=$(echo "$LOGIN_RESPONSE" | tail -n 1 | sed 's/HTTP_STATUS://')
+
+  if [[ "$LOGIN_STATUS" != "200" ]]; then
+    echo "Echec de l'authentification (HTTP $LOGIN_STATUS)"
+    exit 1
+  fi
+
+  TOKEN=$(echo "$LOGIN_BODY" | grep -o '"token":"[^"]*"' | sed 's/"token":"//;s/"//')
+  if [[ -z "$TOKEN" ]]; then
+    echo "Token JWT introuvable dans la reponse de login"
+    exit 1
+  fi
+  echo "Authentification reussie."
+fi
+
 FLUX_URL="$BASE_URL/flux"
 BIENS_URL="$BASE_URL/biens"
 EXERCICES_URL="$BASE_URL/exercices"
@@ -19,10 +57,16 @@ post_json() {
   echo "--------------------------------------------------"
   echo "Insertion: $label"
 
+  local auth_header=()
+  if [[ -n "$TOKEN" ]]; then
+    auth_header=(-H "Authorization: Bearer $TOKEN")
+  fi
+
   local response
   response=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" \
     -X POST "$url" \
     -H "Content-Type: application/json; charset=UTF-8" \
+    "${auth_header[@]}" \
     -d "$payload")
 
   local body
