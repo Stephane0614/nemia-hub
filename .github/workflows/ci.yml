@@ -50,3 +50,6 @@ jobs:
 
       - name: Build production
         run: npx ng build --configuration=production
+
+      - name: Audit sécurité dépendances
+        run: npm audit --audit-level=high
