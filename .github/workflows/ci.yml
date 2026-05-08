@@ -27,6 +27,10 @@ jobs:
 
       - name: Build + Tests
         run: mvn clean verify
+      - name: Audit sécurité dépendances (OWASP)
+        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=7
+
+
   frontend:
     name: Frontend — Build
     runs-on: ubuntu-latest
