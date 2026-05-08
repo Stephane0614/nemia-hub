@@ -1,5 +1,6 @@
 package com.nemia.core.bien.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -50,6 +51,11 @@ class BienControllerTest {
       .setControllerAdvice(new com.nemia.core.common.exception.GlobalExceptionHandler())
       .build();
   }
+
+  @Test
+void testVolontairementCasse() {
+    assertEquals(1, 2, "Ce test doit échouer");
+}
 
   @Test
   void shouldCreateBien() throws Exception {
