@@ -27,3 +27,26 @@ jobs:
 
       - name: Build + Tests
         run: mvn clean verify
+  frontend:
+    name: Frontend — Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Nemia-View
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ./Nemia-View/package-lock.json
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Build production
+        run: npx ng build --configuration=production
