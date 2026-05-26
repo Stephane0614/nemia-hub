@@ -11,18 +11,34 @@
       <a routerLink="/exercice" routerLinkActive="active">Synthèse</a>
       <a routerLink="/flux" routerLinkActive="active">Opérations</a>
       <a routerLink="/mobilier" routerLinkActive="active">Mobilier</a>
-      <a mat-button routerLink="/emprunts" routerLinkActive="nav-active"><mat-icon>account_balance</mat-icon>Emprunts</a> 
+      <a mat-button routerLink="/emprunts" routerLinkActive="nav-active"><mat-icon>account_balance</mat-icon>Emprunts</a>
     </nav>
     }
   </div>
+
+  <button mat-icon-button [matMenuTriggerFor]="menuAide" matTooltip="Aide"
+  style="color: white;">
+  <mat-icon>help_outline</mat-icon>
+</button>
+
+<mat-menu #menuAide="matMenu">
+  <a mat-menu-item [routerLink]="['/aide/guide']">
+  <mat-icon>menu_book</mat-icon>
+  Guide utilisateur
+</a>
+<a mat-menu-item [routerLink]="['/aide/scenarios']">
+  <mat-icon>assignment</mat-icon>
+  Mise en situation
+</a>
+</mat-menu>
   <span class="toolbar-spacer"></span>
 
 <span class="toolbar-username" *ngIf="username">
-  <mat-icon>person</mat-icon>
   {{ username }}
 </span>
 
-<button mat-icon-button (click)="logout()" matTooltip="Se déconnecter">
+<button mat-icon-button (click)="logout()" matTooltip="Se déconnecter"
+style="color: white;">
   <mat-icon>logout</mat-icon>
 </button>
 </mat-toolbar>

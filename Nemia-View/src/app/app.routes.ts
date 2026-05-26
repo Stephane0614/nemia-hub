@@ -86,6 +86,12 @@ export const routes: Routes = [
       ),
   },
   {
+  path: 'aide',
+  canActivate: [authGuard],
+  loadChildren: () =>
+    import('./features/aide/aide.routes').then((m) => m.aideRoutes),
+},
+  {
     path: '**',
     redirectTo: '',
   },

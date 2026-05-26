@@ -1,0 +1,15 @@
+<div class="md-page">
+
+  <div class="md-loading" *ngIf="isLoading">
+    <span>Chargement…</span>
+  </div>
+
+  <div class="md-error" *ngIf="!isLoading && errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="md-content" *ngIf="!isLoading && !errorMessage"
+       [innerHTML]="content">
+  </div>
+
+</div>
