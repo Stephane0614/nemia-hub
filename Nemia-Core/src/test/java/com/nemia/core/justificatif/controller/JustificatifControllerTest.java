@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.nemia.core.common.exception.JustificatifNotFoundException;
 import com.nemia.core.justificatif.dto.JustificatifResponse;
+import com.nemia.core.justificatif.model.Justificatif;
 import com.nemia.core.justificatif.model.StatutDocumentaire;
 import com.nemia.core.justificatif.model.TypePiece;
 import java.time.LocalDate;
@@ -36,6 +37,9 @@ class JustificatifControllerTest {
 
   @Mock
   private com.nemia.core.justificatif.service.JustificatifService justificatifService;
+
+  @Mock
+  private com.nemia.core.justificatif.service.FichierService fichierService; 
 
   @InjectMocks
   private JustificatifController justificatifController;
@@ -244,6 +248,10 @@ class JustificatifControllerTest {
   @Test
   void shouldDeleteJustificatif() throws Exception {
     Long id = 1L;
+    Justificatif justificatif = new Justificatif();
+    justificatif.setFichierChemin(null);
+
+    when(justificatifService.findEntityById(id)).thenReturn(justificatif);
     doNothing().when(justificatifService).delete(id);
 
     mockMvc.perform(delete("/api/justificatifs/{id}", id)).andDo(print()).andExpect(status().isNoContent());
@@ -254,11 +262,11 @@ class JustificatifControllerTest {
   @Test
   void shouldReturn404WhenDeletingNonExistentJustificatif() throws Exception {
     Long id = 99L;
-    doThrow(new JustificatifNotFoundException(id)).when(justificatifService).delete(id);
+    doThrow(new JustificatifNotFoundException(id)).when(justificatifService).findEntityById(id);
 
     mockMvc.perform(delete("/api/justificatifs/{id}", id)).andDo(print()).andExpect(status().isNotFound());
 
-    verify(justificatifService).delete(id);
+    verify(justificatifService).findEntityById(id);
   }
 
   private JustificatifResponse buildJustificatifResponse(
