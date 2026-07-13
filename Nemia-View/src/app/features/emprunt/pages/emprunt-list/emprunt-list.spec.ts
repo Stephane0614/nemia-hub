@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EmpruntList } from './emprunt-list';
+import { EmpruntListComponent } from './emprunt-list';
 
-describe('EmpruntList', () => {
-  let component: EmpruntList;
-  let fixture: ComponentFixture<EmpruntList>;
+describe('EmpruntListComponent', () => {
+  let component: EmpruntListComponent;
+  let fixture: ComponentFixture<EmpruntListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EmpruntList],
+      imports: [EmpruntListComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(EmpruntList);
+    fixture = TestBed.createComponent(EmpruntListComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
@@ -20,3 +20,4 @@ describe('EmpruntList', () => {
     expect(component).toBeTruthy();
   });
 });
+
