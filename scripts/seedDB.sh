@@ -2,6 +2,7 @@
 # Peuplement DB mise en situation — 1er janvier 2026 au 6 mai 2026
 # Prérequis : base vide, backend sur localhost:8080
 
+
 set -u
 
 # ── Mode (dev | prod) ─────────────────────────────────────────────────

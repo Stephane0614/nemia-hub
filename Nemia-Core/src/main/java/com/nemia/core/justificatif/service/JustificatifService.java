@@ -97,6 +97,9 @@ public class JustificatifService {
     response.setFichierAssocie(justificatif.getFichierAssocie());
     response.setCreatedAt(justificatif.getCreatedAt());
     response.setUpdatedAt(justificatif.getUpdatedAt());
+    response.setFichierNom(justificatif.getFichierNom());
+    response.setFichierType(justificatif.getFichierType());
+    response.setFichierTaille(justificatif.getFichierTaille());
     return response;
   }
 
@@ -105,4 +108,14 @@ public class JustificatifService {
     String trimmed = value.trim();
     return trimmed.isEmpty() ? null : trimmed;
   }
+
+  public Justificatif findEntityById(Long id) {
+    return justificatifRepository.findById(id)
+            .orElseThrow(() -> new JustificatifNotFoundException(id));
+}
+
+public JustificatifResponse save(Justificatif justificatif) {
+    Justificatif saved = justificatifRepository.save(justificatif);
+    return mapToResponse(saved);
+}
 }

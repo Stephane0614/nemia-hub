@@ -6,6 +6,9 @@
 
 ## Avant de commencer — ce que tu dois savoir
 
+
+je teste la mise en place d'un nouveau workflow de travail.
+
 Tu passes du micro-BIC au régime réel. Concrètement, ça change tout :
 
 En micro-BIC, tu déclarais tes loyers et l'administration appliquait un abattement forfaitaire de 50%. Tu n'avais rien à justifier, rien à classer, rien à calculer.

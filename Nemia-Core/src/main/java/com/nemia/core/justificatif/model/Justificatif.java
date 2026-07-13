@@ -31,6 +31,18 @@ public class Justificatif {
   @Column(length = 500)
   private String commentaire;
 
+  @Column(name = "fichier_nom")
+  private String fichierNom;
+
+  @Column(name = "fichier_chemin", length = 1000)
+  private String fichierChemin;
+
+  @Column(name = "fichier_type")
+  private String fichierType;
+
+  @Column(name = "fichier_taille")
+  private Long fichierTaille;
+
   @Column
   private String fichierAssocie;
 
@@ -120,5 +132,37 @@ public class Justificatif {
 
   public LocalDateTime getUpdatedAt() {
     return updatedAt;
+  }
+
+  public String getFichierNom() {
+    return fichierNom;
+  }
+
+  public void setFichierNom(String fichierNom) {
+    this.fichierNom = fichierNom;
+  }
+
+  public String getFichierChemin() {
+    return fichierChemin;
+  }
+
+  public void setFichierChemin(String fichierChemin) {
+    this.fichierChemin = fichierChemin;
+  }
+
+  public String getFichierType() {
+    return fichierType;
+  }
+
+  public void setFichierType(String fichierType) {
+    this.fichierType = fichierType;
+  }
+
+  public Long getFichierTaille() {
+    return fichierTaille;
+  }
+
+  public void setFichierTaille(Long fichierTaille) {
+    this.fichierTaille = fichierTaille;
   }
 }

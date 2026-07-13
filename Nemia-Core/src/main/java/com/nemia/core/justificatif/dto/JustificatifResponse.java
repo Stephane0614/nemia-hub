@@ -17,6 +17,9 @@ public class JustificatifResponse {
   private String fichierAssocie;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private String fichierNom;
+  private String fichierType;
+  private Long fichierTaille;
 
   public JustificatifResponse() {}
 
@@ -46,6 +49,30 @@ public class JustificatifResponse {
 
   public LocalDate getDatePiece() {
     return datePiece;
+  }
+
+  public String getFichierNom() {
+    return fichierNom;
+  }
+
+  public void setFichierNom(String fichierNom) {
+    this.fichierNom = fichierNom;
+  }
+
+  public String getFichierType() {
+    return fichierType;
+  }
+
+  public void setFichierType(String fichierType) {
+    this.fichierType = fichierType;
+  }
+
+  public Long getFichierTaille() {
+    return fichierTaille;
+  }
+
+  public void setFichierTaille(Long fichierTaille) {
+    this.fichierTaille = fichierTaille;
   }
 
   public void setDatePiece(LocalDate datePiece) {
