@@ -1,3 +1,8 @@
+import { provideNativeDateAdapter, MAT_DATE_LOCALE } from '@angular/material/core';
+import { LOCALE_ID } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MobilierForm } from './mobilier-form';
@@ -9,6 +14,14 @@ describe('MobilierForm', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MobilierForm],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideNativeDateAdapter(),
+        { provide: MAT_DATE_LOCALE, useValue: 'fr-FR' },
+        { provide: LOCALE_ID, useValue: 'fr-FR' },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MobilierForm);
