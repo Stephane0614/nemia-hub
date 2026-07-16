@@ -151,6 +151,7 @@ public class FluxService {
     flux.setTravauxId(request.getTravauxId());
     flux.setMobilierId(request.getMobilierId());
     flux.setEmpruntId(request.getEmpruntId());
+    flux.setJustificatifId(request.getJustificatifId());
   }
 
   private void mapUpdateRequestToEntity(UpdateFluxRequest request, Flux flux) {
@@ -171,6 +172,7 @@ public class FluxService {
     flux.setTravauxId(request.getTravauxId());
     flux.setMobilierId(request.getMobilierId());
     flux.setEmpruntId(request.getEmpruntId());
+    flux.setJustificatifId(request.getJustificatifId());
   }
 
   private FluxResponse mapToResponse(Flux flux) {
@@ -195,6 +197,7 @@ public class FluxService {
     response.setTravauxId(flux.getTravauxId());
     response.setMobilierId(flux.getMobilierId());
     response.setEmpruntId(flux.getEmpruntId());
+    response.setJustificatifId(flux.getJustificatifId());
 
     return response;
   }

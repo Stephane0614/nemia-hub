@@ -24,6 +24,9 @@ import { BienResponse } from '../../../bien/models/bien-response';
 import { ExerciceResponse } from '../../../exercice/models/exercice-response';
 import { ReferentialItem } from '../../models/referential-item';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { JustificatifApi } from '../../../justificatif/services/justificatif-api';
 
 @Component({
   selector: 'app-flux-list',
@@ -40,6 +43,8 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
     MatSelectModule,
     MatDatepickerModule,
     MatInputModule,
+    MatIconModule,
+    MatTooltipModule,
     DecimalPipe,
     DatePipe,
   ],
@@ -50,6 +55,7 @@ export class FluxList implements OnInit {
   private readonly fluxApi = inject(FluxApi);
   private readonly bienApi = inject(BienApi);
   private readonly exerciceApi = inject(ExerciceApi);
+  private readonly justificatifApi = inject(JustificatifApi);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -324,5 +330,26 @@ export class FluxList implements OnInit {
   }
   isCategorieDivers(cat: string): boolean {
     return ['REGULARISATION', 'AUTRE'].includes(cat);
+  }
+
+  consulterJustificatif(justificatifId: number): void {
+    // Ouvre l'onglet immédiatement (dans le même tick que le clic) pour éviter le blocage de popup
+    // des navigateurs, qui n'autorisent window.open() qu'en réponse directe à un geste utilisateur.
+    const newTab = window.open('', '_blank');
+
+    this.justificatifApi.downloadFichier(justificatifId).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        if (newTab) {
+          newTab.location.href = url;
+        } else {
+          window.open(url, '_blank');
+        }
+      },
+      error: () => {
+        newTab?.close();
+        this.openErrorSnackBar('Impossible d’ouvrir la pièce justificative.');
+      },
+    });
   }
 }

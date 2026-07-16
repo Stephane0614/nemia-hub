@@ -56,6 +56,8 @@ public class UpdateFluxRequest {
 
   private Long empruntId;
 
+  private Long justificatifId;
+
   @Size(max = 500)
   private String commentaire;
 
@@ -195,5 +197,13 @@ public class UpdateFluxRequest {
 
   public void setEmpruntId(Long empruntId) {
     this.empruntId = empruntId;
+  }
+
+  public Long getJustificatifId() {
+    return justificatifId;
+  }
+
+  public void setJustificatifId(Long justificatifId) {
+    this.justificatifId = justificatifId;
   }
 }

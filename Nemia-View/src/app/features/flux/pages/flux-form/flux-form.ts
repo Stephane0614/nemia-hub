@@ -19,16 +19,10 @@ import { BienApi } from '../.././../bien/services/bien-api';
 import { BienResponse } from '../../../bien/models/bien-response';
 import { ExerciceApi } from '../../../exercice/services/exercice-api';
 import { ExerciceResponse } from '../../../exercice/models/exercice-response';
-import { JustificatifApi } from '../../../justificatif/services/justificatif-api';
-import { JustificatifResponse } from '../../../justificatif/models/justificatif-response';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TravauxApi } from '../../../travaux/services/travaux-api';
 import { TravauxResponse } from '../../../travaux/models/travaux-response';
 import { TravauxForm, TravauxDialogData } from '../../../travaux/pages/travaux-form/travaux-form';
-import {
-  JustificatifForm,
-  JustificatifDialogData,
-} from '../../../justificatif/pages/justificatif-form/justificatif-form';
 import { MobilierApi } from '../../../mobilier/services/mobilier-api';
 import { MobilierResponse } from '../../../mobilier/models/mobilier-response';
 import {
@@ -38,6 +32,7 @@ import {
 import { EmpruntApi } from '../../../emprunt/services/emprunt-api';
 import { EmpruntResponse } from '../../../emprunt/models/emprunt-response';
 import { EmpruntFormComponent, EmpruntFormDialogData } from '../../../emprunt/pages/emprunt-form/emprunt-form';
+import { ConfirmDialog } from '../../../../shared/ui/confirm-dialog/confirm-dialog';
 
 import {
   Occurrence,
@@ -73,7 +68,6 @@ export class FluxForm implements OnInit {
   private readonly dialog = inject(MatDialog);
   readonly isEditMode = computed(() => this.fluxId() !== null);
   private readonly exerciceApi = inject(ExerciceApi);
-  private readonly justificatifApi = inject(JustificatifApi);
   private readonly travauxApi = inject(TravauxApi);
   private readonly mobilierApi = inject(MobilierApi);
   private readonly empruntApi = inject(EmpruntApi);
@@ -99,11 +93,11 @@ export class FluxForm implements OnInit {
   statutsTraitement: { code: string; label: string }[] = [];
   biens: BienResponse[] = [];
   exercices: ExerciceResponse[] = [];
-  justificatifs: JustificatifResponse[] = [];
-  justificatifsLoading = false;
   exercicesLoading = false;
   biensLoading = false;
   fluxCreatedId: number | null = null;
+  // Justificatif lié au flux (lecture seule) — permet d'accéder à sa page de modification
+  linkedJustificatifId: number | null = null;
 
   readonly fluxId = computed(() => {
     const id = this.route.snapshot.paramMap.get('id');
@@ -125,7 +119,6 @@ export class FluxForm implements OnInit {
     bienId: [null as number | null],
     exerciceId: [null as number | null],
     commentaire: ['', Validators.maxLength(500)],
-    justificatifId: [null as number | null],
     travauxId: [null as number | null],
     mobilierId: [null as number | null],
     empruntId: [null as number | null],
@@ -165,18 +158,6 @@ export class FluxForm implements OnInit {
           },
           error: () => {
             this.biensLoading = false;
-            this.cdr.detectChanges();
-          },
-        });
-        this.justificatifsLoading = true;
-        this.justificatifApi.getAll().subscribe({
-          next: (justificatifs) => {
-            this.justificatifs = justificatifs;
-            this.justificatifsLoading = false;
-            this.cdr.detectChanges();
-          },
-          error: () => {
-            this.justificatifsLoading = false;
             this.cdr.detectChanges();
           },
         });
@@ -313,10 +294,8 @@ export class FluxForm implements OnInit {
       commentaire: (rawValue.commentaire ?? '').trim() || null,
       bienId: rawValue.bienId ? Number(rawValue.bienId) : null,
       exerciceId: rawValue.exerciceId ? Number(rawValue.exerciceId) : null,
-      justificatifId: rawValue.justificatifId ? Number(rawValue.justificatifId) : null,
-      travauxId: rawValue.travauxId ? Number(rawValue.travauxId) : null,
-      mobilierId: rawValue.mobilierId ? Number(rawValue.mobilierId) : null,
-      empruntId: rawValue.empruntId ?? undefined,
+      travauxId: null,
+      mobilierId: null,
     };
   }
 
@@ -364,8 +343,30 @@ export class FluxForm implements OnInit {
       return;
     }
 
-    this.form.reset();
-    this.router.navigateByUrl('/flux');
+    if (!this.isEditMode()) {
+      const dialogRef = this.dialog.open(ConfirmDialog, {
+        width: '450px',
+        disableClose: true,
+        data: {
+          title: 'Ajouter un justificatif',
+          message: 'Souhaitez-vous ajouter une pièce justificative pour cette opération ?',
+          confirmLabel: 'Ajouter un justificatif',
+          cancelLabel: 'Plus tard',
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((confirmed) => {
+        this.form.reset();
+        if (confirmed && createdId) {
+          this.router.navigate(['/justificatifs/nouveau'], { queryParams: { fluxId: createdId } });
+        } else {
+          this.router.navigateByUrl('/flux');
+        }
+      });
+    } else {
+      this.form.reset();
+      this.router.navigateByUrl('/flux');
+    }
   }
 
   private handleSaveValidationError(errors: Record<string, string> | undefined): void {
@@ -395,11 +396,12 @@ export class FluxForm implements OnInit {
           statutTraitement: flux.statutTraitement,
           bienId: flux.bienId,
           exerciceId: flux.exerciceId,
-          justificatifId: flux.justificatifId ?? null,
           mobilierId: flux.mobilierId ?? null,
           empruntId: flux.empruntId ?? null,
           travauxId: flux.travauxId ?? null,
         });
+
+        this.linkedJustificatifId = flux.justificatifId ?? null;
 
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -415,9 +417,33 @@ export class FluxForm implements OnInit {
 
   confirmAndRedirect(): void {
     this.submitWarnings = [];
+    const wasCreation = !this.isEditMode() && this.fluxCreatedId !== null;
+    const createdId = this.fluxCreatedId;
     this.fluxCreatedId = null;
-    this.form.reset();
-    this.router.navigateByUrl('/flux');
+    if (wasCreation) {
+      const dialogRef = this.dialog.open(ConfirmDialog, {
+        width: '450px',
+        disableClose: true,
+        data: {
+          title: 'Ajouter un justificatif',
+          message: 'Souhaitez-vous ajouter une pièce justificative pour cette opération ?',
+          confirmLabel: 'Ajouter un justificatif',
+          cancelLabel: 'Plus tard',
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((confirmed) => {
+        this.form.reset();
+        if (confirmed && createdId) {
+          this.router.navigate(['/justificatifs/nouveau'], { queryParams: { fluxId: createdId } });
+        } else {
+          this.router.navigateByUrl('/flux');
+        }
+      });
+    } else {
+      this.form.reset();
+      this.router.navigateByUrl('/flux');
+    }
   }
 
   formatExerciceLabel(exercice: ExerciceResponse): string {
@@ -426,33 +452,6 @@ export class FluxForm implements OnInit {
       return `${day}/${month}/${year}`;
     };
     return `${exercice.libelleExercice} (${formatDate(exercice.dateDebut)} → ${formatDate(exercice.dateFin)})`;
-  }
-
-  formatJustificatifLabel(j: JustificatifResponse): string {
-    if (j.referencePiece) return j.referencePiece;
-    if (j.datePiece) return `${j.typePiece} — ${j.datePiece}`;
-    return `${j.typePiece} #${j.id}`;
-  }
-
-  ouvrirDialogJustificatif(): void {
-    const dialogRef = this.dialog.open(JustificatifForm, {
-      width: '640px',
-      disableClose: false,
-      data: {} as JustificatifDialogData,
-    });
-
-    dialogRef.afterClosed().subscribe((justificatif: JustificatifResponse | null) => {
-      if (!justificatif) return;
-
-      // Rafraîchit la liste et positionne sur le nouveau justificatif
-      this.justificatifApi.getAll().subscribe({
-        next: (justificatifs) => {
-          this.justificatifs = justificatifs;
-          this.form.patchValue({ justificatifId: justificatif.id });
-          this.cdr.detectChanges();
-        },
-      });
-    });
   }
 
   ouvrirDialogTravaux(): void {
