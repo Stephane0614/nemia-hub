@@ -136,6 +136,7 @@
           <th>Justificatif</th>
           <th>Qualification</th>
           <th>Traitement</th>
+          <th>Consulter</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -176,7 +177,7 @@
           <td>
             <span class="badge badge--neutral">{{ flux.occurrence }}</span>
           </td>
-          <td>
+          <td class="cell-justificatif">
             <span
               class="badge"
               [class.badge--ok]="flux.statutJustificatif === 'FOURNI'"
@@ -208,6 +209,18 @@
             >
               {{ flux.statutTraitement }}
             </span>
+          </td>
+          <td class="cell-consulter">
+            @if (flux.justificatifId) {
+              <button
+                mat-icon-button
+                type="button"
+                matTooltip="Consulter le justificatif dans un nouvel onglet"
+                (click)="consulterJustificatif(flux.justificatifId)"
+              >
+                <mat-icon>open_in_new</mat-icon>
+              </button>
+            }
           </td>
           <td class="actions-cell">
             <a mat-button [routerLink]="['/flux', flux.id, 'modifier']">Modifier</a>

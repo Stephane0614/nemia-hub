@@ -34,4 +34,23 @@ export class JustificatifApi {
   getReferentials(): Observable<JustificatifReferentialsResponse> {
     return this.http.get<JustificatifReferentialsResponse>(`${this.baseUrl}/referentials`);
   }
+
+  uploadFichier(id: number, file: File): Observable<JustificatifResponse> {
+    const formData = new FormData();
+    formData.append('fichier', file);
+    return this.http.post<JustificatifResponse>(`${this.baseUrl}/${id}/fichier`, formData);
+  }
+
+  downloadFichier(id: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${id}/fichier`, { responseType: 'blob' });
+  }
+
+  getFichierUrl(id: number): string {
+    return `${this.baseUrl}/${id}/fichier`;
+  }
+
+  deleteFichier(id: number): Observable<JustificatifResponse> {
+    return this.http.delete<JustificatifResponse>(`${this.baseUrl}/${id}/fichier`);
+  }
 }
+

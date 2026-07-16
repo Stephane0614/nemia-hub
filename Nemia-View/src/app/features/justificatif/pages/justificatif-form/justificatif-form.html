@@ -72,9 +72,54 @@
       </mat-form-field>
     </div>
 
-    <div class="upload-reserved">
-      <span class="upload-reserved__icon">📎</span>
-      <span class="upload-reserved__label"> Ajout de pièce justificative — disponible prochainement </span>
+    <!-- Zone upload / fichier joint -->
+    <div class="upload-section">
+      <h3 class="section-title">Pièce justificative</h3>
+      
+      <!-- Mode création : message d'avertissement -->
+      @if (!isEditMode || !justificatifId) {
+        <div class="upload-info-box">
+          <span class="info-icon">ℹ</span>
+          <p class="info-text">Enregistrez d'abord le justificatif pour pouvoir joindre un fichier.</p>
+        </div>
+      } @else {
+        <!-- Mode édition -->
+        @if (justificatif?.fichierNom) {
+          <!-- Fichier déjà attaché -->
+          <div class="file-attached-box">
+            <span class="file-icon">📄</span>
+            <div class="file-details">
+              <span class="file-name">{{ justificatif?.fichierNom }}</span>
+              <span class="file-metadata">
+                {{ getFileTypeLabel(justificatif?.fichierType) }} — {{ formatBytes(justificatif?.fichierTaille) }}
+              </span>
+            </div>
+            <div class="file-actions">
+              <button mat-stroked-button type="button" (click)="consulterFichier()">Consulter</button>
+              <button mat-stroked-button color="warn" type="button" (click)="supprimerFichier()">Supprimer</button>
+            </div>
+          </div>
+        } @else {
+          <!-- Aucun fichier attaché -->
+          <div class="no-file-box">
+            @if (isUploading) {
+              <div class="upload-progress">
+                <mat-spinner diameter="24"></mat-spinner>
+                <span>Envoi du fichier en cours...</span>
+              </div>
+            } @else {
+              <button mat-stroked-button type="button" (click)="fileInput.click()">
+                <mat-icon>upload</mat-icon> Joindre un fichier
+              </button>
+              <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)" accept=".pdf,.jpg,.jpeg,.png" />
+            }
+          </div>
+        }
+      }
+
+      @if (fileError) {
+        <p class="error-message">{{ fileError }}</p>
+      }
     </div>
 
     @if (errorMessage) {

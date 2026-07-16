@@ -77,6 +77,19 @@ mat-form-field {
   gap: 12px;
 }
 
+.linked-justificatif {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 4px;
+
+  &__label {
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+}
+
 @media (max-width: 768px) {
   .form-card,
   .state-card {

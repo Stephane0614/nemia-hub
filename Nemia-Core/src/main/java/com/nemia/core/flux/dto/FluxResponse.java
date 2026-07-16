@@ -47,6 +47,8 @@ public class FluxResponse {
 
   private Long empruntId;
 
+  private Long justificatifId;
+
   public FluxResponse() {}
 
   public Long getId() {
@@ -215,5 +217,13 @@ public class FluxResponse {
 
   public void setEmpruntId(Long empruntId) {
     this.empruntId = empruntId;
+  }
+
+  public Long getJustificatifId() {
+    return justificatifId;
+  }
+
+  public void setJustificatifId(Long justificatifId) {
+    this.justificatifId = justificatifId;
   }
 }

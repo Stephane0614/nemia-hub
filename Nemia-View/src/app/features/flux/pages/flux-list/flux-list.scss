@@ -108,6 +108,37 @@ tbody tr:hover td {
   gap: 8px;
 }
 
+.cell-justificatif {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.cell-consulter {
+  text-align: center;
+
+  button {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    color: #4a80c4;
+    opacity: 0.85;
+    transition: opacity 0.15s, color 0.15s;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      opacity: 1;
+      color: #1d4ed8;
+    }
+  }
+}
+
 .warning-icon {
   font-size: 0.9rem;
   cursor: default;
