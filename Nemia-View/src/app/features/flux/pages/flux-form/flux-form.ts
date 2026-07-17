@@ -7,13 +7,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiErrorResponse } from '../../models/api-error-response';
 import { FluxCategory } from '../../models/flux-category';
 import { FluxRequest } from '../../models/flux-request';
 import { FluxType } from '../../models/flux-type';
 import { PaymentMode } from '../../models/payment-mode';
+import { ReferentialItem } from '../../models/referential-item';
 import { FluxApi } from '../../services/flux-api';
 import { BienApi } from '../.././../bien/services/bien-api';
 import { BienResponse } from '../../../bien/models/bien-response';
@@ -54,6 +56,7 @@ import {
     MatProgressSpinnerModule,
     MatDatepickerModule,
     MatDialogModule,
+    MatAutocompleteModule,
   ],
   templateUrl: './flux-form.html',
   styleUrl: './flux-form.scss',
@@ -85,7 +88,7 @@ export class FluxForm implements OnInit {
   emprunts: EmpruntResponse[] = [];
 
   fluxTypes: { code: string; label: string }[] = [];
-  fluxCategories: { code: string; label: string }[] = [];
+  fluxCategories: ReferentialItem[] = [];
   paymentModes: { code: string; label: string }[] = [];
   occurrences: { code: string; label: string }[] = [];
   statutsJustificatif: { code: string; label: string }[] = [];
@@ -98,6 +101,15 @@ export class FluxForm implements OnInit {
   fluxCreatedId: number | null = null;
   // Justificatif lié au flux (lecture seule) — permet d'accéder à sa page de modification
   linkedJustificatifId: number | null = null;
+
+  // Toutes les catégories connues (référentiel complet) — sert de filet de
+  // sécurité pour afficher une catégorie "legacy" absente du préfiltre par type
+  allCategories: ReferentialItem[] = [];
+  // Catégories autorisées pour le typeFlux courant, triées alphabétiquement
+  // Catégories affichées dans l'autocomplete après filtrage par texte tapé
+  filteredCategories: ReferentialItem[] = [];
+  // Contrôle séparé du form group : porte le texte tapé/affiché, pas le code
+  readonly categorieSearchControl = new FormControl<string>('', { nonNullable: true });
 
   readonly fluxId = computed(() => {
     const id = this.route.snapshot.paramMap.get('id');
@@ -128,15 +140,34 @@ export class FluxForm implements OnInit {
     this.isLoading = true;
     this.loadErrorMessage = '';
 
+    // Préfiltre catégorie : à chaque changement de type (utilisateur), on
+    // recharge les catégories autorisées et on vide la catégorie si elle
+    // n'est plus cohérente. En mode édition, ce rechargement est déclenché
+    // manuellement depuis loadFlux() sans ce comportement de vidage (voir
+    // applyCategoriesForType).
+    this.form.get('type')!.valueChanges.subscribe((type) => {
+      this.applyCategoriesForType(type, true);
+    });
+
+    // Filtrage texte de l'autocomplete catégorie au fur et à mesure de la saisie
+    this.categorieSearchControl.valueChanges.subscribe((value) => {
+      if (typeof value === 'string') {
+        this.updateFilteredCategories(value);
+        this.cdr.detectChanges();
+      }
+    });
+
     this.fluxApi.getReferentials().subscribe({
       next: (referentials) => {
-        this.fluxTypes = referentials.types;
-        this.fluxCategories = referentials.categories;
-        this.paymentModes = referentials.paymentModes;
-        this.occurrences = referentials.occurrences ?? [];
-        this.statutsJustificatif = referentials.statutJustificatifs ?? [];
-        this.qualificationsPressenties = referentials.qualificationPressenties ?? [];
-        this.statutsTraitement = referentials.statutTraitements ?? [];
+        this.fluxTypes = this.sortByLabel(referentials.types);
+        this.allCategories = referentials.categories;
+        this.fluxCategories = this.sortByLabel(referentials.categories);
+        this.updateFilteredCategories(this.categorieSearchControl.value);
+        this.paymentModes = this.sortByLabel(referentials.paymentModes);
+        this.occurrences = this.sortByLabel(referentials.occurrences ?? []);
+        this.statutsJustificatif = this.sortByLabel(referentials.statutJustificatifs ?? []);
+        this.qualificationsPressenties = this.sortByLabel(referentials.qualificationPressenties ?? []);
+        this.statutsTraitement = this.sortByLabel(referentials.statutTraitements ?? []);
         this.biensLoading = true;
         this.exercicesLoading = true;
         this.exerciceApi.getAll().subscribe({
@@ -204,6 +235,77 @@ export class FluxForm implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  private sortByLabel<T extends { label: string }>(items: T[]): T[] {
+    return [...items].sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+  }
+
+  // Recharge les catégories autorisées pour le typeFlux donné.
+  // isUserChange=true (sélection en direct par l'utilisateur) : si la
+  // catégorie actuellement choisie n'est plus autorisée, elle est vidée.
+  // isUserChange=false (chargement initial d'un flux existant) : on ne vide
+  // jamais une catégorie déjà validée côté backend ; si elle n'apparaît pas
+  // dans le préfiltre (catégorie legacy), on l'ajoute à la liste affichée.
+  private applyCategoriesForType(type: string | null, isUserChange: boolean): void {
+    this.fluxApi.getCategoriesByType(type || undefined).subscribe({
+      next: (categories) => {
+        let list = categories;
+        const currentCode = this.form.get('categorie')?.value;
+        const stillValid = !!currentCode && list.some((c) => c.code === currentCode);
+
+        if (currentCode && !stillValid) {
+          if (isUserChange) {
+            this.form.get('categorie')!.setValue(null);
+          } else {
+            const legacy = this.allCategories.find((c) => c.code === currentCode);
+            if (legacy) {
+              list = [...list, legacy];
+            }
+          }
+        }
+
+        this.fluxCategories = this.sortByLabel(list);
+        this.syncCategorieDisplay();
+        this.updateFilteredCategories(this.categorieSearchControl.value);
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private updateFilteredCategories(searchText: string): void {
+    const term = (searchText ?? '').trim().toLowerCase();
+    this.filteredCategories = term ? this.fluxCategories.filter((c) => c.label.toLowerCase().includes(term)) : this.fluxCategories;
+  }
+
+  private getCategorieLabel(code: string | null | undefined): string | null {
+    if (!code) return null;
+    return (this.fluxCategories.find((c) => c.code === code) ?? this.allCategories.find((c) => c.code === code))?.label ?? null;
+  }
+
+  private syncCategorieDisplay(): void {
+    const code = this.form.get('categorie')?.value;
+    this.categorieSearchControl.setValue(this.getCategorieLabel(code) ?? '', { emitEvent: false });
+  }
+
+  onCategorieSelected(event: MatAutocompleteSelectedEvent): void {
+    const code = event.option.value as string;
+    this.form.get('categorie')!.setValue(code);
+    this.form.get('categorie')!.markAsTouched();
+    this.clearServerError('categorie');
+    this.categorieSearchControl.setValue(event.option.viewValue, { emitEvent: false });
+  }
+
+  onCategorieBlur(): void {
+    this.form.get('categorie')!.markAsTouched();
+    this.syncCategorieDisplay();
+    this.updateFilteredCategories(this.categorieSearchControl.value);
+  }
+
+  onDateEnterKey(event: Event): void {
+    // Empêche la touche Entrée de soumettre le formulaire pendant la saisie
+    // manuelle d'une date ; elle valide/ferme simplement le champ.
+    event.preventDefault();
   }
 
   hasError(controlName: string, errorCode: string): boolean {
@@ -381,27 +483,34 @@ export class FluxForm implements OnInit {
   private loadFlux(id: number): void {
     this.fluxApi.getById(id).subscribe({
       next: (flux) => {
-        this.form.patchValue({
-          date: this.parseApiDate(flux.date),
-          type: flux.type,
-          libelle: flux.libelle,
-          montant: flux.montant,
-          categorie: flux.categorie,
-          modePaiement: flux.modePaiement,
-          commentaire: flux.commentaire ?? '',
-          dateValeur: this.parseApiDate(flux.dateValeur),
-          occurrence: flux.occurrence,
-          statutJustificatif: flux.statutJustificatif,
-          qualificationPressentie: flux.qualificationPressentie,
-          statutTraitement: flux.statutTraitement,
-          bienId: flux.bienId,
-          exerciceId: flux.exerciceId,
-          mobilierId: flux.mobilierId ?? null,
-          empruntId: flux.empruntId ?? null,
-          travauxId: flux.travauxId ?? null,
-        });
+        // emitEvent:false — évite que le patch de "type" ne déclenche le
+        // rechargement/vidage de catégorie destiné aux changements en direct
+        // par l'utilisateur (voir applyCategoriesForType appelé juste après).
+        this.form.patchValue(
+          {
+            date: this.parseApiDate(flux.date),
+            type: flux.type,
+            libelle: flux.libelle,
+            montant: flux.montant,
+            categorie: flux.categorie,
+            modePaiement: flux.modePaiement,
+            commentaire: flux.commentaire ?? '',
+            dateValeur: this.parseApiDate(flux.dateValeur),
+            occurrence: flux.occurrence,
+            statutJustificatif: flux.statutJustificatif,
+            qualificationPressentie: flux.qualificationPressentie,
+            statutTraitement: flux.statutTraitement,
+            bienId: flux.bienId,
+            exerciceId: flux.exerciceId,
+            mobilierId: flux.mobilierId ?? null,
+            empruntId: flux.empruntId ?? null,
+            travauxId: flux.travauxId ?? null,
+          },
+          { emitEvent: false },
+        );
 
         this.linkedJustificatifId = flux.justificatifId ?? null;
+        this.applyCategoriesForType(flux.type, false);
 
         this.isLoading = false;
         this.cdr.detectChanges();

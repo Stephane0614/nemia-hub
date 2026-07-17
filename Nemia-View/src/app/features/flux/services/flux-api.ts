@@ -7,6 +7,7 @@ import { FluxResponse } from '../models/flux-response';
 import { FluxPageResponse } from '../models/flux-page-response';
 import { FluxReferentialsResponse } from '../models/flux-referentials-response';
 import { FluxFilters } from '../models/flux-filters';
+import { ReferentialItem } from '../models/referential-item';
 
 @Injectable({ providedIn: 'root' })
 export class FluxApi {
@@ -71,5 +72,13 @@ export class FluxApi {
 
   getReferentials(): Observable<FluxReferentialsResponse> {
     return this.http.get<FluxReferentialsResponse>(`${this.baseUrl}/referentials`);
+  }
+
+  getCategoriesByType(typeFlux?: string | null): Observable<ReferentialItem[]> {
+    let params = new HttpParams();
+    if (typeFlux) {
+      params = params.set('typeFlux', typeFlux);
+    }
+    return this.http.get<ReferentialItem[]>(`${this.baseUrl}/referentials/categories`, { params });
   }
 }

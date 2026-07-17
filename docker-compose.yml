@@ -27,6 +27,7 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       NEMIA_ADMIN_PASSWORD: ${NEMIA_ADMIN_PASSWORD}
       NEMIA_EMILIE_PASSWORD: ${NEMIA_EMILIE_PASSWORD}
+      UPLOAD_DIR: /app/uploads
     volumes:
       - ./uploads:/app/uploads
     restart: unless-stopped

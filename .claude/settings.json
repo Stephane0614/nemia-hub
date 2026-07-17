@@ -3,7 +3,14 @@
     "allow": [
       "Bash(npx ng *)",
       "Bash(curl -s -o /dev/null -w \"backend:%{http_code}\\\\n\" http://localhost:8080/api/flux/referentials)",
-      "Bash(curl -s -o /dev/null -w \"frontend:%{http_code}\\\\n\" http://localhost:4200)"
+      "Bash(curl -s -o /dev/null -w \"frontend:%{http_code}\\\\n\" http://localhost:4200)",
+      "Bash(./mvnw.cmd -q compile)",
+      "Bash(./mvnw.cmd test *)",
+      "Bash(curl -s \"http://localhost:8080/api/flux/referentials/categories?typeFlux=RECETTE\")",
+      "Bash(curl -s \"http://localhost:8080/api/flux/referentials/categories\")",
+      "Bash(curl -s -o /tmp/resp.txt -w \"HTTP %{http_code}\\\\n\" \"http://localhost:8080/api/flux/referentials/categories?typeFlux=RECETTE\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" \"http://localhost:8080/api/flux/referentials\")"
     ]
   }
 }

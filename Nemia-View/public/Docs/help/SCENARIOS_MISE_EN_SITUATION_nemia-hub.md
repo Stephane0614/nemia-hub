@@ -45,7 +45,7 @@ Avant de commencer les scénarios, assure-toi d'avoir :
 | Exercice | 2026 | L'exercice en cours |
 | Récurrent / Ponctuel | RECURRENT | Le loyer revient chaque mois |
 | Statut justificatif | FOURNI | Tu as le relevé bancaire |
-| Qualification | CHARGE_COURANTE | Une recette — pas d'immobilisation |
+| Qualification | NON_APPLICABLE | Une recette n'a pas de qualification comptable de charge/immobilisation |
 | Statut traitement | QUALIFIE | Rien d'ambigu ici |
 
 **Justificatif :** crée un justificatif de type RELEVE, statut FOURNI.

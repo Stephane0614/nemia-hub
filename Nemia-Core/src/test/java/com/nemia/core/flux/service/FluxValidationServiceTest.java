@@ -172,4 +172,129 @@ class FluxValidationServiceTest {
     );
     assertThat(warnings).isEmpty();
   }
+
+  // -------------------------------------------------------------------------
+  // Warnings — W9 à W14 (mission #41)
+  // -------------------------------------------------------------------------
+
+  @Test
+  void shouldWarnW9WhenChargeCouranteWithRecetteCategory() {
+    List<String> warnings = service.computeWarnings(
+      FluxType.RECETTE,
+      FluxCategory.LOYER,
+      QualificationPressentie.CHARGE_COURANTE,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).anyMatch(w -> w.contains("recette") && w.contains("charge courante"));
+  }
+
+  @Test
+  void shouldWarnW10WhenChargeCouranteWithMouvementFinancierCategoryOnOtherType() {
+    // REGULARISATION n'est pas bloqué par validateBlocking pour ces catégories
+    List<String> warnings = service.computeWarnings(
+      FluxType.REGULARISATION,
+      FluxCategory.APPORT,
+      QualificationPressentie.CHARGE_COURANTE,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).anyMatch(w -> w.contains("mouvement financier") && w.contains("charge courante"));
+  }
+
+  @Test
+  void shouldNotDuplicateW10WhenTypeIsMouvementFinancier() {
+    // Déjà couvert par W8 pour ce type — W10 ne doit pas se déclencher en plus
+    List<String> warnings = service.computeWarnings(
+      FluxType.MOUVEMENT_FINANCIER,
+      FluxCategory.APPORT,
+      QualificationPressentie.CHARGE_COURANTE,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).hasSize(1);
+    assertThat(warnings).anyMatch(w -> w.contains("Qualification inhabituelle pour un mouvement financier"));
+  }
+
+  @Test
+  void shouldWarnW11WhenImmobilisationWithRecetteCategory() {
+    List<String> warnings = service.computeWarnings(
+      FluxType.RECETTE,
+      FluxCategory.LOYER,
+      QualificationPressentie.IMMOBILISATION,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).anyMatch(w -> w.contains("recette") && w.contains("immobilisation"));
+  }
+
+  @Test
+  void shouldNotDuplicateW1AndW12ForImmobilisationOnChargeCouranteManifeste() {
+    // W1 couvre déjà ce cas — W12 volontairement non implémenté pour éviter le doublon
+    List<String> warnings = service.computeWarnings(
+      FluxType.DEPENSE,
+      FluxCategory.ELECTRICITE,
+      QualificationPressentie.IMMOBILISATION,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).hasSize(1);
+  }
+
+  @Test
+  void shouldWarnW13WhenHorsResultatWithExploitationCategory() {
+    List<String> warnings = service.computeWarnings(
+      FluxType.DEPENSE,
+      FluxCategory.ELECTRICITE,
+      QualificationPressentie.HORS_RESULTAT,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).anyMatch(w -> w.contains("impact sur le résultat"));
+  }
+
+  @Test
+  void shouldWarnW14WhenNonApplicableWithDepenseCategory() {
+    List<String> warnings = service.computeWarnings(
+      FluxType.DEPENSE,
+      FluxCategory.ELECTRICITE,
+      QualificationPressentie.NON_APPLICABLE,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).anyMatch(w -> w.contains("qualification comptable pressentie"));
+  }
+
+  @Test
+  void shouldNotWarnW14ForRecetteCategory() {
+    List<String> warnings = service.computeWarnings(
+      FluxType.RECETTE,
+      FluxCategory.LOYER,
+      QualificationPressentie.NON_APPLICABLE,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).noneMatch(w -> w.contains("qualification comptable pressentie"));
+  }
+
+  @Test
+  void shouldNotWarnW14ForMouvementCategory() {
+    List<String> warnings = service.computeWarnings(
+      FluxType.MOUVEMENT_FINANCIER,
+      FluxCategory.APPORT,
+      QualificationPressentie.NON_APPLICABLE,
+      null,
+      null,
+      null
+    );
+    assertThat(warnings).noneMatch(w -> w.contains("qualification comptable pressentie"));
+  }
 }
