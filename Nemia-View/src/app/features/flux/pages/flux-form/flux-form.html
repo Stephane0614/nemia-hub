@@ -41,11 +41,19 @@
     <div class="form-grid">
       <mat-form-field appearance="outline">
         <mat-label>Date</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="date" (dateInput)="clearServerError('date')" />
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="date"
+          (dateInput)="clearServerError('date')"
+          (keydown.enter)="onDateEnterKey($event)"
+        />
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
         @if (hasError('date', 'required')) {
         <mat-error>La date est obligatoire.</mat-error>
+        } @if (hasError('date', 'matDatepickerParse')) {
+        <mat-error>Date invalide. Utilisez le format jj/mm/aaaa.</mat-error>
         } @if (getServerError('date'); as error) {
         <mat-error>{{ error }}</mat-error>
         }
@@ -92,12 +100,21 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Catégorie</mat-label>
-        <mat-select formControlName="categorie" (selectionChange)="clearServerError('categorie')">
-          <mat-option value="">Sélectionner une catégorie</mat-option>
-          @for (item of fluxCategories; track item.code) {
+        <input
+          matInput
+          type="text"
+          [formControl]="categorieSearchControl"
+          [matAutocomplete]="categorieAuto"
+          (blur)="onCategorieBlur()"
+          placeholder="Rechercher une catégorie..."
+        />
+        <mat-autocomplete #categorieAuto="matAutocomplete" (optionSelected)="onCategorieSelected($event)">
+          @for (item of filteredCategories; track item.code) {
           <mat-option [value]="item.code">{{ item.label }}</mat-option>
+          } @if (filteredCategories.length === 0) {
+          <mat-option disabled>Aucune catégorie ne correspond</mat-option>
           }
-        </mat-select>
+        </mat-autocomplete>
         @if (hasError('categorie', 'required')) {
         <mat-error>La catégorie est obligatoire.</mat-error>
         } @if (getServerError('categorie'); as error) {
@@ -139,10 +156,18 @@
     <div class="form-grid">
       <mat-form-field appearance="outline">
         <mat-label>Date de valeur</mat-label>
-        <input matInput [matDatepicker]="pickerValeur" formControlName="dateValeur" />
+        <input
+          matInput
+          [matDatepicker]="pickerValeur"
+          formControlName="dateValeur"
+          (keydown.enter)="onDateEnterKey($event)"
+        />
         <mat-datepicker-toggle matIconSuffix [for]="pickerValeur"></mat-datepicker-toggle>
         <mat-datepicker #pickerValeur></mat-datepicker>
         <mat-hint>Date réelle d'encaissement / décaissement</mat-hint>
+        @if (hasError('dateValeur', 'matDatepickerParse')) {
+        <mat-error>Date invalide. Utilisez le format jj/mm/aaaa.</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline">

@@ -122,6 +122,32 @@ public class FluxValidationService {
     FluxCategory.COPROPRIETE
   );
 
+  // Catégories "mouvement financier" au sens large — pour W10 (inclut
+  // EMPRUNT_CAPITAL, contrairement à CATEGORIES_MOUVEMENT qui ne contient
+  // que APPORT/RETRAIT/VIREMENT_INTERNE)
+  private static final Set<FluxCategory> CATEGORIES_MOUVEMENT_FINANCIER_ELARGI = EnumSet.of(
+    FluxCategory.EMPRUNT_CAPITAL,
+    FluxCategory.APPORT,
+    FluxCategory.RETRAIT,
+    FluxCategory.VIREMENT_INTERNE
+  );
+
+  // Catégories d'exploitation courante — pour W13 (mélange volontaire de
+  // charges courantes, travaux/mobilier et LOYER, cf. règle 8 de la matrice)
+  private static final Set<FluxCategory> CATEGORIES_EXPLOITATION_COURANTE = EnumSet.of(
+    FluxCategory.ELECTRICITE,
+    FluxCategory.EAU,
+    FluxCategory.INTERNET,
+    FluxCategory.ASSURANCE,
+    FluxCategory.TAXE,
+    FluxCategory.COPROPRIETE,
+    FluxCategory.HONORAIRES,
+    FluxCategory.ENTRETIEN_COURANT,
+    FluxCategory.TRAVAUX,
+    FluxCategory.MOBILIER,
+    FluxCategory.LOYER
+  );
+
   // -------------------------------------------------------------------------
   // Validation bloquante
   // -------------------------------------------------------------------------
@@ -195,6 +221,48 @@ public class FluxValidationService {
       (qualification == QualificationPressentie.CHARGE_COURANTE || qualification == QualificationPressentie.IMMOBILISATION)
     ) {
       warnings.add("Qualification inhabituelle pour un mouvement financier");
+    }
+
+    // W9 — CHARGE_COURANTE + catégorie de recette
+    if (qualification == QualificationPressentie.CHARGE_COURANTE && CATEGORIES_RECETTE.contains(categorie)) {
+      warnings.add("Une recette ne devrait pas être qualifiée en charge courante");
+    }
+
+    // W10 — CHARGE_COURANTE + catégorie mouvement financier (au sens large)
+    // Guard type != MOUVEMENT_FINANCIER : ce cas est déjà couvert par W8,
+    // qui porte le même signal pour ce type. W10 reste utile pour les cas où
+    // ces catégories apparaissent sous un autre type (ex. REGULARISATION).
+    if (
+      qualification == QualificationPressentie.CHARGE_COURANTE &&
+      CATEGORIES_MOUVEMENT_FINANCIER_ELARGI.contains(categorie) &&
+      type != FluxType.MOUVEMENT_FINANCIER
+    ) {
+      warnings.add("Un mouvement financier ne devrait pas être qualifié en charge courante");
+    }
+
+    // W11 — IMMOBILISATION + catégorie de recette
+    if (qualification == QualificationPressentie.IMMOBILISATION && CATEGORIES_RECETTE.contains(categorie)) {
+      warnings.add("Une recette ne devrait pas être qualifiée en immobilisation");
+    }
+
+    // W12 — IMMOBILISATION + catégorie manifestement courante : volontairement
+    // non implémenté. CATEGORIES_CHARGE_COURANTE_MANIFESTE (W1) est un
+    // sur-ensemble strict du sous-groupe demandé pour W12 ; W1 se déclenche
+    // donc déjà systématiquement pour ce cas. L'ajouter dupliquerait le
+    // message pour chaque flux concerné.
+
+    // W13 — HORS_RESULTAT + catégorie d'exploitation courante
+    if (qualification == QualificationPressentie.HORS_RESULTAT && CATEGORIES_EXPLOITATION_COURANTE.contains(categorie)) {
+      warnings.add("Cette catégorie a normalement un impact sur le résultat");
+    }
+
+    // W14 — NON_APPLICABLE + catégorie de dépense (hors recette et mouvement)
+    if (
+      qualification == QualificationPressentie.NON_APPLICABLE &&
+      !CATEGORIES_RECETTE.contains(categorie) &&
+      !CATEGORIES_MOUVEMENT.contains(categorie)
+    ) {
+      warnings.add("Une dépense devrait avoir une qualification comptable pressentie");
     }
 
     return warnings;
